@@ -212,6 +212,31 @@
                     color: var(--app-primary);
                 }
 
+        .app-sidebar-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .app-sidebar-chevron {
+            font-size: .7rem !important;
+            width: auto !important;
+            transition: transform .15s ease;
+        }
+
+            .app-sidebar-toggle.collapsed .app-sidebar-chevron {
+                transform: rotate(-90deg);
+            }
+
+        .app-sidebar-submenu {
+            display: none;
+            padding-left: 1.1rem;
+            margin-top: .2rem;
+        }
+
+            .app-sidebar-submenu.open {
+                display: flex;
+            }
+
         .app-sidebar-overlay {
             display: none;
             position: fixed;
@@ -258,6 +283,7 @@
             (string.Equals(currentController, c, System.StringComparison.OrdinalIgnoreCase)
                 && string.Equals(currentAction, a, System.StringComparison.OrdinalIgnoreCase)
                 ? " active" : "");
+        bool isCarSectionActive = string.Equals(currentController, "Capa", System.StringComparison.OrdinalIgnoreCase);
 
         <nav class="app-navbar navbar-dark">
             <div class="app-navbar-inner">
@@ -285,17 +311,29 @@
         <div class="app-shell">
             <div class="app-sidebar-overlay" id="sidebarOverlay"></div>
             <aside class="app-sidebar" id="appSidebar">
-                <div class="app-sidebar-section">Store Management</div>
+                <div class="app-sidebar-section">
+                    Store Management
+                </div>
                 <ul class="app-sidebar-nav">
                     <li class="nav-item">
-                        <a class="@navClass("Capa", "CapaList")" href="@Url.Action("CapaList", "Capa")"><i class="bi bi-clipboard-data"></i>Dashboard</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="@navClass("Capa", "Quality")" href="@Url.Action("Quality", "Capa")"><i class="bi bi-file-earmark-plus"></i>CAR Report Form</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="@navClass("Store", "Index")" href="@Url.Action("Index", "Store")"><i class="bi bi-shop"></i>Store List</a>
+                    </li>
+                </ul>
+
+                <ul class="app-sidebar-nav mt-3">
+                    <li class="nav-item">
+                        <a class="app-sidebar-link app-sidebar-toggle@(isCarSectionActive ? "" : " collapsed")" href="#" id="carSubmenuToggle" onclick="toggleCarSubmenu(event)" aria-expanded="@(isCarSectionActive ? "false" : "true")" aria-controls="carSubmenu">
+                            <i class="bi bi-folder2-open"></i>CAR
+                            <i class="bi bi-chevron-down app-sidebar-chevron ms-auto"></i>
+                        </a>
+                        <ul class="app-sidebar-nav app-sidebar-submenu@(isCarSectionActive ? " open" : "")" id="carSubmenu">
+                            <li class="nav-item">
+                                <a class="@navClass("Capa", "CapaList")" href="@Url.Action("CapaList", "Capa")"><i class="bi bi-clipboard-data"></i>Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Capa", "Quality")" href="@Url.Action("Quality", "Capa")"><i class="bi bi-file-earmark-plus"></i>CAR Report Form</a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </aside>
@@ -335,6 +373,15 @@
                     overlay.addEventListener('click', closeSidebar);
                 }
             })();
+
+            function toggleCarSubmenu(event) {
+                event.preventDefault();
+                var toggle = document.getElementById('carSubmenuToggle');
+                var submenu = document.getElementById('carSubmenu');
+                var isOpen = submenu.classList.toggle('open');
+                toggle.classList.toggle('collapsed', !isOpen);
+                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
         </script>
     }
     @if (!User.Identity.IsAuthenticated)
