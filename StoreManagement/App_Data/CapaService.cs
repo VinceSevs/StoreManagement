@@ -86,118 +86,19 @@ namespace IsseERP.Services
 
         public async Task<bool> InsertCapaReport(CapaReportModel model)
         {
-            string responseToken = Guid.NewGuid().ToString("N");
+            var json = JsonConvert.SerializeObject(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            const string hdrQuery = @"
-                INSERT INTO dbo.tbl_QualityIncidentHdr
-                (ResponseToken, IssuedBy, ReportNumber, IssuedToDepartment, SiteWarehouse, RefNo, CorrectionDueDate, ReportDueDate, Status,
-                 NonconformanceType, ExternalAuditSubType, CarClassificationType, CarClassificationRefId, CarClassificationRefName, CarClassificationRefEmail, CarClassificationOtherText,
-                 ImmediateAction, IaPerson, IaTargetDate, IaVerifiedBy, IaVerifiedDate,
-                 RootCause, CapaActions, CapaPerson, CapaTargetDate, CapaVerifiedBy, CapaVerifiedDate,
-                 VerificationNotes, EffEffective, EffNotEffective, EffRemarks, VerifiedBy, VerifiedDate, ApprovedBy, ApprovedDate,
-                 StockEventID, DateCreated)
-                OUTPUT INSERTED.EventID
-                VALUES
-                (@ResponseToken, @IssuedBy, @ReportNumber, @IssuedToDepartment, @SiteWarehouse, @RefNo, @CorrectionDueDate, @ReportDueDate, @Status,
-                 @NonconformanceType, @ExternalAuditSubType, @CarClassificationType, @CarClassificationRefId, @CarClassificationRefName, @CarClassificationRefEmail, @CarClassificationOtherText,
-                 @ImmediateAction, @IaPerson, @IaTargetDate, @IaVerifiedBy, @IaVerifiedDate,
-                 @RootCause, @CapaActions, @CapaPerson, @CapaTargetDate, @CapaVerifiedBy, @CapaVerifiedDate,
-                 @VerificationNotes, @EffEffective, @EffNotEffective, @EffRemarks, @VerifiedBy, @VerifiedDate, @ApprovedBy, @ApprovedDate,
-                 @StockEventID, SYSDATETIME())
-            ";
+            var response = await _httpClient.PostAsync("api/capa/insert", content);
 
-            const string dtlQuery = @"
-                INSERT INTO dbo.tbl_QualityIncidentDtl
-                (EventID, LineNumber, ItemID, Quantity, UOMID, DefectCategoryID, UsedToDate, Remarks, Hauler, AdjustmentQty, AdjustmentBy, AdjustmentDate)
-                VALUES
-                (@EventID, @LineNumber, @ItemID, @Quantity, @UOMID, @DefectCategoryID, @UsedToDate, @Remarks, @Hauler, @AdjustmentQty, @AdjustmentBy, @AdjustmentDate)
-            ";
-
-            var items = (model.Items != null && model.Items.Count > 0)
-                ? model.Items
-                : new List<CapaItemModel> { new CapaItemModel { LineNumber = 1 } };
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            if (!response.IsSuccessStatusCode)
             {
-                await conn.OpenAsync();
-                using (SqlTransaction tx = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        int eventId;
-                        using (SqlCommand cmd = new SqlCommand(hdrQuery, conn, tx))
-                        {
-                            AddHdrParameters(cmd, model, responseToken);
-                            eventId = (int)await cmd.ExecuteScalarAsync();
-                        }
-
-                        foreach (var item in items)
-                        {
-                            using (SqlCommand cmd = new SqlCommand(dtlQuery, conn, tx))
-                            {
-                                AddDtlParameters(cmd, eventId, item);
-                                await cmd.ExecuteNonQueryAsync();
-                            }
-                        }
-
-                        tx.Commit();
-
-                        try
-                        {
-                            model.ResponseToken = responseToken;
-                            var json = JsonConvert.SerializeObject(model);
-                            var content = new StringContent(json, Encoding.UTF8, "application/json");
-                            await _httpClient.PostAsync("api/capa/respond-again", content);
-                        }
-                        catch
-                        {
-                            // Swallow — the filing itself already succeeded.
-                        }
-
-                        return true;
-                    }
-                    catch
-                    {
-                        tx.Rollback();
-                        return false;
-                    }
-                }
+                string body = await response.Content.ReadAsStringAsync();
+                throw new Exception($"api/capa/insert returned {(int)response.StatusCode} {response.StatusCode}: {body}");
             }
+
+            return true;
         }
-
-        //public async Task<bool> LoopCapaReport(CapaReportModel model)
-        //{
-        //    try
-        //    {
-        //        var json = JsonConvert.SerializeObject(model);
-        //        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //        var response = await _httpClient.PostAsync("api/capa/respond-again", content);
-
-        //        return response.IsSuccessStatusCode;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-        //}
-
-        //public async Task<bool> InsertCapaReport(CapaReportModel model)
-        //{
-        //    try
-        //    {
-        //        var json = JsonConvert.SerializeObject(model);
-        //        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //        var response = await _httpClient.PostAsync("api/capa/insert", content);
-
-        //        return response.IsSuccessStatusCode;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-        //}
 
         public async Task<List<CapaReportModel>> GetAllCapaReports()
         {
