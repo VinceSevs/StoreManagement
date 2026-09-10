@@ -1,0 +1,136 @@
+/* ---------- LEAD Logistics shared design system ----------
+   Design tokens extracted from the CAPA pages (Quality, CapaList,
+   CapaResponse, CapaStatus) so the rest of the app matches. */
+:root {
+    --lead-primary: #7d1f27;
+    --lead-primary-dark: #5e161f;
+    --lead-primary-light: #f4e2e0;
+    --lead-border: #e8dcda;
+    --lead-bg: #f1e9e7;
+    --lead-text: #241316;
+    --lead-text-muted: #8f7d7b;
+}
+
+body {
+    background: var(--lead-bg);
+    font-family: 'Inter', Arial, sans-serif;
+    color: var(--lead-text);
+}
+
+h1, h2, h3, h4, h5, .brand-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+}
+
+.font-mono {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+a {
+    color: var(--lead-primary);
+}
+
+    a:hover {
+        color: var(--lead-primary-dark);
+    }
+
+.card {
+    border-color: var(--lead-border);
+    border-radius: 14px;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--lead-primary);
+    --bs-btn-border-color: var(--lead-primary);
+    --bs-btn-hover-bg: var(--lead-primary-dark);
+    --bs-btn-hover-border-color: var(--lead-primary-dark);
+    --bs-btn-active-bg: var(--lead-primary-dark);
+    --bs-btn-active-border-color: var(--lead-primary-dark);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--lead-primary);
+    --bs-btn-border-color: var(--lead-primary);
+    --bs-btn-hover-bg: var(--lead-primary);
+    --bs-btn-hover-border-color: var(--lead-primary);
+    --bs-btn-active-bg: var(--lead-primary);
+    --bs-btn-active-border-color: var(--lead-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--lead-primary);
+    box-shadow: 0 0 0 3px rgba(125,31,39,.1);
+}
+
+/* ---------- Page header (eyebrow + icon + title), matches CAPA pages ---------- */
+.lead-page-header {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--lead-border);
+}
+
+.lead-page-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--lead-primary-light);
+    color: var(--lead-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex: none;
+}
+
+.lead-eyebrow {
+    text-transform: uppercase;
+    font-size: .7rem;
+    letter-spacing: .08em;
+    color: var(--lead-primary);
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.lead-page-header h1 {
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+/* ---------- Themed table, matches CapaList's .capa-table ---------- */
+.lead-table thead th {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--lead-text-muted);
+    font-weight: 700;
+    border-bottom: 1px solid var(--lead-border);
+    background: #fbf6f5;
+    white-space: nowrap;
+    padding: 10px 14px;
+}
+
+.lead-table td {
+    vertical-align: middle;
+    padding: 12px 14px;
+}
+
+.lead-table tbody tr:hover {
+    background-color: #fbf6f5;
+}
+
+/* ---------- Pill search input, matches CapaList's .capa-search ---------- */
+.lead-search {
+    border: 1.5px solid var(--lead-border);
+    border-radius: 999px;
+    padding: 8px 16px;
+}
+
+    .lead-search:focus {
+        outline: none;
+        border-color: var(--lead-primary);
+        box-shadow: 0 0 0 3px rgba(125,31,39,.1);
+    }

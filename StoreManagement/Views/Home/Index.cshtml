@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<main>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="lead-page-header">
+            <div class="lead-page-icon"><i class="bi bi-house-door"></i></div>
+            <div>
+                <div class="lead-eyebrow">Welcome</div>
+                <h1>ASP.NET</h1>
+            </div>
+        </div>
+
+        <section class="card shadow-sm p-4 mb-4" aria-labelledby="aspnetTitle">
+            <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+            <p class="mb-0"><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
+        </section>
+
+        <div class="row g-3">
+            <section class="col-md-4" aria-labelledby="gettingStartedTitle">
+                <div class="card shadow-sm p-3 h-100">
+                    <h2 id="gettingStartedTitle" class="h5">Getting started</h2>
+                    <p class="text-secondary">
+                        ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+                        enables a clean separation of concerns and gives you full control over markup
+                        for enjoyable, agile development.
+                    </p>
+                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+                </div>
+            </section>
+            <section class="col-md-4" aria-labelledby="librariesTitle">
+                <div class="card shadow-sm p-3 h-100">
+                    <h2 id="librariesTitle" class="h5">Get more libraries</h2>
+                    <p class="text-secondary">NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+                </div>
+            </section>
+            <section class="col-md-4" aria-labelledby="hostingTitle">
+                <div class="card shadow-sm p-3 h-100">
+                    <h2 id="hostingTitle" class="h5">Web Hosting</h2>
+                    <p class="text-secondary">You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+                </div>
+            </section>
+        </div>
+    }
+    else
+    {
+        <p>Please log in to view this content.</p>
+    }
+
+</main>

@@ -1,0 +1,22 @@
+@model StoreManagement.Models.Store
+
+<div class="modal-header" style="border-bottom-color:var(--lead-border)">
+    <h5 class="modal-title"><i class="bi bi-shop me-1" style="color:var(--lead-primary)"></i> @Model.StoreName <span class="text-muted">#@Model.StoreNumber</span></h5>
+</div>
+<div class="modal-body">
+    <div class="mb-3">
+        <label class="form-label small text-uppercase text-secondary">City Name</label>
+        <input type="text" value="@Model.CityName" disabled class="form-control" style="background-color:var(--lead-primary-light)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label small text-uppercase text-secondary">State</label>
+        <input type="text" value="@Model.StateName" disabled class="form-control" style="background-color:var(--lead-primary-light)" />
+    </div>
+    <div class="mb-0">
+        <label class="form-label small text-uppercase text-secondary">Coordinates</label>
+        <input type="text" value="@Model.Coordinates" disabled class="form-control font-mono" style="background-color:var(--lead-primary-light)" />
+    </div>
+</div>
+<div class="modal-footer">
+    <button onclick="closeModal()" class="btn btn-secondary">Close</button>
+</div>

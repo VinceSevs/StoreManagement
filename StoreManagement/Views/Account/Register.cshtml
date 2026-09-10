@@ -1,0 +1,39 @@
+@model StoreManagement.Models.RegisterViewModel
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:70vh;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+        <div class="card-header bg-white border-bottom-0 pt-4 text-center">
+            @*<div class="lead-page-icon mx-auto mb-2"><i class="bi bi-person-plus"></i></div>
+            <div class="lead-eyebrow">Store Management</div>*@
+            <h5 class="mb-0">Create an Account</h5>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.Username, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            }
+        </div>
+        <div class="card-footer text-center">
+            @Html.ActionLink("Already have an account? Login", "Login", "Account")
+        </div>
+    </div>
+</div>

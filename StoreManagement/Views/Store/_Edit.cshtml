@@ -1,0 +1,25 @@
+@model StoreManagement.Models.Store
+
+<div class="modal-header" style="border-bottom-color:var(--lead-border)">
+    <h5 class="modal-title"><i class="bi bi-pencil-square me-1" style="color:var(--lead-primary)"></i> Edit @Model.StoreName <span class="text-muted">#@Model.StoreNumber</span></h5>
+</div>
+<form id="editForm">
+    @Html.HiddenFor(m => m.StoreID)
+    @Html.HiddenFor(m => m.StoreNumber)
+    @Html.HiddenFor(m => m.StoreName)
+
+    <div class="modal-body">
+        <div class="mb-3">
+            @Html.LabelFor(m => m.CityID, "City Name", new { @class = "form-label small text-uppercase text-secondary" })
+            @Html.DropDownListFor(m => m.CityID, (SelectList)ViewBag.Cities, new { @class = "form-select" })
+        </div>
+        <div class="mb-0">
+            @Html.LabelFor(m => m.Coordinates, new { @class = "form-label small text-uppercase text-secondary" })
+            @Html.TextBoxFor(m => m.Coordinates, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" onclick="postToModal('@Url.Action("Confirm")', '#editForm')" class="btn btn-primary">Update</button>
+        <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+    </div>
+</form>

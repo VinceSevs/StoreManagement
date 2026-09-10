@@ -1,0 +1,22 @@
+@model StoreManagement.Models.Store
+
+<div class="modal-header" style="border-bottom-color:var(--lead-border)">
+    <h5 class="modal-title"><i class="bi bi-check2-circle me-1" style="color:var(--lead-primary)"></i> Confirm Update</h5>
+</div>
+<div class="modal-body">
+    <p class="mb-1"><strong>@Model.StoreName</strong> <span class="text-muted">#@Model.StoreNumber</span></p>
+    <p class="mb-1">City: <strong>@Model.CityName</strong></p>
+    <p class="mb-0">Coordinates: <strong>@Model.Coordinates</strong></p>
+</div>
+
+<form id="confirmForm" action="@Url.Action("Save")" method="post">
+    @Html.HiddenFor(m => m.StoreID)
+    @Html.HiddenFor(m => m.CityID)
+    @Html.HiddenFor(m => m.CityName)
+    @Html.HiddenFor(m => m.Coordinates)
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Confirm</button>
+        <button type="button" onclick="closeModal()" class="btn btn-secondary">Back</button>
+    </div>
+</form>

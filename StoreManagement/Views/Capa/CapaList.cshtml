@@ -1,0 +1,848 @@
+﻿@model List<IsseERP.Models.CapaReportModel>
+@using System.Linq
+<style>
+    :root {
+        --bs-primary: #7d1f27;
+        --bs-primary-rgb: 125,31,39;
+        --bs-body-font-family: 'Inter', Arial, sans-serif;
+        --bs-body-color: #241316;
+        --bs-border-color: #e8dcda;
+        --status-response: #c07a00;
+        --status-response-bg: #fdf3e2;
+        --status-verify: #2f6690;
+        --status-verify-bg: #e8f1f7;
+        --status-effect: #7d1f27;
+        --status-effect-bg: #f4e2e0;
+        --status-closed: #2f6b46;
+        --status-closed-bg: #e5f0e8;
+        --status-reopened: #b3261e;
+        --status-reopened-bg: #fbe7e6;
+        --status-cancelled: #b3261e;
+        --status-cancelled-bg: #fbe7e6;
+        --status-total: #241316;
+        --status-total-bg: #f7f2f3;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+    }
+
+    .font-mono {
+        font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .brand-logo {
+        height: 46px;
+        width: auto;
+    }
+
+    .has-items-expand {
+        cursor: pointer;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 14px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: all .15s ease;
+        position: relative;
+        overflow: hidden;
+        min-height: 92px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-color, #8f7d7b);
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 6px 18px rgba(36,19,22,.08);
+            transform: translateY(-1px);
+        }
+
+        .stat-card.active {
+            border-color: var(--accent-color, #8f7d7b);
+            background: var(--accent-bg, #fff);
+        }
+
+        .stat-card .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            line-height: 1;
+            color: var(--bs-body-color);
+        }
+
+        .stat-card .stat-label {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #8f7d7b;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+    /* ---------- List / table ---------- */
+    .capa-panel {
+        background: #fff;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .capa-toolbar {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--bs-border-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .capa-search {
+        border: 1.5px solid var(--bs-border-color);
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: .85rem;
+        max-width: 320px;
+        flex: 1 1 240px;
+    }
+
+        .capa-search:focus {
+            outline: none;
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 3px rgba(125,31,39,.1);
+        }
+
+    .capa-count {
+        font-size: .78rem;
+        color: #8f7d7b;
+        white-space: nowrap;
+    }
+
+    .capa-table {
+        margin-bottom: 0;
+    }
+
+        .capa-table thead th {
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #8f7d7b;
+            font-weight: 700;
+            border-bottom: 1px solid var(--bs-border-color);
+            background: #fbf6f5;
+            white-space: nowrap;
+            padding: 10px 14px;
+        }
+
+
+        .capa-table td {
+            vertical-align: middle;
+            font-size: .84rem;
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1e7e5;
+        }
+
+        .capa-table tbody tr {
+            transition: background-color .12s ease;
+            border-left: 3px solid transparent;
+        }
+
+            .capa-table tbody tr:hover {
+                background-color: #fbf6f5;
+            }
+
+            .capa-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+    .capa-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--bs-primary);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .7rem;
+        font-weight: 700;
+        flex: none;
+    }
+
+    .truncate-cell {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px 4px 8px;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex: none;
+        }
+
+    .view-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: .78rem;
+        font-weight: 600;
+        color: var(--bs-primary);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .view-link:hover {
+            color: #4f1015;
+        }
+
+    .empty-state {
+        padding: 56px 20px;
+        text-align: center;
+        color: #8f7d7b;
+    }
+
+        .empty-state .empty-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: .6;
+        }
+
+    /* ---------- Pagination ---------- */
+    #capaPagination {
+        gap: 4px;
+    }
+
+        #capaPagination .page-item .page-link {
+            border: 1px solid var(--bs-border-color);
+            border-radius: 999px;
+            color: #4a3a38;
+            font-size: .8rem;
+            font-weight: 600;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 .55rem;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: none;
+        }
+
+            #capaPagination .page-item .page-link:hover {
+                background: var(--status-effect-bg);
+                border-color: var(--bs-primary);
+                color: var(--bs-primary);
+                transform: translateY(-1px);
+            }
+
+            #capaPagination .page-item .page-link:focus {
+                box-shadow: 0 0 0 3px rgba(125,31,39,.15);
+            }
+
+        #capaPagination .page-item.active .page-link {
+            background: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #fff;
+        }
+
+        #capaPagination .page-item.disabled .page-link {
+            background: #fbf6f5;
+            color: #c9b7b4;
+            border-color: var(--bs-border-color);
+        }
+</style>
+
+@{
+    int totalCount = Model?.Count ?? 0;
+    int awaitingResponseCount = 0;
+    int awaitingVerificationCount = 0;
+    int closedCount = 0;
+    int cancelledCount = 0;
+
+    Func<IsseERP.Models.CapaReportModel, string> computeStatusKey = c =>
+    {
+        if (string.Equals(c.Status, "Cancelled", System.StringComparison.OrdinalIgnoreCase)) return "cancelled";
+        if (string.Equals(c.Status, "Closed", System.StringComparison.OrdinalIgnoreCase)) return "closed";
+
+        bool s2Done = !string.IsNullOrWhiteSpace(c.ImmediateAction);
+        bool s2Verified = !string.IsNullOrWhiteSpace(c.IaVerifiedBy);
+        bool s4Verified = !string.IsNullOrWhiteSpace(c.CapaVerifiedBy);
+
+        if (!s2Done) return "response";
+        if (!s2Verified || !s4Verified) return "verify";
+        return "closed";
+    };
+
+    var itemsByCar = new Dictionary<string, List<object>>();
+
+    if (Model != null)
+    {
+        foreach (var c in Model)
+        {
+            switch (computeStatusKey(c))
+            {
+                case "response": awaitingResponseCount++; break;
+                case "verify": awaitingVerificationCount++; break;
+                case "closed": closedCount++; break;
+                case "cancelled": cancelledCount++;  break;
+            }
+
+            itemsByCar[c.ReportNumber] = (c.Items ?? new List<IsseERP.Models.CapaItemModel>())
+                .Select(i => (object)new
+                {
+                    itemCode = i.ItemCode,
+                    itemDescription = i.ItemDescription,
+                    utd = i.UsedToDate.HasValue ? i.UsedToDate.Value.ToString("MMM dd, yyyy") : "",
+                    uom = i.UOMDisplay,
+                    quantity = i.Quantity,
+                    defectName = i.DefectName
+                })
+                .ToList();
+        }
+    }
+
+    var itemsByCarJson = Newtonsoft.Json.JsonConvert.SerializeObject(itemsByCar);
+            }
+
+<div class="container-fluid my-4">
+
+    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+        <img src="data:image/png;base64,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" class="brand-logo" alt="LEAD Logistics Innovations, Inc.">
+        <div>
+            <div class="text-uppercase small fw-semibold font-mono" style="color:var(--bs-primary);letter-spacing:.08em">Quality Assurance</div>
+            <h1 class="h4 mb-0">CAR Reports</h1>
+        </div>
+    </div>
+
+    <div class="row row-cols-7 row-cols-md-7 g-2 mb-3">
+        <div class="col">
+            <div class="stat-card active" data-status="all" style="--accent-color:var(--status-total);--accent-bg:var(--status-total-bg)">
+                <div class="stat-value">@totalCount</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card" data-status="response" style="--accent-color:var(--status-response);--accent-bg:var(--status-response-bg)">
+                <div class="stat-value">@awaitingResponseCount</div>
+                <div class="stat-label">Awaiting Response</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card" data-status="verify" style="--accent-color:var(--status-verify);--accent-bg:var(--status-verify-bg)">
+                <div class="stat-value">@awaitingVerificationCount</div>
+                <div class="stat-label">Awaiting Verification</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card" data-status="closed" style="--accent-color:var(--status-closed);--accent-bg:var(--status-closed-bg)">
+                <div class="stat-value">@closedCount</div>
+                <div class="stat-label">Closed</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card" data-status="cancelled" style="--accent-color:var(--status-cancelled);--accent-bg:var(--status-cancelled-bg)">
+                <div class="stat-value">@cancelledCount</div>
+                <div class="stat-label">Cancelled</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="capa-panel">
+        <div class="capa-toolbar">
+            <input type="text" id="capaSearch" class="form-control capa-search" placeholder="Search CAR No., issued by">
+            <select id="classificationFilter" class="form-select form-select-sm" style="width:auto;">
+                <option value="">All Classifications</option>
+                <option value="LLII">LLII</option>
+                <option value="Supplier">Supplier</option>
+                <option value="Trucker">Trucker</option>
+                <option value="DCSite">DC Site</option>
+            </select>
+            <div class="d-flex align-items-center gap-1 ms-auto">
+                <label class="small text-secondary mb-0">Created</label>
+                <input type="date" id="exportDateFrom" class="form-control form-control-sm" style="width:150px" title="From date">
+                <span class="small text-secondary">to</span>
+                <input type="date" id="exportDateTo" class="form-control form-control-sm" style="width:150px" title="To date">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="exportExcelBtn" onclick="exportToExcel()">
+                    <i class="bi bi-file-earmark-excel"></i> Export to Excel
+                </button>
+            </div>
+            <span class="capa-count" id="capaCount"></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table capa-table" id="capaTable">
+                <thead>
+                    <tr>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleDateIssuedSort()">
+                            Date Issued <i class="bi bi-arrow-down-up sort-icon" id="dateIssuedSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleCarNoSort()">
+                            Car No. <i class="bi bi-arrow-down-up sort-icon" id="carNoSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleStockMovementSort()">
+                            Stock Movement <i class="bi bi-arrow-down-up sort-icon" id="stockMovementSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleItemCodeSort()">
+                            Item Code <i class="bi bi-arrow-down-up sort-icon" id="itemCodeSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleDescriptionSort()">
+                            Description <i class="bi bi-arrow-down-up sort-icon" id="descriptionSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleUTDSort()">
+                            UTD <i class="bi bi-arrow-down-up sort-icon" id="utdSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleUOMSort()">
+                            UOM <i class="bi bi-arrow-down-up sort-icon" id="uomSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleQuantitySort()">
+                            Quantity <i class="bi bi-arrow-down-up sort-icon" id="quantitySortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleNatureOfDefectSort()">
+                            Nature of Defect <i class="bi bi-arrow-down-up sort-icon" id="natureOfDefectSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleCarClassificationSort()">
+                            Car Classification <i class="bi bi-arrow-down-up sort-icon" id="carClassificationSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th style="cursor:pointer;user-select:none;" onclick="toggleStatusSort()">
+                            Status <i class="bi bi-arrow-down-up sort-icon" id="statusSortIcon" style="font-size:.7rem;"></i>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || Model.Count == 0)
+            {
+                        <tr>
+                            <td colspan="12">
+                                <div class="empty-state">
+                                    <div class="empty-icon">&#128203;</div>
+                                    <div class="fw-semibold">No CAR reports yet</div>
+                                    <div class="small">Filed reports will show up here.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var capa in Model)
+                        {
+                            string statusKey = computeStatusKey(capa);
+        string statusText, dotColor, pillColor, pillBg;
+
+                            switch (statusKey)
+                            {
+                                case "response":
+                                    statusText = "Awaiting Response"; dotColor = "var(--status-response)"; pillColor = "var(--status-response)"; pillBg = "var(--status-response-bg)"; break;
+                                case "verify":
+                                    statusText = "Awaiting Verification"; dotColor = "var(--status-verify)"; pillColor = "var(--status-verify)"; pillBg = "var(--status-verify-bg)"; break;
+                                case "cancelled":
+                                    statusText = "Cancelled"; dotColor = "var(--status-cancelled)"; pillColor = "var(--status-cancelled)"; pillBg = "var(--status-cancelled-bg)"; break;
+                                default:
+                                    statusText = "Closed"; dotColor = "var(--status-closed)"; pillColor = "var(--status-closed)"; pillBg = "var(--status-closed-bg)"; break;
+                            }
+
+    string initials = "?";
+    if (!string.IsNullOrWhiteSpace(capa.IssuedBy))
+    {
+        var parts = capa.IssuedBy.Trim().Split(' ');
+        initials = parts.Length > 1
+            ? ("" + parts[0][0] + parts[parts.Length - 1][0]).ToUpper()
+            : capa.IssuedBy.Trim().Substring(0, Math.Min(2, capa.IssuedBy.Trim().Length)).ToUpper();
+    }
+
+    string allItemsText = capa.Items != null
+        ? string.Join(" ", capa.Items.Select(i => $"{i.ItemDescription} {i.DefectName} {i.DefectCategoryName}"))
+        : "";
+
+    string searchText = $"{capa.ReportNumber} {capa.IssuedBy} {capa.SiteWarehouseName} {capa.CarClassificationType} {capa.CarClassificationRefName} {allItemsText}".ToLower();
+
+    var carItems = capa.Items ?? new List<IsseERP.Models.CapaItemModel>();
+    var firstItem = carItems.Count > 0 ? carItems[0] : null;
+    bool hasMultipleItems = carItems.Count > 1;
+
+                <tr class="@(hasMultipleItems ? "has-items-expand" : "")" data-status="@statusKey" data-classification="@capa.CarClassificationType" data-created="@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("yyyy-MM-dd") : "")" data-due="@(capa.ReportDueDate.HasValue ? capa.ReportDueDate.Value.ToString("yyyy-MM-dd") : "")" data-search="@searchText" data-report-number="@capa.ReportNumber" style="border-left-color:@dotColor" onclick="toggleItemDetails(this, event)">
+                    <td class="font-mono fw-semibold">@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("MMM dd, yyyy") : "")</td>
+                    <td class="font-mono text-secondary">
+                        @if (hasMultipleItems)
+                        {
+                            <i class="bi bi-chevron-right expand-icon" style="font-size:.7rem;"></i>
+                        }
+                        @capa.ReportNumber
+                        @if (hasMultipleItems)
+                        {
+                            <span class="badge bg-secondary fw-normal" title="This CAR has @carItems.Count items — click the row to see them all">+@(carItems.Count - 1) more item@(carItems.Count > 2 ? "s" : "")</span>
+                        }
+                        @if (capa.LoopNumber > 0)
+                        {
+                            <span class="badge bg-warning text-dark" title="Sent back to Awaiting Response @capa.LoopNumber time(s) after failing an effectiveness check">&#x21bb; @capa.LoopNumber</span>
+                        }
+                    </td>
+                    <td class="font-mono text-secondary">@(capa.StockEventID == 2 ? "AUDIT" : capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT")</td>
+                    <td class="font-mono text-secondary">@(firstItem?.ItemCode)</td>
+                    <td class="font-mono text-secondary">@(firstItem?.ItemDescription)</td>
+                    <td class="font-mono text-secondary">@(firstItem?.UsedToDate != null ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
+                    <td class="font-mono text-secondary">@(firstItem?.UOMDisplay)</td>
+                    <td class="font-mono text-secondary">@(firstItem?.Quantity)</td>
+                    <td class="font-mono text-secondary">@(firstItem?.DefectName)</td>
+                    <td class="font-mono text-secondary">@capa.CarClassificationType</td>
+                    <td>
+                        <span class="status-pill" style="color:@pillColor;background:@pillBg">
+                            <span class="dot" style="background:@dotColor"></span>@statusText
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="@Url.Action("CapaStatus", "Capa")?token=@capa.ResponseToken" class="view-link" target="_blank">View &rarr;</a>
+                    </td>
+                </tr>
+                        if (hasMultipleItems)
+                        {
+                <tr class="item-detail-row d-none">
+                    <td colspan="12" class="p-0">
+                        <table class="table table-sm mb-0" style="background:#faf6f5;">
+                            <thead>
+                                <tr>
+                                    <th class="small text-secondary text-uppercase">Item Code</th>
+                                    <th class="small text-secondary text-uppercase">Description</th>
+                                    <th class="small text-secondary text-uppercase">UTD</th>
+                                    <th class="small text-secondary text-uppercase">UOM</th>
+                                    <th class="small text-secondary text-uppercase">Quantity</th>
+                                    <th class="small text-secondary text-uppercase">Nature of Defect</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var carItem in carItems)
+                                {
+                                    <tr>
+                                        <td class="font-mono text-secondary">@carItem.ItemCode</td>
+                                        <td class="font-mono text-secondary">@carItem.ItemDescription</td>
+                                        <td class="font-mono text-secondary">@(carItem.UsedToDate.HasValue ? carItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
+                                        <td class="font-mono text-secondary">@carItem.UOMDisplay</td>
+                                        <td class="font-mono text-secondary">@carItem.Quantity</td>
+                                        <td class="font-mono text-secondary">@carItem.DefectName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                        }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 px-3 py-3 border-top" id="capaPaginationBar" style="border-color:var(--bs-border-color)">
+            <span class="capa-count" id="capaPageInfo"></span>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <ul class="pagination pagination-sm mb-0" id="capaPagination"></ul>
+                <div class="input-group input-group-sm" style="width:150px;">
+                    <input type="number" min="1" class="form-control" id="capaPageJumpInput" placeholder="Page #">
+                    <button class="btn btn-outline-primary" type="button" id="capaPageJumpBtn">Go</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+	const ITEMS_BY_CAR = @Html.Raw(itemsByCarJson);
+	const PAGE_SIZE = 8;
+	let currentStatusFilter = 'all';
+	let currentSearchQuery = '';
+	let currentClassificationFilter = '';
+	let currentPage = 1;
+	let lastMatchingRows = [];
+	let lastTotalPages = 1;
+	let sortState = { column: null, direction: null };
+
+	function sortRowsByColumn(columnIndex, iconId, getValue) {
+		sortState.direction = (sortState.column === columnIndex && sortState.direction === 'asc') ? 'desc' : 'asc';
+		sortState.column = columnIndex;
+
+		const tbody = document.querySelector('#capaTable tbody');
+		const rows = Array.from(tbody.querySelectorAll('tr[data-search]'));
+
+		rows.sort(function (a, b) {
+			const cmp = getValue(a).localeCompare(getValue(b), undefined, { numeric: true, sensitivity: 'base' });
+			return sortState.direction === 'asc' ? cmp : -cmp;
+		});
+
+		rows.forEach(function (row) {
+			const detail = row.nextElementSibling;
+			const hasDetail = detail && detail.classList.contains('item-detail-row');
+			tbody.appendChild(row);
+			if (hasDetail) tbody.appendChild(detail);
+		});
+
+		document.querySelectorAll('.sort-icon').forEach(function (icon) {
+			icon.className = icon.id === iconId
+				? 'bi sort-icon ' + (sortState.direction === 'asc' ? 'bi-sort-up' : 'bi-sort-down')
+				: 'bi bi-arrow-down-up sort-icon';
+		});
+
+		applyFilters();
+	}
+
+	function cellText(columnIndex) {
+		return function (row) { return row.cells[columnIndex].textContent.trim().toLowerCase(); };
+	}
+
+	function toggleItemDetails(rowEl, event) {
+		if (event && event.target.closest('a')) return;
+
+		const detailRow = rowEl.nextElementSibling;
+		if (!detailRow || !detailRow.classList.contains('item-detail-row')) return;
+
+		detailRow.classList.toggle('d-none');
+
+		const icon = rowEl.querySelector('.expand-icon');
+		if (icon) {
+			icon.classList.toggle('bi-chevron-right');
+			icon.classList.toggle('bi-chevron-down');
+		}
+	}
+
+    function toggleDateIssuedSort() {
+        sortRowsByColumn(0, 'dateIssuedSortIcon', function (row) { return row.getAttribute('data-created') || ''; });
+    }
+    function toggleCarNoSort() {
+        sortRowsByColumn(1, 'carNoSortIcon', cellText(1));
+    }
+    function toggleStockMovementSort() {
+        sortRowsByColumn(2, 'stockMovementSortIcon', cellText(2));
+    }
+    function toggleItemCodeSort() {
+        sortRowsByColumn(3, 'itemCodeSortIcon', cellText(3));
+    }
+    function toggleDescriptionSort() {
+        sortRowsByColumn(4, 'descriptionSortIcon', cellText(4));
+    }
+    function toggleUTDSort() {
+        sortRowsByColumn(5, 'utdSortIcon', cellText(5));
+    }
+    function toggleUOMSort() {
+        sortRowsByColumn(6, 'uomSortIcon', cellText(6));
+    }
+    function toggleQuantitySort() {
+        sortRowsByColumn(7, 'quantitySortIcon', cellText(7));
+    }
+    function toggleNatureOfDefectSort() {
+        sortRowsByColumn(8, 'natureOfDefectSortIcon', cellText(8));
+    }
+    function toggleCarClassificationSort() {
+        sortRowsByColumn(9, 'carClassificationSortIcon', cellText(9));
+    }
+    function toggleStatusSort() {
+        sortRowsByColumn(10, 'statusSortIcon', cellText(10));
+    }
+
+	function applyFilters() {
+		currentPage = 1;
+		renderPage();
+	}
+
+	function renderPage() {
+		document.querySelectorAll('#capaTable tbody tr.item-detail-row').forEach(function (row) {
+			row.classList.add('d-none');
+		});
+		document.querySelectorAll('#capaTable tbody .expand-icon').forEach(function (icon) {
+			icon.classList.remove('bi-chevron-down');
+			icon.classList.add('bi-chevron-right');
+		});
+
+		const allRows = Array.from(document.querySelectorAll('#capaTable tbody tr[data-search]'));
+		const matchingRows = allRows.filter(function (row) {
+			const matchesSearch = !currentSearchQuery || (row.getAttribute('data-search') || '').includes(currentSearchQuery);
+			const matchesStatus = currentStatusFilter === 'all' || row.getAttribute('data-status') === currentStatusFilter;
+			const matchesClassification = !currentClassificationFilter || row.getAttribute('data-classification') === currentClassificationFilter;
+			return matchesSearch && matchesStatus && matchesClassification;
+		});
+		lastMatchingRows = matchingRows;
+
+		const totalMatches = matchingRows.length;
+		const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
+		if (currentPage > totalPages) currentPage = totalPages;
+		lastTotalPages = totalPages;
+
+		const startIndex = (currentPage - 1) * PAGE_SIZE;
+		const endIndex = startIndex + PAGE_SIZE;
+
+		allRows.forEach(function (row) { row.style.display = 'none'; });
+		matchingRows.slice(startIndex, endIndex).forEach(function (row) { row.style.display = ''; });
+
+		const infoEl = document.getElementById('capaPageInfo');
+		if (infoEl) {
+			infoEl.textContent = totalMatches === 0
+				? '0 of @totalCount shown'
+				: (startIndex + 1) + ' to ' + Math.min(endIndex, totalMatches) + ' of ' + totalMatches + ' shown';
+		}
+
+		const countEl = document.getElementById('capaCount');
+		if (countEl) countEl.textContent = totalMatches + ' of @totalCount match' + (totalMatches === 1 ? '' : 'es');
+
+		renderPaginationControls(totalPages);
+	}
+
+	function renderPaginationControls(totalPages) {
+		const pager = document.getElementById('capaPagination');
+		if (!pager) return;
+		pager.innerHTML = '';
+
+		function addPageItem(label, page, opts) {
+			opts = opts || {};
+			const li = document.createElement('li');
+			li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'page-link';
+			btn.textContent = label;
+			if (!opts.disabled && !opts.active) {
+				btn.addEventListener('click', function () {
+					currentPage = page;
+					renderPage();
+				});
+			}
+			li.appendChild(btn);
+			pager.appendChild(li);
+		}
+
+		if (totalPages <= 1) return;
+
+		const MAX_VISIBLE = 5;
+		let windowStart = Math.max(1, currentPage - Math.floor(MAX_VISIBLE / 2));
+		let windowEnd = windowStart + MAX_VISIBLE - 1;
+		if (windowEnd > totalPages) {
+			windowEnd = totalPages;
+			windowStart = Math.max(1, windowEnd - MAX_VISIBLE + 1);
+		}
+
+		addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1 });
+		for (let p = windowStart; p <= windowEnd; p++) {
+			addPageItem(String(p), p, { active: p === currentPage });
+		}
+		addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages });
+	}
+
+	function jumpToPage() {
+		const input = document.getElementById('capaPageJumpInput');
+		if (!input) return;
+		let target = parseInt(input.value, 10);
+		if (isNaN(target) || target < 1) target = 1;
+		if (target > lastTotalPages) target = lastTotalPages;
+		currentPage = target;
+		renderPage();
+		input.value = '';
+	}
+
+	document.getElementById('capaPageJumpBtn').addEventListener('click', jumpToPage);
+	document.getElementById('capaPageJumpInput').addEventListener('keydown', function (e) {
+		if (e.key === 'Enter') { e.preventDefault(); jumpToPage(); }
+	});
+
+	document.getElementById('capaSearch').addEventListener('input', function () {
+		currentSearchQuery = this.value.trim().toLowerCase();
+		applyFilters();
+	});
+
+	document.getElementById('classificationFilter').addEventListener('change', function () {
+		currentClassificationFilter = this.value;
+		applyFilters();
+	});
+
+	function exportToExcel() {
+		const dateFrom = document.getElementById('exportDateFrom').value; 
+		const dateTo = document.getElementById('exportDateTo').value;
+
+		const matchingRows = lastMatchingRows.filter(function (row) {
+			const created = row.getAttribute('data-created') || '';
+			if (dateFrom && (!created || created < dateFrom)) return false;
+			if (dateTo && (!created || created > dateTo)) return false;
+			return true;
+		});
+
+		if (matchingRows.length === 0) {
+			alert('No reports found for the selected filters/date range.');
+			return;
+		}
+
+		const headers = ['Date Created', 'Car No.', 'Stock Movement', 'Item Code', 'Description', 'UTD', 'UOM', 'Quantity', 'Nature of Defect', 'Car Classification', 'Status'];
+		const rows = [];
+
+		matchingRows.forEach(function (row) {
+			const dateCreated = row.cells[0].textContent.trim();
+			const reportNumber = row.getAttribute('data-report-number') || row.cells[1].textContent.trim();
+			const stockMovement = row.cells[2].textContent.trim();
+			const carClassification = row.cells[9].textContent.trim();
+            const status = row.cells[10].textContent.trim();
+
+			const items = ITEMS_BY_CAR[reportNumber] || [];
+			if (items.length === 0) {
+				rows.push([dateCreated, reportNumber, stockMovement, '', '', '', '', '', '', carClassification, status]);
+				return;
+			}
+
+			items.forEach(function (item) {
+				rows.push([
+					dateCreated, reportNumber, stockMovement,
+					item.itemCode, item.itemDescription, item.utd, item.uom, item.quantity, item.defectName,
+					carClassification, status
+				]);
+			});
+		});
+
+		const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+		worksheet['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 28 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 20 }, { wch: 18 }, { wch: 16 }];
+
+		const workbook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workbook, worksheet, 'CAR Reports');
+
+		const today = new Date().toISOString().slice(0, 10);
+		XLSX.writeFile(workbook, `CAR_Reports_${today}.xlsx`);
+	}
+
+	document.querySelectorAll('.stat-card').forEach(function (card) {
+		card.addEventListener('click', function () {
+			document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+			this.classList.add('active');
+			currentStatusFilter = this.dataset.status;
+			applyFilters();
+		});
+	});
+
+	renderPage();
+</script>

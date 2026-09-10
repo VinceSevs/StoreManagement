@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Contact";
+}
+<main aria-labelledby="title">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="lead-page-header">
+            <div class="lead-page-icon"><i class="bi bi-envelope"></i></div>
+            <div>
+                <div class="lead-eyebrow">Store Management</div>
+                <h1 id="title">@ViewBag.Title.</h1>
+            </div>
+        </div>
+
+        <div class="card shadow-sm p-4">
+            <h3 class="h5">@ViewBag.Message</h3>
+
+            <address class="mb-3">
+                One Microsoft Way<br />
+                Redmond, WA 98052-6399<br />
+                <abbr title="Phone">P:</abbr>
+                425.555.0100
+            </address>
+
+            <address class="mb-0">
+                <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
+                <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
+            </address>
+        </div>
+    }
+    else
+    {
+        <p>Please log in to view this content.</p>
+    }
+
+</main>

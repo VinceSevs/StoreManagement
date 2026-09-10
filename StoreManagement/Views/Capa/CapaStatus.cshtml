@@ -1,0 +1,736 @@
+﻿
+<style>
+    :root {
+        --bs-primary: #7d1f27;
+        --bs-primary-rgb: 125,31,39;
+        --bs-body-font-family: 'Inter', Arial, sans-serif;
+        --bs-body-color: #241316;
+        --bs-border-color: #e2d3d0;
+        --bs-link-color: #7d1f27;
+        --bs-link-hover-color: #4f1015;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+    }
+
+    .font-mono {
+        font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .card {
+        border-color: #e2d3d0;
+    }
+
+    .readonly-field {
+        background-color: #f6efee;
+    }
+
+    .brand-logo {
+        height: 48px;
+        width: auto;
+    }
+
+    .stage-card .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .stage-card,
+    .attach-thumb-btn,
+    .attach-thumb-btn img {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .stage-badge {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: .72rem;
+        letter-spacing: .02em;
+    }
+
+    /* ---------- Attachment thumbnails ---------- */
+    .attach-thumb-btn {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        line-height: 0;
+    }
+
+        .attach-thumb-btn img {
+            transition: transform .15s ease, opacity .15s ease;
+        }
+
+        .attach-thumb-btn:hover img {
+            transform: scale(1.03);
+            opacity: .9;
+        }
+
+    /* ---------- Lightbox (Facebook-style photo preview) ---------- */
+    .lightbox-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 8, 8, 0.92);
+        z-index: 1080;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .lightbox-overlay.active {
+            display: flex;
+        }
+
+    .lightbox-img {
+        max-width: 90vw;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+
+    .lightbox-btn {
+        position: absolute;
+        background: rgba(255,255,255,0.15);
+        border: none;
+        color: #fff;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .15s ease;
+    }
+
+        .lightbox-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+    .lightbox-close {
+        top: 20px;
+        right: 20px;
+    }
+
+    .lightbox-download {
+        top: 20px;
+        right: 76px;
+        font-size: 18px;
+    }
+
+    .lightbox-prev {
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .lightbox-next {
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .lightbox-caption {
+        position: absolute;
+        bottom: 24px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: rgba(255,255,255,0.85);
+        font-size: 13px;
+        padding: 0 80px;
+    }
+
+    .lightbox-counter {
+        position: absolute;
+        top: 30px;
+        left: 24px;
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        font-family: 'IBM Plex Mono', monospace;
+    }
+</style>
+
+@{
+    string ImmediateAction = (string)ViewBag.Capa.ImmediateAction;
+    string RootCause = (string)ViewBag.Capa.RootCause;
+    string CapaActions = (string)ViewBag.Capa.CapaActions;
+    string IaVerifiedBy = (string)ViewBag.Capa.IaVerifiedBy;
+    string CapaVerifiedBy = (string)ViewBag.Capa.CapaVerifiedBy;
+    bool step2Done = !string.IsNullOrWhiteSpace(ImmediateAction);
+    bool step2Verified = !string.IsNullOrWhiteSpace(IaVerifiedBy);
+    bool step3Done = !string.IsNullOrWhiteSpace(RootCause);
+    bool step4Done = !string.IsNullOrWhiteSpace(CapaActions);
+    bool step4Verified = !string.IsNullOrWhiteSpace(CapaVerifiedBy);
+    string overallStatus;
+    string overallBadgeClass;
+    if (string.Equals((string)ViewBag.Capa.Status, "Cancelled", System.StringComparison.OrdinalIgnoreCase))
+    {
+        overallStatus = "Cancelled";
+        overallBadgeClass = "bg-dark";
+    }
+    else if (!step2Done && string.Equals((string)ViewBag.Capa.Status, "Closed", System.StringComparison.OrdinalIgnoreCase))
+    {
+        overallStatus = "Closed — Past Due";
+        overallBadgeClass = "bg-dark";
+    }
+    else if (!step2Done)
+    {
+        overallStatus = "Awaiting Response";
+        overallBadgeClass = "bg-warning text-dark";
+    }
+    else if (!step2Verified || !step4Verified)
+    {
+        overallStatus = "Awaiting QA Verification";
+        overallBadgeClass = "bg-info text-dark";
+    }
+    else
+    {
+        overallStatus = "Closed";
+        overallBadgeClass = "bg-success";
+    }
+}
+
+@{
+    bool isAwaitingVerification = step2Done && (!step2Verified || !step4Verified);
+    bool isCancel = overallStatus == "Awaiting Response";
+}
+
+<div class="d-flex justify-content-end gap-2 mb-3" style="max-width: 820px; margin-left: auto; margin-right: auto;">
+    @if (isAwaitingVerification)
+    {
+        <a href="@Url.Action("CapaVerification", "Capa")?token=@ViewBag.Capa.ResponseToken" class="btn btn-primary btn-sm">
+            <i class="bi bi-clipboard-check"></i> Verify
+        </a>
+    }
+    else if (isCancel)
+    {
+        <button type="button" class="btn btn-outline btn-sm" id="cancelCarBtn" onclick="cancelCar()" style="background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 200%); color: white;">
+            Cancel CAR
+        </button>
+    }
+    <button type="button" class="btn btn-outline-primary btn-sm" id="downloadPdfBtn" onclick="downloadCapaStatusPdf()">
+        <i class="bi bi-download"></i> Download PDF
+    </button>
+</div>
+
+<div class="container my-4" id="capaStatusPrintArea" style="max-width: 820px;">
+
+    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom flex-wrap">
+        <img src="data:image/png;base64,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" class="brand-logo" alt="LEAD Logistics Innovations, Inc.">
+        <div class="flex-grow-1">
+            <div class="text-uppercase small fw-semibold font-mono" style="color:var(--bs-primary);letter-spacing:.08em">CAR Status</div>
+            <h1 class="h4 mb-0">Reference: @ViewBag.Capa.ReportNumber</h1>
+        </div>
+        <span class="badge @overallBadgeClass px-3 py-2">@overallStatus</span>
+    </div>
+
+    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>1. Filing Details</span>
+            <span class="badge bg-secondary stage-badge">Filed</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Issued By</label>
+                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedBy" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Issued To</label>
+                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedToDepartmentName" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
+                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.SiteWarehouseName" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Ref. No. (QAR / PNCR)</label>
+                    <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.RefNo" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Correction Due</label>
+                    <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.CorrectionDueDate.ToString("MMM dd, yyyy")" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">CAR Due</label>
+                    <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.ReportDueDate.ToString("MMM dd, yyyy")" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Type of Non-conformance</label>
+                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.NonconformanceType" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">CAR Classification</label>
+                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.CarClassificationType &mdash; @(!string.IsNullOrWhiteSpace((string)ViewBag.Capa.CarClassificationRefName) ? ViewBag.Capa.CarClassificationRefName : ViewBag.Capa.CarClassificationOtherText)" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Stock Movement</label>
+                    <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.StockEventID == 2 ? "AUDIT" : ViewBag.Capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT")" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Accredited Hauler</label>
+                    <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.Items.Count > 0 ? ViewBag.Capa.Items[0].Hauler : null)" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>2. Immediate Action</span>
+            @if (step2Done)
+            {
+                <span class="badge bg-success stage-badge">Submitted</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark stage-badge">Awaiting Response</span>
+            }
+        </div>
+        <div class="card-body">
+            @if (step2Done)
+            {
+                <div class="row g-3">
+                    <div class="col-12">
+                        <textarea class="form-control readonly-field" rows="3" readonly>@ImmediateAction</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Person Responsible</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IaPerson" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Date Completed</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@(ViewBag.Capa.IaTargetDate != null ? ((DateTime)ViewBag.Capa.IaTargetDate).ToString("MMM dd, yyyy") : "")" readonly>
+                    </div>
+                    <div class="col-12 pt-2 border-top">
+                        <label class="form-label small text-uppercase text-secondary">QA Verification</label>
+                        @if (step2Verified)
+                        {
+                            <div class="small">Verified by <strong>@IaVerifiedBy</strong> on <span class="font-mono">@(ViewBag.Capa.IaVerifiedDate != null ? ((DateTime)ViewBag.Capa.IaVerifiedDate).ToString("MMM dd, yyyy") : "")</span></div>
+                        }
+                        else
+                        {
+                            <div class="small text-secondary fst-italic">Awaiting QA verification.</div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-secondary fst-italic small">No response submitted yet.</div>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>3. Root Cause Analysis</span>
+            @if (step3Done)
+            {
+                <span class="badge bg-success stage-badge">Submitted</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark stage-badge">Awaiting Response</span>
+            }
+        </div>
+        <div class="card-body">
+            @if (step3Done)
+            {
+                <textarea class="form-control readonly-field" rows="3" readonly>@RootCause</textarea>
+            }
+            else
+            {
+                <div class="text-secondary fst-italic small">No root cause analysis submitted yet.</div>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>4. Corrective Action</span>
+            @if (step4Done)
+            {
+                <span class="badge bg-success stage-badge">Submitted</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark stage-badge">Awaiting Response</span>
+            }
+        </div>
+        <div class="card-body">
+            @if (step4Done)
+            {
+                <div class="row g-3">
+                    <div class="col-12">
+                        <textarea class="form-control readonly-field" rows="3" readonly>@CapaActions</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Person Responsible</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.CapaPerson" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Target Completion Date</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@(ViewBag.Capa.CapaTargetDate != null ? ((DateTime)ViewBag.Capa.CapaTargetDate).ToString("MMM dd, yyyy") : "")" readonly>
+                    </div>
+                    <div class="col-12 pt-2 border-top">
+                        <label class="form-label small text-uppercase text-secondary">QA Verification</label>
+                        @if (step4Verified)
+                        {
+                            <div class="small">Verified by <strong>@CapaVerifiedBy</strong> on <span class="font-mono">@(ViewBag.Capa.CapaVerifiedDate != null ? ((DateTime)ViewBag.Capa.CapaVerifiedDate).ToString("MMM dd, yyyy") : "")</span></div>
+                        }
+                        else
+                        {
+                            <div class="small text-secondary fst-italic">Awaiting QA verification.</div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-secondary fst-italic small">No corrective action submitted yet.</div>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>5. Product Disposition</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    @{ int itemNumber = 0; int photoIndex = 0; }
+                    @foreach (var capaItem in ViewBag.Capa.Items)
+                    {
+                        itemNumber++;
+                        int lineNumber = (int)capaItem.LineNumber;
+                        var itemPhotos = ViewBag.ItemAttachments.ContainsKey(lineNumber) ? ViewBag.ItemAttachments[lineNumber] : null;
+                        <div class="border rounded p-3 mb-2">
+                            <div class="fw-semibold text-uppercase small mb-2" style="color:var(--bs-primary)">Item @itemNumber</div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Item</label>
+                                    <input type="text" class="form-control readonly-field" value="@capaItem.ItemDescription" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Quantity for Disposal</label>
+                                    <input type="text" class="form-control readonly-field" value="@capaItem.Quantity" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Unit of Measure</label>
+                                    <input type="text" class="form-control readonly-field" value="@capaItem.UOMDisplay" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Defect</label>
+                                    @{
+                                        var defectDisplay = string.IsNullOrWhiteSpace(capaItem.DefectName)
+                                            ? "Other (Kindly Check Remarks)"
+                                            : $"{capaItem.DefectName} ({capaItem.DefectCategoryName})";
+                                    }
+                                    <input type="text" class="form-control readonly-field"
+                                           value="@defectDisplay"
+                                           readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">UTD</label>
+                                    <input type="text" class="form-control readonly-field font-mono" value="@(capaItem.UsedToDate != null ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "")" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small text-uppercase text-secondary">Remarks</label>
+                                    <textarea class="form-control readonly-field" rows="2" readonly>@capaItem.Remarks</textarea>
+                                </div>
+                                @if (itemPhotos != null && itemPhotos.Count > 0)
+                                {
+                                    <div class="col-12 attached-photos-block">
+                                        <label class="form-label small text-uppercase text-secondary">Item @itemNumber Attached Photos</label>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var att in itemPhotos)
+                                            {
+                                                if (!string.IsNullOrEmpty(att.ContentType) && att.ContentType.StartsWith("image/"))
+                                                {
+                                                    <button type="button" class="attach-thumb-btn" onclick="openLightbox(@photoIndex)">
+                                                        <img src="@Url.Action("CapaAttachment", "Capa")?path=@Uri.EscapeDataString(att.FilePath)"
+                                                             style="width:140px;height:105px;object-fit:cover;border:1px solid #e2d3d0;border-radius:8px;" alt="Attachment">
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@Url.Action("CapaAttachment", "Capa")?path=@Uri.EscapeDataString(att.FilePath)" target="_blank"
+                                                       class="d-flex flex-column align-items-center justify-content-center text-decoration-none text-secondary"
+                                                       style="width:140px;height:105px;border:1px solid #e2d3d0;border-radius:8px;background:#f6efee;">
+                                                        <span style="font-size:1.6rem;line-height:1;">@(System.IO.Path.GetExtension(att.FilePath).TrimStart('.').ToUpperInvariant())</span>
+                                                        <small class="text-truncate px-2" style="max-width:90%;">@System.IO.Path.GetFileName(att.FilePath)</small>
+                                                    </a>
+                                                }
+                                                photoIndex++;
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>6. QA Verification</span>
+            @if (!step2Verified || !step4Verified)
+            {
+                <span class="badge bg-secondary stage-badge">Pending</span>
+            }
+            else
+            {
+                <span class="badge bg-success stage-badge">Closed</span>
+            }
+        </div>
+        <div class="card-body">
+            @if (!step2Verified && !step4Verified)
+            {
+                <div class="text-secondary fst-italic small">Awaiting QA verification.</div>
+            }
+            else
+            {
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Verified By</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.VerifiedByName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Verified Date</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@(ViewBag.Capa.VerifiedDate != null ? ((DateTime)ViewBag.Capa.VerifiedDate).ToString("MMM dd, yyyy") : "")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Approved By</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.ApprovedByName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Approved Date</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@(ViewBag.Capa.ApprovedDate != null ? ((DateTime)ViewBag.Capa.ApprovedDate).ToString("MMM dd, yyyy") : "")" readonly>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label small text-uppercase text-secondary">Verification Notes</label>
+                        <textarea class="form-control readonly-field" rows="2" readonly>@ViewBag.Capa.VerificationNotes</textarea>
+                    </div>
+                </div> 
+            }
+        </div>
+    </div>
+
+</div>
+
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="handleOverlayClick(event)">
+    <span class="lightbox-counter" id="lightboxCounter"></span>
+    <button type="button" class="lightbox-btn lightbox-prev" id="lightboxPrev" onclick="showLightboxPhoto(currentLightboxIndex - 1)" title="Previous">&#8249;</button>
+    <img id="lightboxImage" class="lightbox-img" src="" alt="Attachment preview">
+    <button type="button" class="lightbox-btn lightbox-next" id="lightboxNext" onclick="showLightboxPhoto(currentLightboxIndex + 1)" title="Next">&#8250;</button>
+    <a id="lightboxDownload" class="lightbox-btn lightbox-download" href="#" download title="Download">&#8681;</a>
+    <button type="button" class="lightbox-btn lightbox-close" onclick="closeLightbox()" title="Close">&#10005;</button>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+@{
+    var photoList = new List<object>();
+    if (ViewBag.Attachments != null)
+    {
+        foreach (var att in ViewBag.Attachments)
+        {
+            photoList.Add(new
+            {
+                url = Url.Action("CapaAttachment", "Capa") + "?path=" + Uri.EscapeDataString((string)att.FilePath),
+                caption = (string)att.Caption,
+                fileName = System.IO.Path.GetFileName((string)att.FilePath)
+            });
+        }
+    }
+    var photoListJson = Newtonsoft.Json.JsonConvert.SerializeObject(photoList);
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const CANCEL_ENDPOINT = '@Url.Action("Cancel", "Capa")';
+const CANCEL_TOKEN = '@ViewBag.Capa.ResponseToken';
+
+async function cancelCar() {
+	const confirmResult = await Swal.fire({
+		icon: 'warning',
+		title: 'Cancel this CAR?',
+		text: 'This cannot be undone.',
+		showCancelButton: true,
+		confirmButtonText: 'Yes, cancel it',
+		cancelButtonText: 'No, keep it',
+		confirmButtonColor: '#7d1f27'
+	});
+	if (!confirmResult.isConfirmed) return;
+
+	const btn = document.getElementById('cancelCarBtn');
+	btn.disabled = true;
+	btn.textContent = 'Cancelling…';
+
+	try {
+		const response = await fetch(CANCEL_ENDPOINT, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: 'token=' + encodeURIComponent(CANCEL_TOKEN)
+		});
+		const result = await response.json().catch(() => null);
+
+		if (response.ok && result && result.success) {
+			Swal.fire({
+				icon: 'success',
+				title: 'CAR cancelled',
+				confirmButtonColor: '#7d1f27'
+			}).then(() => location.reload());
+		} else {
+			Swal.fire({
+				icon: 'error',
+				title: 'Could not cancel',
+				text: (result && result.message) || `HTTP ${response.status}`,
+				confirmButtonColor: '#7d1f27'
+			});
+			btn.disabled = false;
+			btn.textContent = 'Cancel CAR';
+		}
+	} catch (err) {
+		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#7d1f27' });
+		btn.disabled = false;
+		btn.textContent = 'Cancel CAR';
+	}
+}
+
+const ATTACHMENT_PHOTOS = @Html.Raw(photoListJson);
+let currentLightboxIndex = 0;
+
+function openLightbox(index) {
+	currentLightboxIndex = index;
+	renderLightboxPhoto();
+	document.getElementById('lightboxOverlay').classList.add('active');
+	document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+	document.getElementById('lightboxOverlay').classList.remove('active');
+	document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+	if (e.target.id === 'lightboxOverlay') closeLightbox();
+}
+
+function showLightboxPhoto(index) {
+	if (index < 0 || index >= ATTACHMENT_PHOTOS.length) return;
+	currentLightboxIndex = index;
+	renderLightboxPhoto();
+}
+
+function renderLightboxPhoto() {
+	const photo = ATTACHMENT_PHOTOS[currentLightboxIndex];
+	if (!photo) return;
+
+	document.getElementById('lightboxImage').src = photo.url;
+	document.getElementById('lightboxDownload').href = photo.url;
+	document.getElementById('lightboxDownload').setAttribute('download', photo.fileName || 'attachment');
+	document.getElementById('lightboxCaption').textContent = photo.caption || '';
+	document.getElementById('lightboxCounter').textContent = ATTACHMENT_PHOTOS.length > 1
+		? `${currentLightboxIndex + 1} / ${ATTACHMENT_PHOTOS.length}` : '';
+
+	const showNav = ATTACHMENT_PHOTOS.length > 1;
+	document.getElementById('lightboxPrev').style.display = showNav ? 'flex' : 'none';
+	document.getElementById('lightboxNext').style.display = showNav ? 'flex' : 'none';
+}
+
+document.addEventListener('keydown', (e) => {
+	const overlay = document.getElementById('lightboxOverlay');
+	if (!overlay || !overlay.classList.contains('active')) return;
+	if (e.key === 'Escape') closeLightbox();
+	else if (e.key === 'ArrowLeft') showLightboxPhoto(currentLightboxIndex - 1);
+	else if (e.key === 'ArrowRight') showLightboxPhoto(currentLightboxIndex + 1);
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadCapaStatusPdf() {
+	const btn = document.getElementById('downloadPdfBtn');
+	const source = document.getElementById('capaStatusPrintArea');
+	const capaNo = '@ViewBag.Capa.ReportNumber';
+
+	btn.disabled = true;
+	btn.textContent = 'Generating...';
+
+	const clone = source.cloneNode(true);
+	clone.removeAttribute('id');
+	const photosBlocks = clone.querySelectorAll('.attached-photos-block');
+
+	if (photosBlocks.length > 0) {
+		const photosPage = document.createElement('div');
+		photosPage.id = 'pdfAttachmentsPage';
+		photosPage.className = 'card mb-3 stage-card';
+		photosPage.innerHTML = '<div class="card-header bg-white fw-semibold">Attached Photos</div><div class="card-body"></div>';
+		const photosBody = photosPage.querySelector('.card-body');
+
+		photosBlocks.forEach(photosBlock => {
+			photosBlock.remove();
+			photosBlock.classList.remove('col-12');
+
+			photosBlock.querySelectorAll('.attach-thumb-btn img').forEach(img => {
+				img.style.width = '340px';
+				img.style.height = '255px';
+			});
+			photosBlock.querySelectorAll('.attach-thumb-btn').forEach(btnEl => {
+				btnEl.removeAttribute('onclick');
+				btnEl.style.cursor = 'default';
+			});
+
+			photosBody.appendChild(photosBlock);
+		});
+
+		clone.appendChild(photosPage);
+	}
+	document.body.appendChild(clone);
+
+	const opt = {
+		margin: 0.4,
+		filename: 'CAPA-Status-' + capaNo + '.pdf',
+		image: { type: 'jpeg', quality: 0.98 },
+		html2canvas: { scale: 2, useCORS: true },
+		jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+		pagebreak: { mode: ['avoid-all', 'css'], before: '#pdfAttachmentsPage' }
+	};
+
+	html2pdf().set(opt).from(clone).save().then(() => {
+		clone.remove();
+		btn.disabled = false;
+		btn.innerHTML = '<i class="bi bi-download"></i> Download PDF';
+	}).catch((err) => {
+		clone.remove();
+		btn.disabled = false;
+		btn.innerHTML = '<i class="bi bi-download"></i> Download PDF';
+		console.error('PDF generation failed:', err);
+		alert('Could not generate PDF: ' + (err && err.message ? err.message : err));
+	});
+}
+</script>

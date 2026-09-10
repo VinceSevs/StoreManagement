@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+<main aria-labelledby="title">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="lead-page-header">
+            <div class="lead-page-icon"><i class="bi bi-info-circle"></i></div>
+            <div>
+                <div class="lead-eyebrow">Store Management</div>
+                <h1 id="title">@ViewBag.Title.</h1>
+            </div>
+        </div>
+
+        <div class="card shadow-sm p-4">
+            <h3 class="h5">@ViewBag.Message</h3>
+            <p class="text-secondary mb-0">Use this area to provide additional information.</p>
+        </div>
+    }
+    else
+    {
+        <p>Please log in to view this content.</p>
+    }
+
+</main>

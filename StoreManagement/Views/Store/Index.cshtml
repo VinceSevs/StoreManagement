@@ -1,0 +1,288 @@
+@model IEnumerable<StoreManagement.Models.Store>
+
+<style>
+    .store-list-card {
+        padding: 1.5rem 1.75rem;
+        margin-top: 1.5rem;
+    }
+    .store-list-card table th,
+    .store-list-card table td { padding: 0.85rem 1rem; }
+    #searchSuggestions .list-group-item { padding: 0.6rem 1rem; }
+    #modalBox .modal-header,
+    #modalBox .modal-body,
+    #modalBox .modal-footer { padding: 1.25rem 1.5rem; }
+    #modalBox .modal-footer { gap: 0.5rem; }
+
+    /* ---------- Pagination ---------- */
+    #storePagination {
+        gap: 4px;
+    }
+
+        #storePagination .page-item .page-link {
+            border: 1px solid var(--lead-border);
+            border-radius: 999px;
+            color: #4a3a38;
+            font-size: .8rem;
+            font-weight: 600;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 .55rem;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: none;
+        }
+
+            #storePagination .page-item .page-link:hover {
+                background: var(--lead-primary-light);
+                border-color: var(--lead-primary);
+                color: var(--lead-primary);
+                transform: translateY(-1px);
+            }
+
+            #storePagination .page-item .page-link:focus {
+                box-shadow: 0 0 0 3px rgba(125,31,39,.15);
+            }
+
+        #storePagination .page-item.active .page-link {
+            background: var(--lead-primary);
+            border-color: var(--lead-primary);
+            color: #fff;
+        }
+
+        #storePagination .page-item.disabled .page-link {
+            background: #fbf6f5;
+            color: #c9b7b4;
+            border-color: var(--lead-border);
+        }
+</style>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-shop"></i></div>
+    <div>
+        <div class="lead-eyebrow">Store Management</div>
+        <h1>Store List</h1>
+    </div>
+</div>
+
+<div class="card shadow-sm store-list-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <span class="fw-semibold text-secondary small text-uppercase" style="letter-spacing:.04em">All Stores</span>
+
+        @using (Html.BeginForm("Index", "Store", FormMethod.Get))
+        {
+            <div class="position-relative" style="width: 280px;">
+                <input type="text" id="search" name="search" value="@ViewBag.Search" autocomplete="off"
+                       class="form-control lead-search"
+                       placeholder="Search stores, cities..."
+                       aria-label="Search" />
+
+                <div id="searchSuggestions" class="list-group position-absolute w-100 shadow-sm mt-1"
+                     style="display:none; z-index:1000; max-height: 250px; overflow-y: auto;">
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 lead-table" id="storeTable">
+            <thead>
+                <tr>
+                    <th>Store Number</th>
+                    <th>Store Name</th>
+                    <th>City Name</th>
+                    <th>Coordinates</th>
+                    <th>State</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var store in Model)
+                {
+                    <tr class="store-row">
+                        <td class="font-mono fw-semibold" style="color:var(--lead-primary)">@store.StoreNumber</td>
+                        <td>@store.StoreName</td>
+                        <td>@store.CityName</td>
+                        <td>@store.Coordinates</td>
+                        <td>@store.StateName</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button onclick="openModal('@Url.Action("Details", new { id = store.StoreID })')"
+                                        class="btn btn-primary">View</button>
+                                <button onclick="openModal('@Url.Action("Edit", new { id = store.StoreID })')"
+                                        class="btn btn-outline-primary">Update</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 mt-2 border-top">
+        <span class="small text-secondary" id="storePageInfo"></span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <ul class="pagination pagination-sm mb-0" id="storePagination"></ul>
+            <div class="input-group input-group-sm" style="width:150px;">
+                <input type="number" min="1" class="form-control" id="storePageJumpInput" placeholder="Page #">
+                <button class="btn btn-outline-primary" type="button" id="storePageJumpBtn">Go</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- for modals -->
+
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1050;">
+    <div id="modalBox" class="shadow" style="background:#fff; width:100%; max-width:450px; margin:80px auto; border-radius:8px; overflow:hidden;">
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+
+<script>
+    function openModal(url) {
+        $.get(url, function (html) {
+            $('#modalBox').html(html);
+            $('#modalOverlay').show();
+        });
+    }
+
+    function closeModal() {
+        $('#modalOverlay').hide();
+        $('#modalBox').empty();
+    }
+
+    function postToModal(url, formSelector) {
+        $.post(url, $(formSelector).serialize(), function (html) {
+            $('#modalBox').html(html);
+        });
+    }
+
+    function setupAutocomplete(inputId, boxId, field) {
+        var timer;
+        var $input = $('#' + inputId);
+        var $box = $('#' + boxId);
+
+        $input.on('input', function () {
+            clearTimeout(timer);
+            var term = $input.val();
+
+            if (term.length < 1) { $box.hide().empty(); return; }
+
+            timer = setTimeout(function () {
+                $.getJSON('@Url.Action("Suggestions", "Store")', { field: field, term: term }, function (data) {
+                    $box.empty();
+                    if (data.length === 0) { $box.hide(); return; }
+                    data.forEach(function (item) {
+                        $('<button type="button" class="list-group-item list-group-item-action"></button>')
+                            .text(item.Display)
+                            .appendTo($box)
+                            .on('click', function () {
+                                $input.val(item.Value);
+                                $box.hide().empty();
+                                $input.closest('form').submit();
+                            });
+                    });
+                    $box.show();
+                });
+            }, 250);
+        });
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#' + inputId).length && !$(e.target).closest('#' + boxId).length) {
+                $box.hide();
+            }
+        });
+    }
+
+    $(function () {
+        setupAutocomplete('search', 'searchSuggestions', 'search');
+        setupStorePagination();
+    });
+
+    function setupStorePagination() {
+        var PAGE_SIZE = 8;
+        var currentPage = 1;
+        var rows = Array.from(document.querySelectorAll('#storeTable tbody tr.store-row'));
+        var totalRows = rows.length;
+        var totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+
+        function renderPage() {
+            var startIndex = (currentPage - 1) * PAGE_SIZE;
+            var endIndex = startIndex + PAGE_SIZE;
+
+            rows.forEach(function (row, i) {
+                row.style.display = (i >= startIndex && i < endIndex) ? '' : 'none';
+            });
+
+            var infoEl = document.getElementById('storePageInfo');
+            if (infoEl) {
+                infoEl.textContent = totalRows === 0
+                    ? 'No stores found'
+                    : (startIndex + 1) + ' to ' + Math.min(endIndex, totalRows) + ' of ' + totalRows + ' shown';
+            }
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            var pager = document.getElementById('storePagination');
+            if (!pager) return;
+            pager.innerHTML = '';
+
+            function addPageItem(label, page, opts) {
+                opts = opts || {};
+                var li = document.createElement('li');
+                li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'page-link';
+                btn.textContent = label;
+                if (!opts.disabled && !opts.active) {
+                    btn.addEventListener('click', function () {
+                        currentPage = page;
+                        renderPage();
+                    });
+                }
+                li.appendChild(btn);
+                pager.appendChild(li);
+            }
+
+            if (totalPages <= 1) return;
+
+            var MAX_VISIBLE = 5;
+            var windowStart = Math.max(1, currentPage - Math.floor(MAX_VISIBLE / 2));
+            var windowEnd = windowStart + MAX_VISIBLE - 1;
+            if (windowEnd > totalPages) {
+                windowEnd = totalPages;
+                windowStart = Math.max(1, windowEnd - MAX_VISIBLE + 1);
+            }
+
+            addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1 });
+            for (var p = windowStart; p <= windowEnd; p++) {
+                addPageItem(String(p), p, { active: p === currentPage });
+            }
+            addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages });
+        }
+
+        function jumpToPage() {
+            var input = document.getElementById('storePageJumpInput');
+            if (!input) return;
+            var target = parseInt(input.value, 10);
+            if (isNaN(target) || target < 1) target = 1;
+            if (target > totalPages) target = totalPages;
+            currentPage = target;
+            renderPage();
+            input.value = '';
+        }
+
+        document.getElementById('storePageJumpBtn').addEventListener('click', jumpToPage);
+        document.getElementById('storePageJumpInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); jumpToPage(); }
+        });
+
+        renderPage();
+    }
+</script>

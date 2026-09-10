@@ -1,0 +1,17 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# NuGet packages (regenerated via package restore)
+packages/
+
+# Contains real credentials — see Web.config.example for the template
+StoreManagement/StoreManagement/Web.config
+
+# Backup archive, don't need it in source control
+StoreManagement.zip

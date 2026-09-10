@@ -1,0 +1,1023 @@
+﻿
+<style>
+    :root {
+        --bs-primary: #7d1f27;
+        --bs-primary-rgb: 125,31,39;
+        --bs-body-font-family: 'Inter', Arial, sans-serif;
+        --bs-body-color: #241316;
+        --bs-border-color: #e2d3d0;
+        --bs-link-color: #7d1f27;
+        --bs-link-hover-color: #4f1015;
+    }
+
+    body {
+        background: var(--bs-body-bg);
+    }
+
+    h1, h2, h3, .brand-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+    }
+
+    .font-mono {
+        font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .card {
+        border-color: #e2d3d0;
+    }
+
+    .btn-primary {
+        --bs-btn-bg: var(--bs-primary);
+        --bs-btn-border-color: var(--bs-primary);
+        --bs-btn-hover-bg: #5e161f;
+        --bs-btn-hover-border-color: #5e161f;
+        --bs-btn-active-bg: #5e161f;
+        --bs-btn-active-border-color: #5e161f;
+    }
+
+    .btn-outline-primary {
+        --bs-btn-color: var(--bs-primary);
+        --bs-btn-border-color: var(--bs-primary);
+        --bs-btn-hover-bg: var(--bs-primary);
+        --bs-btn-hover-border-color: var(--bs-primary);
+    }
+
+    .btn-check:checked + .btn-outline-primary {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: #fff;
+    }
+
+    .btn-check:checked + .btn-outline-secondary {
+        background-color: #5b474a;
+        border-color: #5b474a;
+        color: #fff;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+
+    .step-badge {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--bs-primary);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: .8rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .brand-logo {
+        height: 52px;
+        width: auto;
+    }
+
+    .autocomplete-wrap {
+        position: relative;
+    }
+
+    .ac-dropdown {
+        position: absolute;
+        z-index: 1000;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: .25rem;
+        max-height: 230px;
+        overflow-y: auto;
+        display: none;
+    }
+
+        .ac-dropdown.open {
+            display: block;
+        }
+
+        .ac-dropdown small {
+            color: var(--bs-primary);
+        }
+
+    .attach-thumb {
+        position: relative;
+    }
+
+        .attach-thumb img {
+            aspect-ratio: 4/3;
+            object-fit: cover;
+        }
+
+        .attach-thumb .btn-close {
+            position: absolute;
+            top: .5rem;
+            right: .5rem;
+            background-color: #fff;
+            border-radius: 50%;
+            padding: .35rem;
+            opacity: .9;
+            box-shadow: 0 1px 4px rgba(0,0,0,.25);
+        }
+
+    #submitStatus.text-success {
+        color: #3f6b46 !important;
+    }
+
+    @@media print {
+        .d-print-none {
+            display: none !important;
+        }
+
+        body {
+            background: #fff;
+        }
+
+        .card {
+            box-shadow: none !important;
+        }
+    }
+
+    /* Scoped to .capa-tour-tooltip / .capa-tour-highlight so other intro.js
+    tours elsewhere in the app are untouched. */
+    .capa-tour-tooltip.introjs-tooltip {
+        font-family: 'Inter', Arial, sans-serif;
+        max-width: 380px;
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 50px rgba(125, 31, 39, .25), 0 4px 12px rgba(0,0,0,.08);
+        padding: 0;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    .capa-tour-tooltip *,
+    .capa-tour-tooltip *::before,
+    .capa-tour-tooltip *::after {
+        box-sizing: border-box;
+    }
+
+    /* Header row (title + skip button) — this is what was overflowing */
+    .capa-tour-tooltip .introjs-tooltip-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 16px 16px 0;
+        overflow: hidden;
+    }
+
+    .capa-tour-tooltip .introjs-tooltip-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1.3;
+        color: var(--bs-primary);
+        flex: 1 1 auto;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .capa-tour-tooltip .introjs-skipbutton {
+        flex: none;
+        position: static !important; /* override intro.js default absolute positioning */
+        width: auto;
+        height: auto;
+        font-size: .72rem;
+        font-weight: 600;
+        color: #8f7d7b;
+        background: #f6efee;
+        border: none;
+        border-radius: 999px;
+        padding: 4px 10px;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+
+        .capa-tour-tooltip .introjs-skipbutton:hover {
+            background: #eddedc;
+            color: #5b474a;
+        }
+
+    .capa-tour-tooltip .introjs-tooltiptext {
+        padding: 10px 20px 18px;
+        font-size: .92rem;
+        line-height: 1.55;
+        color: #241316;
+    }
+
+    .capa-tour-tooltip .introjs-tooltipbuttons {
+        border-top: 1px solid #f1e4e3;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fdfaf9;
+        gap: 8px;
+    }
+
+    .capa-tour-tooltip .introjs-button {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: .82rem;
+        padding: 7px 16px;
+        border-radius: 999px;
+        border: 1.5px solid var(--bs-primary);
+        color: var(--bs-primary);
+        background: #fff;
+        text-shadow: none;
+        transition: all .15s ease;
+        white-space: nowrap;
+    }
+
+        .capa-tour-tooltip .introjs-button:hover {
+            background: var(--bs-primary);
+            color: #fff;
+        }
+
+    .capa-tour-tooltip .introjs-nextbutton,
+    .capa-tour-tooltip .introjs-donebutton {
+        background: var(--bs-primary);
+        color: #fff;
+    }
+
+        .capa-tour-tooltip .introjs-nextbutton:hover,
+        .capa-tour-tooltip .introjs-donebutton:hover {
+            background: #5e161f;
+            border-color: #5e161f;
+        }
+
+    .capa-tour-tooltip .introjs-disabled {
+        opacity: .35;
+        pointer-events: none;
+    }
+
+    .capa-tour-tooltip .introjs-progress {
+        height: 5px;
+        background: #f1e4e3;
+        border-radius: 999px;
+        margin: 0 20px 14px;
+        overflow: hidden;
+    }
+
+    .capa-tour-tooltip .introjs-progressbar {
+        background: linear-gradient(90deg, var(--bs-primary), #a8434a);
+        border-radius: 999px;
+    }
+
+    .capa-tour-tooltip .introjs-arrow.top {
+        border-bottom-color: #fff;
+    }
+
+    .capa-tour-tooltip .introjs-arrow.bottom {
+        border-top-color: #fff;
+    }
+
+    .capa-tour-tooltip .introjs-arrow.left {
+        border-right-color: #fff;
+    }
+
+    .capa-tour-tooltip .introjs-arrow.right {
+        border-left-color: #fff;
+    }
+
+    /* Welcome / closing "cover" steps: no skip button clutter, centered title */
+    .capa-tour-cover .introjs-tooltip-header {
+        justify-content: center;
+    }
+
+    .capa-tour-cover .introjs-skipbutton {
+        display: none;
+    }
+
+    .capa-tour-cover .introjs-tooltip-title {
+        text-align: center;
+        font-size: 1.15rem;
+    }
+
+    .capa-tour-cover .introjs-tooltiptext {
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    /* Highlighted field + dimmed backdrop */
+    .capa-tour-highlight {
+        border-radius: 10px !important;
+        box-shadow: 0 0 0 4px rgba(125,31,39,.35), 0 0 0 9999px rgba(36,19,22,.55) !important;
+    }
+
+    .introjs-overlay {
+        background: rgba(36,19,22,.55);
+    }
+
+    @@media (max-width: 480px) {
+        .capa-tour-tooltip.introjs-tooltip {
+            max-width: 90vw;
+        }
+    }
+</style>
+
+<div class="container my-4">
+
+    <div class="d-flex align-items-center justify-content-end gap-2 mb-3 d-print-none">
+        <span id="submitStatus" class="me-auto small fw-semibold"></span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="startFormTour()">
+            <i class="bi bi-info-circle"></i> Take a Tour
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearForm()">Clear form</button>
+        <button type="button" class="btn btn-primary btn-sm" id="submitBtn" onclick="submitCapaForm()">Submit to Database</button>
+
+    </div>
+
+    <form id="capaForm" class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4 flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="data:image/png;base64,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" class="brand-logo" alt="LEAD Logistics Innovations, Inc.">
+                    <div>
+                        <div class="text-uppercase small fw-semibold font-mono" style="color:var(--bs-primary);letter-spacing:.08em">Quality Assurance @*&middot; @ViewBag.ReportNumber*@</div>
+                        <h1 class="h3 mb-0">Corrective Action Report</h1>
+                        <div class="text-secondary small">Product Quality &amp; Food Safety Compliance</div>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <label class="form-label small text-uppercase text-secondary mb-1">Date</label>
+                    <input type="date" class="form-control font-mono" name="doc_date" id="docDateInput" value="@ViewBag.DateCreated" readonly>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">
+                        Issued By <i class="fw-normal fst-italic text-lowercase">(Name / Department)</i>
+                    </label>
+                    <input type="text" class="form-control" name="issued_by" id="issuedByInput" value="@IsseERP.Models.MySession.Current.FullName" style="background-color:#f4e2e0" readonly>
+                    <div class="form-text">
+                        @if (string.IsNullOrWhiteSpace(IsseERP.Models.MySession.Current?.FullName))
+                        {
+                            <a href="@Url.Action("Login", "Home")">&middot; Login here</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">
+                        Ref. No. <i id="tempRefNoOptionalHint" class="fw-normal fst-italic text-lowercase">(not required for LLII / DC Site)</i>
+                        <span id="refNoOptionalHint" class="fw-normal fst-italic text-lowercase d-none">(not required for LLII / DC Site)</span>
+                    </label>
+                    <input type="text" id="removeReadonly"class="form-control font-mono" name="ref_no" style="background-color:#f4e2e0" readonly>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">
+                        Issued to <i class="fw-normal fst-italic text-lowercase">(Department)</i>
+                    </label>
+                    <select class="form-select" name="issued_to" id="issuedToSelect" required>
+                        <option value="" disabled selected>Select department&hellip;</option>
+
+                        @foreach (var d in ViewBag.Capa)
+                        {
+                            <option value="@d.DepartmentID">@d.DepartmentDescription</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
+                    <select class="form-select" name="site_warehouse" id="siteWarehouseSelect" onchange="handleWarehouseChange()" required>
+                        <option value="" disabled selected>Select warehouse&hellip;</option>
+                        @foreach (var w in ViewBag.Warehouse)
+                        {
+                            <option value="@w.WarehouseID" data-code="@w.ExternalCode">@w.WarehouseName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-uppercase text-secondary">Warehouse Code</label>
+                    <input type="text" class="form-control font-mono" name="warehouse_code" id="warehouseCodeInput" placeholder="Auto-fills from selection" readonly>
+                </div>
+
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100" style="border-left:4px solid var(--bs-primary) !important;">
+                        <label class="form-label small text-uppercase text-secondary">Immediate Action Due Date</label>
+                        <input type="date" class="form-control font-mono" name="correction_due" id="correctionDueInput" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100" style="border-left:4px solid var(--bs-primary) !important;">
+                        <label class="form-label small text-uppercase text-secondary">Corrective Action Due Date</label>
+                        <input type="date" class="form-control font-mono" name="capa_due" id="capaDueInput" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100" id="nonconformanceTypeSection">
+                        <div class="fw-semibold text-uppercase small mb-2" style="color:var(--bs-primary)">
+                            Type of Non-conformance <span class="fw-normal text-secondary text-lowercase">(select one)</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <input type="radio" class="btn-check" name="nonconformance_type" id="ncType1" value="ProductQualityFoodSafety" onchange="handleNonconformanceTypeChange()" autocomplete="off" required>
+                            <label class="btn btn-outline-primary btn-sm rounded-pill" for="ncType1">Product Quality &amp; Food Safety</label>
+
+                            <input type="radio" class="btn-check" name="nonconformance_type" id="ncType2" value="EnvironmentHealthSafetySecurity" onchange="handleNonconformanceTypeChange()" autocomplete="off" required>
+                            <label class="btn btn-outline-primary btn-sm rounded-pill" for="ncType2">Environment, Health &amp; Safety, Security</label>
+
+                            <input type="radio" class="btn-check" name="nonconformance_type" id="ncType3" value="InternalQualityAudit" onchange="handleNonconformanceTypeChange()" autocomplete="off" required>
+                            <label class="btn btn-outline-primary btn-sm rounded-pill" for="ncType3">Internal Quality Audit</label>
+
+                            <input type="radio" class="btn-check" name="nonconformance_type" id="ncType4" value="ExternalQualityAudit" onchange="handleNonconformanceTypeChange()" autocomplete="off" required>
+                            <label class="btn btn-outline-primary btn-sm rounded-pill" for="ncType4">External Quality Audit</label>
+
+                            <input type="radio" class="btn-check" name="nonconformance_type" id="ncType5" value="CustomerAudit" onchange="handleNonconformanceTypeChange()" autocomplete="off" required>
+                            <label class="btn btn-outline-primary btn-sm rounded-pill" for="ncType5">Customer Audit</label>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-2 d-none" id="externalAuditSubWrap">
+                            <input type="radio" class="btn-check" name="external_audit_subtype" id="eqaGov" value="Government" autocomplete="off" required>
+                            <label class="btn btn-outline-secondary btn-sm rounded-pill" for="eqaGov">Government</label>
+
+                            <input type="radio" class="btn-check" name="external_audit_subtype" id="eqa3rd" value="ThirdParty" autocomplete="off" required>
+                            <label class="btn btn-outline-secondary btn-sm rounded-pill" for="eqa3rd">3rd Party</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100" id="carClassificationSection">
+                        <div class="fw-semibold text-uppercase small mb-2" style="color:var(--bs-primary)">
+                            CAR Classification <span class="fw-normal text-secondary text-lowercase">(select one)</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="car_classification_type" id="carLlii" value="LLII" onchange="handleCarClassificationChange()" required>
+                                <label class="form-check-label" for="carLlii">LLII</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="car_classification_type" id="carSupplier" value="Supplier" onchange="handleCarClassificationChange()" required>
+                                <label class="form-check-label" for="carSupplier">Supplier</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="car_classification_type" id="carTrucker" value="Trucker" onchange="handleCarClassificationChange()" required>
+                                <label class="form-check-label" for="carTrucker">Trucker</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="car_classification_type" id="carDcSite" value="DCSite" onchange="handleCarClassificationChange()" required>
+                                <label class="form-check-label" for="carDcSite">DC Site</label>
+                            </div>
+
+                        </div>
+                        <div id="carClassificationDetail" class="mt-2">
+                            <select id="carSupplierSelect" class="form-select form-select-sm d-none" required onchange="handleSupplierChange()">
+                                <option value="" disabled selected>Select Supplier&hellip;</option>
+                                @foreach (var v in ViewBag.Vendor)
+                                {
+                                    <option value="@v.VendorID" data-name="@v.VendorName" data-email="@v.EmailAddress">@v.VendorName (@v.EmailAddress)</option>
+                                }
+                            </select>
+                            <select id="carTruckerSelect" class="form-select form-select-sm d-none" required>
+                                <option value="" disabled selected>Select Trucker&hellip;</option>
+                                @foreach (var t in ViewBag.Truck)
+                                {
+                                    <option value="@t.TruckID" data-name="@t.TruckerName" data-email="@t.EmailAddress">@t.TruckerName (@t.EmailAddress)</option>
+                                }
+                            </select>
+                            <select id="carDcSiteSelect" class="form-select form-select-sm d-none" required>
+                                <option value="" disabled selected>Select DC Site&hellip;</option>
+                                @foreach (var dc in ViewBag.DcSites)
+                                {
+                                    var dcEmail = (dc.ExternalCode ?? "").ToString().ToLower() + "@leadlogistics.com.ph";
+                                    <option value="@dc.ExternalCode" data-name="@dc.WarehouseName" data-email="@dcEmail">@dc.WarehouseName (@dcEmail)</option>
+                                }
+                            </select>
+                            <input type="text" id="carOtherText" class="form-control form-control-sm d-none" placeholder="Specify" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="capa-item-block" data-item-index="0" id="capaItemBlock0">
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white flex-wrap gap-1">
+                    <span><span class="step-badge me-2">1</span>Details of the Non-conformance</span>
+                    <small class="text-secondary fst-italic">To be completed by Requestor</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Item Description <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <div class="autocomplete-wrap item-search-wrap">
+                                <input type="text" class="form-control item-search" autocomplete="off"
+                                       placeholder="Start typing, e.g. &ldquo;mini apple&rdquo;&hellip;" required>
+                                <input type="hidden" class="item-field" data-field="item_id">
+                                <div class="list-group ac-dropdown item-ac-dropdown shadow-sm"></div>
+                            </div>
+                            <select class="form-select item-vendor-select d-none">
+                                <option value="" disabled selected>Select item&hellip;</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Item Code <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="text" class="form-control font-mono item-code-display" placeholder="Auto-fills from selection" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Quantity of Affected Items <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="number" min="0" class="form-control item-field" data-field="quantity" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Unit of Measure <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <select class="form-select item-field" data-field="uom_id" required>
+                                <option value="" disabled selected>Select UOM&hellip;</option>
+                                @foreach (var u in ViewBag.UOM)
+                                {
+                                    <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Defect Description <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <select class="form-select item-field defect-select" data-field="defect_category_id" required>
+                                <option value="" disabled selected>Loading&hellip;</option>
+                            </select>
+                            <input type="text" class="form-control mt-2 d-none defect-other-input" placeholder="Specify the defect">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Defect Category <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="text" class="form-control font-mono defect-category-display" placeholder="Auto-fills from selection" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">UTD <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="date" class="form-control item-field" data-field="used_to_date" required>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label small text-uppercase text-secondary">Remarks</label>
+                        <textarea class="form-control item-field" data-field="remarks" rows="4" placeholder="Describe what happened, when and where it was discovered, and which product, batch, or shipment is affected&hellip;" required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white flex-wrap gap-1">
+                    <span><span class="step-badge me-2">2</span>Photo / Document Attachments</span>
+                    <small class="text-secondary fst-italic">Evidence photos, supporting documents, etc.</small>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                        <label class="btn btn-outline-primary btn-sm mb-0">
+                            + Add file(s)
+                            <input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple class="d-none item-attach-input">
+                        </label>
+                        <span class="small text-secondary fst-italic">Images, PDF, Word, or Excel &mdash; multiple files allowed. Stored only in this open page &mdash; nothing is uploaded anywhere.</span>
+                    </div>
+                    <div class="item-attach-empty text-secondary fst-italic small text-center py-3">No attachments added yet.</div>
+                    <div class="item-attach-grid row row-cols-2 row-cols-md-3 g-3"></div>
+                </div>
+            </div>
+            </div>
+
+            <div class="d-flex mb-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="addItemBtn" onclick="addCapaItem()">
+                    <i class="bi bi-plus-circle"></i> Add Item
+                </button>
+            </div>
+
+            <template id="capaItemTemplate">
+                <div class="capa-item-block">
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white flex-wrap gap-1">
+                            <span><span class="step-badge me-2">1</span>Details of the Non-conformance</span>
+                            <button type="button" class="btn btn-link btn-sm text-danger p-0 remove-item-btn">Remove item</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Item Description <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <div class="autocomplete-wrap item-search-wrap">
+                                        <input type="text" class="form-control item-search" autocomplete="off"
+                                               placeholder="Start typing, e.g. &ldquo;mini apple&rdquo;&hellip;" required>
+                                        <input type="hidden" class="item-field" data-field="item_id">
+                                        <div class="list-group ac-dropdown item-ac-dropdown shadow-sm"></div>
+                                    </div>
+                                    <select class="form-select item-vendor-select d-none">
+                                        <option value="" disabled selected>Select item&hellip;</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Item Code <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <input type="text" class="form-control font-mono item-code-display" placeholder="Auto-fills from selection" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Quantity of Affected Items <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <input type="number" min="0" class="form-control item-field" data-field="quantity" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Unit of Measure <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <select class="form-select item-field" data-field="uom_id" required>
+                                        <option value="" disabled selected>Select UOM&hellip;</option>
+                                        @foreach (var u in ViewBag.UOM)
+                                        {
+                                            <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Defect Description <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <select class="form-select item-field defect-select" data-field="defect_category_id" required>
+                                        <option value="" disabled selected>Loading&hellip;</option>
+                                    </select>
+                                    <input type="text" class="form-control mt-2 d-none defect-other-input" placeholder="Specify the defect">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Defect Category <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <input type="text" class="form-control font-mono defect-category-display" placeholder="Auto-fills from selection" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">UTD <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                                    <input type="date" class="form-control item-field" data-field="used_to_date" required>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label small text-uppercase text-secondary">Remarks</label>
+                                <textarea class="form-control item-field" data-field="remarks" rows="4" placeholder="Describe what happened, when and where it was discovered, and which product, batch, or shipment is affected&hellip;" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white flex-wrap gap-1">
+                            <span><span class="step-badge me-2">2</span>Photo / Document Attachments</span>
+                            <small class="text-secondary fst-italic">Evidence photos, supporting documents, etc.</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                                <label class="btn btn-outline-primary btn-sm mb-0">
+                                    + Add file(s)
+                                    <input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple class="d-none item-attach-input">
+                                </label>
+                                <span class="small text-secondary fst-italic">Images, PDF, Word, or Excel &mdash; multiple files allowed. Stored only in this open page &mdash; nothing is uploaded anywhere.</span>
+                            </div>
+                            <div class="item-attach-empty text-secondary fst-italic small text-center py-3">No attachments added yet.</div>
+                            <div class="item-attach-grid row row-cols-2 row-cols-md-3 g-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <div class="d-flex justify-content-between text-secondary small border-top pt-3 font-mono">
+                <span>QF-QAD-014 Rev 03</span>
+                <span>Effectivity date: April 15, 2026</span>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+<script>
+    function hideLayoutElements() {
+        document.getElementById("navbarLLII")?.classList.add("visually-hidden");
+        document.getElementById("footerLLII2")?.classList.add("visually-hidden");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        hideLayoutElements();
+
+    });
+</script>
+
+<script>
+    let capaItemCounter = 0;
+
+    const ALLOWED_ATTACHMENT_TYPES = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+
+    function isAllowedAttachment(file) {
+        return file.type.startsWith('image/') || ALLOWED_ATTACHMENT_TYPES.includes(file.type);
+    }
+
+    function fileIconFor(fileName) {
+        const ext = (fileName.split('.').pop() || '').toLowerCase();
+        if (ext === 'pdf') return '📕';
+        if (ext === 'doc' || ext === 'docx') return '📄';
+        if (ext === 'xls' || ext === 'xlsx') return '📊';
+        return '📎';
+    }
+
+    function readAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function compressImageFile(file, maxDimension = 1600, quality = 0.82) {
+        return readAsDataUrl(file).then(originalDataUrl => new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                if (width <= maxDimension && height <= maxDimension) {
+                    resolve(originalDataUrl);
+                    return;
+                }
+                const scale = maxDimension / Math.max(width, height);
+                width = Math.round(width * scale);
+                height = Math.round(height * scale);
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = () => resolve(originalDataUrl);
+            img.src = originalDataUrl;
+        }));
+    }
+
+    function initItemAttachments(block) {
+        let attachments = [];
+        let idSeq = 0;
+        const fileInput = block.querySelector('.item-attach-input');
+        const grid = block.querySelector('.item-attach-grid');
+        const empty = block.querySelector('.item-attach-empty');
+
+        function render() {
+            empty.style.display = attachments.length ? 'none' : 'block';
+            grid.innerHTML = attachments.map(a => `
+                <div class="col">
+                    <div class="card attach-thumb h-100">
+                        <button type="button" class="btn-close" aria-label="Remove" data-remove-id="${a.id}"></button>
+                        ${a.isImage
+                            ? `<img src="${a.dataUrl}" class="card-img-top" alt="Attachment">`
+                            : `<div class="card-img-top d-flex flex-column align-items-center justify-content-center bg-light" style="aspect-ratio:4/3;">
+                                   <span style="font-size:2rem;line-height:1;">${fileIconFor(a.fileName)}</span>
+                                   <small class="text-secondary text-truncate px-2" style="max-width:90%;">${escapeHtml(a.fileName)}</small>
+                               </div>`}
+                        <div class="card-body p-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" data-caption-id="${a.id}">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            grid.querySelectorAll('[data-remove-id]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    attachments = attachments.filter(a => a.id !== Number(btn.dataset.removeId));
+                    render();
+                });
+            });
+            grid.querySelectorAll('[data-caption-id]').forEach(input => {
+                input.addEventListener('input', () => {
+                    const found = attachments.find(a => a.id === Number(input.dataset.captionId));
+                    if (found) found.caption = input.value;
+                });
+            });
+        }
+
+        fileInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files || []);
+            files.forEach(file => {
+                if (!isAllowedAttachment(file)) return;
+                const isImage = file.type.startsWith('image/');
+                const process = isImage ? compressImageFile(file) : readAsDataUrl(file);
+                process.then(dataUrl => {
+                    attachments.push({ id: ++idSeq, dataUrl, caption: '', fileName: file.name, isImage });
+                    render();
+                });
+            });
+            event.target.value = '';
+        });
+
+        render();
+        block.getItemAttachments = () => attachments;
+        block.resetAttachments = () => { attachments = []; render(); };
+    }
+
+    function initItemAutocomplete(block) {
+        block._acMatches = [];
+        block._acActiveIndex = -1;
+
+        const itemSearch = block.querySelector('.item-search');
+        const itemIdField = block.querySelector('[data-field="item_id"]');
+        const itemDropdown = block.querySelector('.item-ac-dropdown');
+        const itemCodeDisplay = block.querySelector('.item-code-display');
+
+        function renderItemDropdown() {
+            const query = itemSearch.value;
+            if (!block._acMatches.length) {
+                itemDropdown.innerHTML = query.trim() ? '<div class="list-group-item text-secondary fst-italic small">No catalog match.</div>' : '';
+                itemDropdown.classList.toggle('open', !!query.trim());
+                return;
+            }
+            itemDropdown.innerHTML = block._acMatches.map((it, i) => `
+                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center ${i === block._acActiveIndex ? 'active' : ''}" data-index="${i}">
+                    <span>${highlightMatch(it.name, query)}</span>
+                    <small class="font-mono">${escapeHtml(it.code || '')}</small>
+                </button>
+            `).join('');
+            itemDropdown.classList.add('open');
+            itemDropdown.querySelectorAll('[data-index]').forEach(btn => {
+                btn.addEventListener('mousedown', () => selectItemMatch(Number(btn.dataset.index)));
+            });
+        }
+
+        function selectItemMatch(i) {
+            const it = block._acMatches[i];
+            if (!it) return;
+            itemSearch.value = it.name;
+            itemIdField.value = it.id;
+            itemCodeDisplay.value = it.code || '';
+            closeItemDropdown();
+        }
+
+        function closeItemDropdown() {
+            block._acMatches = [];
+            block._acActiveIndex = -1;
+            itemDropdown.classList.remove('open');
+            itemDropdown.innerHTML = '';
+        }
+
+        itemSearch.addEventListener('input', () => {
+            itemIdField.value = '';
+            itemCodeDisplay.value = '';
+            block._acMatches = filterCatalog(itemSearch.value);
+            block._acActiveIndex = -1;
+            renderItemDropdown();
+        });
+        itemSearch.addEventListener('focus', () => {
+            block._acMatches = filterCatalog(itemSearch.value);
+            block._acActiveIndex = -1;
+            renderItemDropdown();
+        });
+        itemSearch.addEventListener('keydown', (e) => {
+            if (!block._acMatches.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); block._acActiveIndex = Math.min(block._acActiveIndex + 1, block._acMatches.length - 1); renderItemDropdown(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); block._acActiveIndex = Math.max(block._acActiveIndex - 1, 0); renderItemDropdown(); }
+            else if (e.key === 'Enter') { if (block._acActiveIndex >= 0) { e.preventDefault(); selectItemMatch(block._acActiveIndex); } }
+            else if (e.key === 'Escape') { closeItemDropdown(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!itemSearch.closest('.autocomplete-wrap').contains(e.target)) closeItemDropdown();
+        });
+    }
+    function populateDefectSelect(select) {
+        if (!select) return;
+        const current = select.value;
+        select.innerHTML = '<option value="" disabled' + (current ? '' : ' selected') + '>Select defect&hellip;</option>' +
+            DEFECT_CATALOG.map(d => `<option value="${d.id}" data-category="${escapeHtml(d.category)}">${escapeHtml(d.name)}</option>`).join('') +
+            '<option value="other">Other (please specify)</option>';
+        if (current) select.value = current;
+    }
+
+    function populateAllDefectSelects() {
+        document.querySelectorAll('.defect-select').forEach(populateDefectSelect);
+    }
+
+    function initDefectSelect(block) {
+        const select = block.querySelector('.defect-select');
+        const categoryDisplay = block.querySelector('.defect-category-display');
+        const otherInput = block.querySelector('.defect-other-input');
+        if (!select) return;
+
+        select.addEventListener('change', () => {
+            const opt = select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
+            if (select.value === 'other') {
+                categoryDisplay.value = 'Other';
+                otherInput.classList.remove('d-none');
+            } else {
+                categoryDisplay.value = opt ? (opt.dataset.category || '') : '';
+                otherInput.classList.add('d-none');
+                otherInput.value = '';
+            }
+        });
+
+        populateDefectSelect(select);
+    }
+
+    function addCapaItem() {
+        capaItemCounter++;
+        const template = document.getElementById('capaItemTemplate');
+        const fragment = template.content.cloneNode(true);
+        const block = fragment.querySelector('.capa-item-block');
+        block.dataset.itemIndex = capaItemCounter;
+
+        block.querySelector('.remove-item-btn').addEventListener('click', () => {
+            block.remove();
+        });
+
+        document.getElementById('addItemBtn').parentElement.insertAdjacentElement('beforebegin', block);
+        initItemAttachments(block);
+        initItemAutocomplete(block);
+        initVendorItemSelect(block);
+        initDefectSelect(block);
+        applyItemFieldsRequiredState(block);
+    }
+
+    let currentVendorItems = null;
+
+    async function loadVendorItemsForSupplier(vendorId) {
+        if (!vendorId) {
+            resetVendorItemRestriction();
+            return;
+        }
+        try {
+            const res = await fetch(window.CAPA_CONFIG.vendorItemListUrl + '?vendorId=' + encodeURIComponent(vendorId));
+            currentVendorItems = res.ok ? await res.json() : [];
+        } catch (err) {
+            console.error('Could not load vendor items', err);
+            currentVendorItems = [];
+        }
+        applyItemModeToAllBlocks();
+    }
+
+    function resetVendorItemRestriction() {
+        if (currentVendorItems === null) return;
+        currentVendorItems = null;
+        applyItemModeToAllBlocks();
+    }
+
+    function handleSupplierChange() {
+        const supplierSelect = document.getElementById('carSupplierSelect');
+        loadVendorItemsForSupplier(supplierSelect.value);
+    }
+
+    function applyItemModeToAllBlocks() {
+        document.querySelectorAll('.capa-item-block').forEach(applyItemModeToBlock);
+    }
+
+    function applyItemModeToBlock(block) {
+        const searchWrap = block.querySelector('.item-search-wrap');
+        const vendorSelect = block.querySelector('.item-vendor-select');
+        const itemIdField = block.querySelector('[data-field="item_id"]');
+        const itemCodeDisplay = block.querySelector('.item-code-display');
+        if (!searchWrap || !vendorSelect) return;
+
+        if (currentVendorItems) {
+            searchWrap.classList.add('d-none');
+            vendorSelect.classList.remove('d-none');
+
+            const current = vendorSelect.value;
+            vendorSelect.innerHTML = '<option value="" disabled selected>Select item&hellip;</option>' +
+                currentVendorItems.map(it => `<option value="${it.id}" data-code="${escapeHtml(it.code || '')}">${escapeHtml(it.name)}</option>`).join('');
+            if (current) vendorSelect.value = current;
+        } else {
+            searchWrap.classList.remove('d-none');
+            vendorSelect.classList.add('d-none');
+            vendorSelect.value = '';
+            itemIdField.value = '';
+            itemCodeDisplay.value = '';
+        }
+    }
+
+    function initVendorItemSelect(block) {
+        const vendorSelect = block.querySelector('.item-vendor-select');
+        const itemIdField = block.querySelector('[data-field="item_id"]');
+        const itemCodeDisplay = block.querySelector('.item-code-display');
+        if (!vendorSelect) return;
+
+        vendorSelect.addEventListener('change', () => {
+            const opt = vendorSelect.selectedIndex >= 0 ? vendorSelect.options[vendorSelect.selectedIndex] : null;
+            itemIdField.value = vendorSelect.value || '';
+            itemCodeDisplay.value = opt ? (opt.dataset.code || '') : '';
+        });
+
+        applyItemModeToBlock(block);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const block0 = document.getElementById('capaItemBlock0');
+        initItemAttachments(block0);
+        initItemAutocomplete(block0);
+        initVendorItemSelect(block0);
+        initDefectSelect(block0);
+    });
+</script>
+
+<script>
+	window.CAPA_CONFIG = {
+		itemCatalogUrl: '@Url.Action("Catalog", "Capa")',
+		defectCatalogUrl: '@Url.Action("DefectCatalog", "Capa")',
+		vendorItemListUrl: '@Url.Action("VendorItemList", "Capa")',
+		saveCapaReportUrl: '@Url.Action("SaveCapaReport", "Capa")'
+	};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="@Url.Content("~/Scripts/capa-form.js")?v=@DateTime.Now.Ticks"></script>
+<script src="@Url.Content("~/Scripts/capa-tour.js")?v=@DateTime.Now.Ticks"></script>
