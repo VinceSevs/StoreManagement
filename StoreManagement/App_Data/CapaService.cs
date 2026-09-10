@@ -165,6 +165,40 @@ namespace IsseERP.Services
             }
         }
 
+        //public async Task<bool> LoopCapaReport(CapaReportModel model)
+        //{
+        //    try
+        //    {
+        //        var json = JsonConvert.SerializeObject(model);
+        //        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        //        var response = await _httpClient.PostAsync("api/capa/respond-again", content);
+
+        //        return response.IsSuccessStatusCode;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        //public async Task<bool> InsertCapaReport(CapaReportModel model)
+        //{
+        //    try
+        //    {
+        //        var json = JsonConvert.SerializeObject(model);
+        //        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        //        var response = await _httpClient.PostAsync("api/capa/insert", content);
+
+        //        return response.IsSuccessStatusCode;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
+
         public async Task<List<CapaReportModel>> GetAllCapaReports()
         {
             var reports = new List<CapaReportModel>();

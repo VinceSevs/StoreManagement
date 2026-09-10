@@ -577,6 +577,11 @@ function renderResponseAttachments() {
 	`).join('');
 }
 
+function val(id) {
+	const el = document.getElementById(id);
+	return el ? el.value.trim() : '';
+}
+
 async function submitResponse() {
 	const required = [
 		{ id: 'immediateAction', label: 'Correction / Immediate Action Taken' },
