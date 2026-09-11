@@ -186,11 +186,6 @@
         overallStatus = "Cancelled";
         overallBadgeClass = "bg-dark";
     }
-    else if (!step2Done && string.Equals((string)ViewBag.Capa.Status, "Closed", System.StringComparison.OrdinalIgnoreCase))
-    {
-        overallStatus = "Closed — Past Due";
-        overallBadgeClass = "bg-dark";
-    }
     else if (!step2Done)
     {
         overallStatus = "Awaiting Response";
@@ -249,46 +244,84 @@
         </div>
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Issued By</label>
-                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedBy" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Issued To</label>
-                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedToDepartmentName" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
-                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.SiteWarehouseName" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Ref. No. (QAR / PNCR)</label>
-                    <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.RefNo" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Correction Due</label>
-                    <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.CorrectionDueDate.ToString("MMM dd, yyyy")" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">CAR Due</label>
-                    <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.ReportDueDate.ToString("MMM dd, yyyy")" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Type of Non-conformance</label>
-                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.NonconformanceType" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">CAR Classification</label>
-                    <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.CarClassificationType &mdash; @(!string.IsNullOrWhiteSpace((string)ViewBag.Capa.CarClassificationRefName) ? ViewBag.Capa.CarClassificationRefName : ViewBag.Capa.CarClassificationOtherText)" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Stock Movement</label>
-                    <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.StockEventID == 2 ? "AUDIT" : ViewBag.Capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT")" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small text-uppercase text-secondary">Accredited Hauler</label>
-                    <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.Items.Count > 0 ? ViewBag.Capa.Items[0].Hauler : null)" readonly>
-                </div>
+                @if (step4Verified || step2Verified)
+                {
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Issued By</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedBy" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Issued To</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedToDepartmentName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.SiteWarehouseName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Ref. No. (QAR / PNCR)</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.RefNo" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Correction Due</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.CorrectionDueDate.ToString("MMM dd, yyyy")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">CAR Due</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.ReportDueDate.ToString("MMM dd, yyyy")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Type of Non-conformance</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.NonconformanceType" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">CAR Classification</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.CarClassificationType &mdash; @(!string.IsNullOrWhiteSpace((string)ViewBag.Capa.CarClassificationRefName) ? ViewBag.Capa.CarClassificationRefName : ViewBag.Capa.CarClassificationOtherText)" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Stock Movement</label>
+                        <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.StockEventID == 2 ? "AUDIT" : ViewBag.Capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Accredited Hauler</label>
+                        <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.Items.Count > 0 ? ViewBag.Capa.Items[0].Hauler : null)" readonly>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Issued By</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedBy" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Issued To</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.IssuedToDepartmentName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.SiteWarehouseName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Ref. No. (QAR / PNCR)</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.RefNo" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Correction Due</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.CorrectionDueDate.ToString("MMM dd, yyyy")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">CAR Due</label>
+                        <input type="text" class="form-control readonly-field font-mono" value="@ViewBag.Capa.ReportDueDate.ToString("MMM dd, yyyy")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">Type of Non-conformance</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.NonconformanceType" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-uppercase text-secondary">CAR Classification</label>
+                        <input type="text" class="form-control readonly-field" value="@ViewBag.Capa.CarClassificationType &mdash; @(!string.IsNullOrWhiteSpace((string)ViewBag.Capa.CarClassificationRefName) ? ViewBag.Capa.CarClassificationRefName : ViewBag.Capa.CarClassificationOtherText)" readonly>
+                    </div>
+                }
             </div>
         </div>
     </div>
