@@ -534,10 +534,16 @@
                         <div class="col-md-6">
                             <label class="form-label small text-uppercase text-secondary">Unit of Measure <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
                             <select class="form-select item-field" data-field="uom_id" required>
-                                <option value="" disabled selected>Select UOM&hellip;</option>
                                 @foreach (var u in ViewBag.UOM)
                                 {
-                                    <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                    if (string.Equals((string)u.Text, "Case", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <option value="@u.UOMID" selected>@u.Text - @u.IsoCode</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                    }
                                 }
                             </select>
                         </div>
@@ -621,10 +627,16 @@
                                 <div class="col-md-6">
                                     <label class="form-label small text-uppercase text-secondary">Unit of Measure <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
                                     <select class="form-select item-field" data-field="uom_id" required>
-                                        <option value="" disabled selected>Select UOM&hellip;</option>
                                         @foreach (var u in ViewBag.UOM)
                                         {
-                                            <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                            if (string.Equals((string)u.Text, "Case", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <option value="@u.UOMID" selected>@u.Text - @u.IsoCode</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                            }
                                         }
                                     </select>
                                 </div>
