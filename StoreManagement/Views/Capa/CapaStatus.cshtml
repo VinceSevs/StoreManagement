@@ -280,7 +280,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small text-uppercase text-secondary">Stock Movement</label>
-                        <input type="text" class="form-control readonly-field" value="@(ViewBag.Capa.StockEventID == 2 ? "AUDIT" : ViewBag.Capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT")" readonly>
+                        <input type="text" class="form-control readonly-field" value="@(string.IsNullOrWhiteSpace((string)ViewBag.Capa.IaVerifiedBy) ? "Not yet set" : (ViewBag.Capa.StockEventID == 2 ? "AUDIT" : ViewBag.Capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT"))" readonly>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small text-uppercase text-secondary">Accredited Hauler</label>

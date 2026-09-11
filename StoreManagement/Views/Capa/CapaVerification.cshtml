@@ -361,7 +361,6 @@
     }
     else
     {
-        int stockEventID = ViewBag.Capa.StockEventID;
         int? headerVerifiedBy = ViewBag.Capa.VerifiedBy;
 
         <form id="verificationForm" class="card mb-3">
@@ -370,13 +369,13 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label small text-uppercase text-secondary d-block">Stock Movement</label>
-                        <input type="radio" class="btn-check" name="stock_event" id="stockEventSaOut" value="0" autocomplete="off" @(stockEventID == 0 ? "checked" : "")>
+                        <input type="radio" class="btn-check" name="stock_event" id="stockEventSaOut" value="0" autocomplete="off">
                         <label class="btn btn-outline-primary btn-sm rounded-pill" for="stockEventSaOut">SA OUT</label>
 
-                        <input type="radio" class="btn-check" name="stock_event" id="stockEventOutRight" value="1" autocomplete="off" @(stockEventID == 1 ? "checked" : "")>
+                        <input type="radio" class="btn-check" name="stock_event" id="stockEventOutRight" value="1" autocomplete="off">
                         <label class="btn btn-outline-primary btn-sm rounded-pill" for="stockEventOutRight">OUT RIGHT</label>
 
-                        <input type="radio" class="btn-check" name="stock_event" id="stockEventAudit" value="2" autocomplete="off" @(stockEventID == 2 ? "checked" : "")>
+                        <input type="radio" class="btn-check" name="stock_event" id="stockEventAudit" value="2" autocomplete="off">
                         <label class="btn btn-outline-primary btn-sm rounded-pill" for="stockEventAudit">AUDIT</label>
                     </div>
 

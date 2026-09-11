@@ -509,7 +509,7 @@
                             <span class="badge bg-warning text-dark" title="Sent back to Awaiting Response @capa.LoopNumber time(s) after failing an effectiveness check">&#x21bb; @capa.LoopNumber</span>
                         }
                     </td>
-                    <td class="font-mono text-secondary">@(capa.StockEventID == 2 ? "AUDIT" : capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT")</td>
+                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(capa.IaVerifiedBy) ? "—" : (capa.StockEventID == 2 ? "AUDIT" : capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT"))</td>
                     <td class="font-mono text-secondary">@(firstItem?.ItemCode)</td>
                     <td class="font-mono text-secondary">@(firstItem?.ItemDescription)</td>
                     <td class="font-mono text-secondary">@(firstItem?.UsedToDate != null ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
