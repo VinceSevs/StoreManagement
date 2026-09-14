@@ -714,6 +714,7 @@ function downloadCapaStatusPdf() {
 	const btn = document.getElementById('downloadPdfBtn');
 	const source = document.getElementById('capaStatusPrintArea');
 	const capaNo = '@ViewBag.Capa.ReportNumber';
+	const carStatus = '@overallStatus'.replace(/\s+/g, '-');
 
 	btn.disabled = true;
 	btn.textContent = 'Generating...';
@@ -766,7 +767,7 @@ function downloadCapaStatusPdf() {
 
 	const opt = {
 		margin: 0.4,
-		filename: 'CAR-Status-' + capaNo + '.pdf',
+		filename: 'CAR-Status-' + capaNo + '-' + carStatus + '.pdf',
 		image: { type: 'jpeg', quality: 0.98 },
 		html2canvas: { scale: 2, useCORS: true },
 		jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
@@ -790,6 +791,10 @@ function downloadCapaStatusPdf() {
 		console.error('PDF generation failed:', err);
 		alert('Could not generate PDF: ' + (err && err.message ? err.message : err));
 	});
+}
+
+if (new URLSearchParams(window.location.search).get('autoDownloadPdf') === '1') {
+	downloadCapaStatusPdf();
 }
 </script>
 
@@ -887,7 +892,7 @@ function printPalletTags() {
 
 	const opt = {
 		margin: 0.4,
-		filename: 'CAR-' + capaNo + '-Pallet-Tags.pdf',
+		filename: capaNo + '-Pallet-Tags.pdf',
 		image: { type: 'jpeg', quality: 0.98 },
 		html2canvas: { scale: 2, useCORS: true },
 		jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },

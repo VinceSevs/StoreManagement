@@ -226,8 +226,11 @@ namespace IsseERP.Controllers
                     "Submit to Database",
                     CurrentUserID());
 
+
+                var savedCapa = await _capaService.GetCapaByReportNumber(reportNumber);
+
                 // Return the newly generated report number back to the client
-                return Json(new { success = true, ReportNumber = reportNumber });
+                return Json(new { success = true, ReportNumber = reportNumber, ResponseToken = savedCapa?.ResponseToken });
             }
             catch (Exception ex)
             {

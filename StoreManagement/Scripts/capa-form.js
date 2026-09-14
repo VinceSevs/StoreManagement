@@ -400,6 +400,13 @@ async function submitCapaForm() {
 			statusEl.textContent = `Saved — ${result.ReportNumber}`;
 			statusEl.className = 'me-auto small fw-semibold text-success';
 
+			if (result.ResponseToken) {
+				window.open(
+					`${window.CAPA_CONFIG.capaStatusUrl}?token=${encodeURIComponent(result.ResponseToken)}&autoDownloadPdf=1`,
+					'_blank'
+				);
+			}
+
 			let timerInterval;
 
 			Swal.fire({
