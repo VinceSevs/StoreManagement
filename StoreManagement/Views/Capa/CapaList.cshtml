@@ -833,6 +833,12 @@
 
 		const today = new Date().toISOString().slice(0, 10);
 		XLSX.writeFile(workbook, `CAR_Reports_${today}.xlsx`);
+
+		fetch('@Url.Action("LogCapaAction", "Capa")', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: 'logType=' + encodeURIComponent('Export to Excel')
+		}).catch(() => {});
 	}
 
 	document.querySelectorAll('.stat-card').forEach(function (card) {

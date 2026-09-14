@@ -1,5 +1,6 @@
 using IsseERP.Models;
 using IsseERP.Services;
+using StoreManagement.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -22,6 +23,18 @@ namespace IsseERP.Controllers
         private readonly VendorService _vendorService = new VendorService();
         private readonly UOMService _uomService = new UOMService();
         private readonly UserAccountService _userAccountService = new UserAccountService();
+        private readonly CapaLogService _capaLogService = new CapaLogService();
+        private readonly AccountRepository _accountRepo = new AccountRepository();
+
+        // Resolves the logged-in internal user for the log's UserID column.
+        // Returns 0 when nobody is logged in — e.g. an external respondent
+        // using their emailed link.
+        private int CurrentUserID()
+        {
+            if (string.IsNullOrWhiteSpace(User?.Identity?.Name)) return 0;
+            var account = _accountRepo.GetByUsername(User.Identity.Name);
+            return account?.UserID ?? 0;
+        }
         public async Task<ActionResult> CapaList()
         {
             await _capaService.CloseAllOverdue();
@@ -211,6 +224,11 @@ namespace IsseERP.Controllers
                     }
                 }
 
+                await _capaLogService.AddLog(
+                    $"Filed CAR {reportNumber}",
+                    "Submit to Database",
+                    CurrentUserID());
+
                 // Return the newly generated report number back to the client
                 return Json(new { success = true, ReportNumber = reportNumber });
             }
@@ -295,17 +313,23 @@ namespace IsseERP.Controllers
                 });
             }
 
+            var capaBeforeCancel = await _capaService.GetCapaByToken(token);
             bool cancelled = await _capaService.CancelRequest(token);
 
             if (!cancelled)
             {
                 Response.StatusCode = 400;
-                return Json(new 
-                { 
-                    success = false, 
-                    message = "This report can no longer be cancelled — it may have already been responded to, verified, or closed." 
+                return Json(new
+                {
+                    success = false,
+                    message = "This report can no longer be cancelled — it may have already been responded to, verified, or closed."
                 });
             }
+
+            await _capaLogService.AddLog(
+                $"Cancelled CAR {(capaBeforeCancel != null ? capaBeforeCancel.ReportNumber : token)}",
+                "Cancel CAR",
+                CurrentUserID());
 
             return Json(new
             {
@@ -357,16 +381,17 @@ namespace IsseERP.Controllers
                 });
             }
 
+            var respondedCapa = await _capaService.GetCapaByToken(request.ResponseToken);
+
             if (request.Attachments != null && request.Attachments.Count > 0)
             {
                 try
                 {
-                    var capa = await _capaService.GetCapaByToken(request.ResponseToken);
-                    if (capa != null && !string.IsNullOrWhiteSpace(capa.ReportNumber))
+                    if (respondedCapa != null && !string.IsNullOrWhiteSpace(respondedCapa.ReportNumber))
                     {
                         string attachmentsRoot = Server.MapPath("~/App_Data/CapaAttachments");
                         var fileService = new CapaAttachmentFileService(attachmentsRoot);
-                        fileService.SaveResponseAttachments(capa.ReportNumber, request.Attachments);
+                        fileService.SaveResponseAttachments(respondedCapa.ReportNumber, request.Attachments);
                     }
                 }
                 catch (Exception attachEx)
@@ -374,6 +399,15 @@ namespace IsseERP.Controllers
                     System.Diagnostics.Trace.TraceError("CAPA response attachment save failed: " + attachEx);
                 }
             }
+
+            // The respondent isn't a logged-in internal user — identify them
+            // by the email on file for this CAR's classification (the
+            // Supplier/Trucker/DC Site contact the report was addressed to).
+            string respondentEmail = respondedCapa?.CarClassificationRefEmail;
+            await _capaLogService.AddLog(
+                $"{(!string.IsNullOrWhiteSpace(respondentEmail) ? respondentEmail : "Unknown respondent")} submitted a response",
+                "Submit Response",
+                0);
 
             return Json(new 
             { 
@@ -440,21 +474,27 @@ namespace IsseERP.Controllers
                 });
             }
 
+            var capaBeforeVerify = await _capaService.GetCapaByToken(request.ResponseToken);
             bool success = await _capaService.SubmitVerification(request);
 
             if (!success)
             {
                 Response.StatusCode = 500;
-                return Json(new 
-                { 
-                    success = false, 
-                    message = "Could not save the verification. Please try again." 
+                return Json(new
+                {
+                    success = false,
+                    message = "Could not save the verification. Please try again."
                 });
             }
 
-            return Json(new 
-            { 
-                success = true 
+            await _capaLogService.AddLog(
+                $"Submitted verification for CAR {(capaBeforeVerify != null ? capaBeforeVerify.ReportNumber : request.ResponseToken)} — {(request.IsEffective ? "Effective" : "Not Effective")}",
+                "Submit Verification",
+                CurrentUserID());
+
+            return Json(new
+            {
+                success = true
             });
         }
 
@@ -490,6 +530,28 @@ namespace IsseERP.Controllers
             ViewBag.ItemAttachments = itemAttachments;
             ViewBag.Attachments = allAttachments;
             return View();
+        }
+
+        // Fire-and-forget logging for actions that never make a server
+        // round trip today — the CAR List's Export to Excel (SheetJS) and
+        // the CAR Status page's Download PDF (html2pdf.js) both run
+        // entirely client-side, so the JS calls this once the file is built.
+        [HttpPost]
+        public async Task<JsonResult> LogCapaAction(string logType, string reportNumber)
+        {
+            if (string.IsNullOrWhiteSpace(logType))
+            {
+                Response.StatusCode = 400;
+                return Json(new { success = false });
+            }
+
+            string description = string.IsNullOrWhiteSpace(reportNumber)
+                ? logType
+                : $"{logType} for CAR {reportNumber}";
+
+            await _capaLogService.AddLog(description, logType, CurrentUserID());
+
+            return Json(new { success = true });
         }
     }
 }

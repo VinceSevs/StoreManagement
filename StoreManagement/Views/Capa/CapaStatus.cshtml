@@ -758,6 +758,12 @@ function downloadCapaStatusPdf() {
 		clone.remove();
 		btn.disabled = false;
 		btn.innerHTML = '<i class="bi bi-download"></i> Download PDF';
+
+		fetch('@Url.Action("LogCapaAction", "Capa")', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: 'logType=' + encodeURIComponent('Download as PDF') + '&reportNumber=' + encodeURIComponent(capaNo)
+		}).catch(() => {});
 	}).catch((err) => {
 		clone.remove();
 		btn.disabled = false;

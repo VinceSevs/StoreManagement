@@ -146,6 +146,7 @@
   <ItemGroup>
     <Compile Include="App_Data\BaseApiClient.cs" />
     <Compile Include="App_Data\Capaattachmentfileservice.cs" />
+    <Compile Include="App_Data\CapaLogService.cs" />
     <Compile Include="App_Data\CapaService.cs" />
     <Compile Include="App_Data\HelperService.cs" />
     <Compile Include="App_Data\InboundService.cs" />
@@ -171,6 +172,7 @@
     </Compile>
     <Compile Include="Models\AccountRepository.cs" />
     <Compile Include="Models\Capa.cs" />
+    <Compile Include="Models\CapaLog.cs" />
     <Compile Include="Models\CapaLookups.cs" />
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\Login.cs" />
