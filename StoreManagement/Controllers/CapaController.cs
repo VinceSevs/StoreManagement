@@ -26,9 +26,6 @@ namespace IsseERP.Controllers
         private readonly CapaLogService _capaLogService = new CapaLogService();
         private readonly AccountRepository _accountRepo = new AccountRepository();
 
-        // Resolves the logged-in internal user for the log's UserID column.
-        // Returns 0 when nobody is logged in — e.g. an external respondent
-        // using their emailed link.
         private int CurrentUserID()
         {
             if (string.IsNullOrWhiteSpace(User?.Identity?.Name)) return 0;
@@ -225,7 +222,7 @@ namespace IsseERP.Controllers
                 }
 
                 await _capaLogService.AddLog(
-                    $"Filed CAR {reportNumber}",
+                    $"Filed {reportNumber}",
                     "Submit to Database",
                     CurrentUserID());
 
@@ -327,7 +324,7 @@ namespace IsseERP.Controllers
             }
 
             await _capaLogService.AddLog(
-                $"Cancelled CAR {(capaBeforeCancel != null ? capaBeforeCancel.ReportNumber : token)}",
+                $"Cancelled {(capaBeforeCancel != null ? capaBeforeCancel.ReportNumber : token)}",
                 "Cancel CAR",
                 CurrentUserID());
 
@@ -396,18 +393,17 @@ namespace IsseERP.Controllers
                 }
                 catch (Exception attachEx)
                 {
-                    System.Diagnostics.Trace.TraceError("CAPA response attachment save failed: " + attachEx);
+                    System.Diagnostics.Trace.TraceError("CAR response attachment save failed: " + attachEx);
                 }
             }
 
-            // The respondent isn't a logged-in internal user — identify them
-            // by the email on file for this CAR's classification (the
-            // Supplier/Trucker/DC Site contact the report was addressed to).
-            string respondentEmail = respondedCapa?.CarClassificationRefEmail;
+            string respondentEmail = !string.IsNullOrWhiteSpace(respondedCapa?.CarClassificationRefEmail)
+                ? respondedCapa.CarClassificationRefEmail
+                : respondedCapa?.CarClassificationOtherText;
             await _capaLogService.AddLog(
                 $"{(!string.IsNullOrWhiteSpace(respondentEmail) ? respondentEmail : "Unknown respondent")} submitted a response",
                 "Submit Response",
-                0);
+                1);
 
             return Json(new 
             { 
@@ -488,7 +484,7 @@ namespace IsseERP.Controllers
             }
 
             await _capaLogService.AddLog(
-                $"Submitted verification for CAR {(capaBeforeVerify != null ? capaBeforeVerify.ReportNumber : request.ResponseToken)} — {(request.IsEffective ? "Effective" : "Not Effective")}",
+                $"Submitted verification for {(capaBeforeVerify != null ? capaBeforeVerify.ReportNumber : request.ResponseToken)} — {(request.IsEffective ? "Effective" : "Not Effective")}",
                 "Submit Verification",
                 CurrentUserID());
 
@@ -532,10 +528,6 @@ namespace IsseERP.Controllers
             return View();
         }
 
-        // Fire-and-forget logging for actions that never make a server
-        // round trip today — the CAR List's Export to Excel (SheetJS) and
-        // the CAR Status page's Download PDF (html2pdf.js) both run
-        // entirely client-side, so the JS calls this once the file is built.
         [HttpPost]
         public async Task<JsonResult> LogCapaAction(string logType, string reportNumber)
         {
@@ -547,7 +539,7 @@ namespace IsseERP.Controllers
 
             string description = string.IsNullOrWhiteSpace(reportNumber)
                 ? logType
-                : $"{logType} for CAR {reportNumber}";
+                : $"{logType} for {reportNumber}";
 
             await _capaLogService.AddLog(description, logType, CurrentUserID());
 

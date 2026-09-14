@@ -6,8 +6,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StoreManagement.Models
 {
-    // Maps to tbl_StoreLog — the general activity log for the Store module
-    // (LogDescription/LogType are plain strings for now, not lookup tables).
     public class UpdateLog
     {
         public int LogID { get; set; }

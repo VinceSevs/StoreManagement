@@ -510,12 +510,12 @@
                         }
                     </td>
                     <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(capa.IaVerifiedBy) ? "—" : (capa.StockEventID == 2 ? "AUDIT" : capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT"))</td>
-                    <td class="font-mono text-secondary">@(firstItem?.ItemCode)</td>
-                    <td class="font-mono text-secondary">@(firstItem?.ItemDescription)</td>
-                    <td class="font-mono text-secondary">@(firstItem?.UsedToDate != null ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
-                    <td class="font-mono text-secondary">@(firstItem?.UOMDisplay)</td>
-                    <td class="font-mono text-secondary">@(firstItem?.Quantity)</td>
-                    <td class="font-mono text-secondary">@(firstItem?.DefectName)</td>
+                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.ItemCode) ? "—" : firstItem?.ItemCode)</td>
+                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.ItemDescription) ? "—" : firstItem?.ItemDescription)</td>
+                    <td class="font-mono text-secondary">@(firstItem?.UsedToDate != null && firstItem.UsedToDate.Value.Year > 1900 ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "—")</td>
+                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.UOMDisplay) ? "—" : firstItem?.UOMDisplay)</td>
+                    <td class="font-mono text-secondary">@((firstItem?.Quantity ?? 0) == 0 ? "—" : firstItem?.Quantity.ToString())</td>
+                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.DefectName) ? "—" : firstItem?.DefectName)</td>
                     <td class="font-mono text-secondary">@capa.CarClassificationType</td>
                     <td>
                         <span class="status-pill" style="color:@pillColor;background:@pillBg">

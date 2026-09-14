@@ -4,11 +4,6 @@ using System.Threading.Tasks;
 
 namespace IsseERP.Services
 {
-    // Writes to tbl_QualityIncidentLog — every column is NOT NULL, so every
-    // call must supply a real LogDescription/LogType and a real UserID
-    // (0 for actions taken outside a logged-in session, e.g. an external
-    // respondent replying through their emailed token link). LogDate is
-    // left out of the INSERT — the column defaults to GETDATE().
     public class CapaLogService
     {
         private readonly string connectionString =
