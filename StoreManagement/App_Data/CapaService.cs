@@ -184,6 +184,47 @@ namespace IsseERP.Services
             return report;
         }
 
+        public async Task<CapaReportModel> GetCapaByReportNumber(string reportNumber)
+        {
+            const string hdrQuery = @"
+                SELECT h.*,
+                       d.DepartmentDescription AS IssuedToDepartmentName,
+                       w.WarehouseName AS SiteWarehouseName,
+                       uv.username AS VerifiedByName,
+                       ua.username AS ApprovedByName
+                FROM dbo.tbl_QualityIncidentHdr h
+                LEFT JOIN tbl_Department d ON h.IssuedToDepartment = d.DepartmentID
+                LEFT JOIN tbl_Warehouse w ON h.SiteWarehouse = w.WarehouseID
+                LEFT JOIN tbl_UserAccount uv ON h.VerifiedBy = uv.id
+                LEFT JOIN tbl_UserAccount ua ON h.ApprovedBy = ua.id
+                WHERE h.ReportNumber = @ReportNumber";
+
+            CapaReportModel report = null;
+            int eventId = 0;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(hdrQuery, conn))
+            {
+                cmd.Parameters.AddWithValue("@ReportNumber", reportNumber);
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        eventId = (int)reader["EventID"];
+                        report = MapHdrReader(reader, eventId);
+                    }
+                }
+            }
+
+            if (report == null) return null;
+
+            var itemsById = await GetItemsGroupedByEventId(new[] { eventId });
+            report.Items = itemsById.TryGetValue(eventId, out var items) ? items : new List<CapaItemModel>();
+
+            return report;
+        }
+
         private async Task<Dictionary<int, List<CapaItemModel>>> GetItemsGroupedByEventId(IEnumerable<int> eventIds)
         {
             var result = new Dictionary<int, List<CapaItemModel>>();
