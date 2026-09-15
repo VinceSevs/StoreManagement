@@ -1,5 +1,6 @@
 using IsseERP.Models;
 using IsseERP.Services;
+using StoreManagement.Controllers;
 using StoreManagement.Models;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Web.Mvc;
 
 namespace IsseERP.Controllers
 {
-    public class CapaController : Controller
+    public class CapaController : BaseController
     {
         private readonly CapaService _capaService = new CapaService();
         private readonly PublicService _publicService = new PublicService();

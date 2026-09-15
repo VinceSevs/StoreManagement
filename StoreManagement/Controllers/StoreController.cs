@@ -12,7 +12,7 @@ using System.Drawing.Drawing2D;
 namespace StoreManagement.Controllers
 {
     [Authorize]
-    public class StoreController : Controller
+    public class StoreController : BaseController
     {
         private StoreRepository repo = new StoreRepository();
         private AccountRepository accountRepo = new AccountRepository();
