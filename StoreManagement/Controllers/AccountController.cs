@@ -8,13 +8,18 @@ using System.Diagnostics;
 
 namespace StoreManagement.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private AccountRepository repo = new AccountRepository();
 
         [HttpGet]
         public ActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("CapaList", "Capa");
+            }
+
             return View();
         }
 
@@ -38,7 +43,7 @@ namespace StoreManagement.Controllers
 
                 if (user.Password == encryptedPassword)
                 {
-                    FormsAuthentication.SetAuthCookie(user.Username, false);
+                    FormsAuthentication.SetAuthCookie(user.Username, model.RememberMe);
                     Session["Username"] = user.Username;
                     return RedirectToAction("CapaList", "Capa");
                 }
