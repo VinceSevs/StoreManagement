@@ -24,6 +24,11 @@
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
 
+                <div class="mb-3 form-check">
+                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.RememberMe, "Remember me", new { @class = "form-check-label" })
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">Login</button>
             }
         </div>
