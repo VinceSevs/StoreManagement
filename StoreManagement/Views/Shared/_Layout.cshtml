@@ -312,13 +312,13 @@
             <div class="app-sidebar-overlay" id="sidebarOverlay"></div>
             <aside class="app-sidebar" id="appSidebar">
                 <div class="app-sidebar-section">
-                    Store Management
+                    @*Store Management*@Quality Assurance
                 </div>
-                <ul class="app-sidebar-nav">
+                @*<ul class="app-sidebar-nav">
                     <li class="nav-item">
                         <a class="@navClass("Store", "Index")" href="@Url.Action("Index", "Store")"><i class="bi bi-shop"></i>Store List</a>
                     </li>
-                </ul>
+                </ul>*@
 
                 <ul class="app-sidebar-nav mt-3">
                     <li class="nav-item">
@@ -342,7 +342,7 @@
                 @RenderBody()
                 <hr />
                 <footer>
-                    <p>&copy; @DateTime.Now.Year Store Management</p>
+                    <p>&copy; @DateTime.Now.Year Corrective Action Report</p>
                 </footer>
             </div>
         </div>
@@ -390,7 +390,7 @@
             <div class="app-navbar-inner">
                 <a class="app-brand" href="@Url.Action("Login", "Account")">
                     <i class="bi bi-boxes" style="font-size:1.3rem;"></i>
-                    <span class="app-brand-text">Store Management</span>
+                    <span class="app-brand-text">Corrective Action Report</span>
                 </a>
             </div>
         </nav>
@@ -398,7 +398,7 @@
             <footer>
                 @RenderBody()
                 <hr />
-                <p>&copy; @DateTime.Now.Year Store Management</p>
+                <p>&copy; @DateTime.Now.Year Corrective Action Report</p>
             </footer>
         </div>
 
