@@ -28,8 +28,14 @@ namespace StoreManagement.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model)
         {
+            bool isAjax = Request.IsAjaxRequest();
+
             if (!ModelState.IsValid)
             {
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = "Please fill in your username and password." });
+                }
                 return View(model);
             }
 
@@ -45,11 +51,21 @@ namespace StoreManagement.Controllers
                 {
                     FormsAuthentication.SetAuthCookie(user.Username, model.RememberMe);
                     Session["Username"] = user.Username;
+
+                    if (isAjax)
+                    {
+                        return Json(new { success = true, redirectUrl = Url.Action("CapaList", "Capa") });
+                    }
                     return RedirectToAction("CapaList", "Capa");
                 }
             }
 
             ModelState.AddModelError("", "Invalid username or password.");
+
+            if (isAjax)
+            {
+                return Json(new { success = false, message = "Invalid username or password." });
+            }
             return View(model);
         }
 
