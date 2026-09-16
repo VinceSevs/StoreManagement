@@ -17,6 +17,7 @@
             --app-primary-light: #f4e2e0;
             --app-sidebar-bg: #fffaf9;
             --app-border: #e8dcda;
+            --app-navbar-height: 56px;
         }
 
         body {
@@ -118,28 +119,35 @@
         .app-shell {
             display: flex;
             align-items: stretch;
-            min-height: calc(100vh - 56px);
+            min-height: calc(100vh - var(--app-navbar-height));
         }
 
         /* ---------- Sidebar ---------- */
         .app-sidebar {
-            width: 232px;
+            width: 248px;
             flex: none;
             position: sticky;
+            top: var(--app-navbar-height);
+            align-self: flex-start;
+            height: calc(100vh - var(--app-navbar-height));
+            overflow-y: auto;
             background: var(--app-sidebar-bg);
             border-right: 1px solid var(--app-border);
-            padding: 1.1rem .8rem;
+            padding: 1.25rem 1rem;
             transition: transform .25s ease, width .25s ease;
         }
 
         .app-sidebar-section {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
             text-transform: uppercase;
             font-size: .68rem;
             letter-spacing: .08em;
             font-weight: 700;
             color: #a68d8a;
             padding: 0 .6rem;
-            margin-bottom: .6rem;
+            margin-bottom: .9rem;
         }
 
         .app-sidebar-nav {
@@ -171,45 +179,55 @@
             display: flex;
             align-items: center;
             gap: .65rem;
-            padding: .55rem .7rem;
-            border-radius: 10px;
+            padding: .5rem .6rem;
+            border-radius: 12px;
             color: #4a3a38;
             font-size: .88rem;
             font-weight: 500;
             text-decoration: none;
-            border-left: 3px solid transparent;
-            transition: background-color .15s ease, color .15s ease, transform .15s ease, border-color .15s ease;
+            transition: background-color .18s ease, color .18s ease, transform .12s ease;
         }
 
-            .app-sidebar-link i {
-                font-size: 1.02rem;
-                width: 20px;
-                text-align: center;
+            .app-sidebar-link .icon-chip {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 9px;
+                background: rgba(125, 31, 39, .07);
+                color: var(--app-primary);
+                font-size: 1rem;
+                transition: background-color .18s ease, color .18s ease;
+            }
+
+            .app-sidebar-link .app-sidebar-chevron {
+                margin-left: auto;
                 color: #a68d8a;
-                transition: color .15s ease, transform .15s ease;
             }
 
             .app-sidebar-link:hover {
                 background: var(--app-primary-light);
                 color: var(--app-primary-dark);
-                transform: translateX(3px);
+                transform: translateX(2px);
                 text-decoration: none;
             }
 
-                .app-sidebar-link:hover i {
+                .app-sidebar-link:hover .icon-chip {
+                    background: #fff;
                     color: var(--app-primary);
-                    transform: scale(1.08);
                 }
 
             .app-sidebar-link.active {
-                background: var(--app-primary-light);
-                border-left-color: var(--app-primary);
-                color: var(--app-primary-dark);
-                font-weight: 700;
+                background: var(--app-primary);
+                color: #fff;
+                font-weight: 600;
             }
 
-                .app-sidebar-link.active i {
-                    color: var(--app-primary);
+                .app-sidebar-link.active .icon-chip {
+                    background: rgba(255,255,255,.16);
+                    color: #fff;
                 }
 
         .app-sidebar-toggle {
@@ -219,8 +237,7 @@
 
         .app-sidebar-chevron {
             font-size: .7rem !important;
-            width: auto !important;
-            transition: transform .15s ease;
+            transition: transform .2s ease;
         }
 
             .app-sidebar-toggle.collapsed .app-sidebar-chevron {
@@ -229,18 +246,32 @@
 
         .app-sidebar-submenu {
             display: none;
-            padding-left: 1.1rem;
-            margin-top: .2rem;
+            flex-direction: column;
+            gap: .2rem;
+            margin: .3rem 0 .2rem .95rem;
+            padding-left: .85rem;
+            border-left: 2px solid var(--app-border);
         }
 
             .app-sidebar-submenu.open {
                 display: flex;
             }
 
+            .app-sidebar-submenu .app-sidebar-link {
+                padding: .45rem .55rem;
+                font-size: .84rem;
+            }
+
+            .app-sidebar-submenu .icon-chip {
+                width: 28px;
+                height: 28px;
+                font-size: .92rem;
+            }
+
         .app-sidebar-overlay {
             display: none;
             position: fixed;
-            top: 56px;
+            top: var(--app-navbar-height);
             left: 0;
             right: 0;
             bottom: 0;
@@ -248,12 +279,42 @@
             z-index: 1020;
         }
 
+        /* Large desktops: a little extra breathing room */
+        @@media (min-width: 1400px) {
+            .app-sidebar {
+                width: 272px;
+                padding: 1.5rem 1.1rem;
+            }
+        }
+
+        /* Small laptops / tablets in landscape: keep the sidebar docked but tighten it */
+        @@media (min-width: 992px) and (max-width: 1199.98px) {
+            .app-sidebar {
+                width: 212px;
+                padding: 1rem .7rem;
+            }
+
+            .app-sidebar-link {
+                font-size: .84rem;
+                padding: .45rem .5rem;
+            }
+
+            .app-sidebar-link .icon-chip {
+                width: 28px;
+                height: 28px;
+                font-size: .92rem;
+            }
+        }
+
+        /* Tablets in portrait and phones: off-canvas drawer */
         @@media (max-width: 991.98px) {
             .app-sidebar {
                 position: fixed;
-                top: 56px;
+                top: var(--app-navbar-height);
                 left: 0;
                 bottom: 0;
+                width: min(78vw, 288px);
+                height: auto;
                 z-index: 1025;
                 transform: translateX(-100%);
                 box-shadow: 6px 0 24px rgba(36,19,22,.18);
@@ -265,6 +326,14 @@
 
             .app-sidebar-overlay.show {
                 display: block;
+            }
+        }
+
+        /* Small phones: trim the drawer's own padding a touch */
+        @@media (max-width: 420px) {
+            .app-sidebar {
+                width: min(84vw, 260px);
+                padding: 1rem .85rem;
             }
         }
 
@@ -312,7 +381,7 @@
             <div class="app-sidebar-overlay" id="sidebarOverlay"></div>
             <aside class="app-sidebar" id="appSidebar">
                 <div class="app-sidebar-section">
-                    @*Store Management*@Quality Assurance
+                    <i class="bi bi-patch-check-fill"></i> Quality Assurance
                 </div>
                 @*<ul class="app-sidebar-nav">
                     <li class="nav-item">
@@ -320,18 +389,25 @@
                     </li>
                 </ul>*@
 
-                <ul class="app-sidebar-nav mt-3">
+                <ul class="app-sidebar-nav mt-2">
                     <li class="nav-item">
                         <a class="app-sidebar-link app-sidebar-toggle@(isCarSectionActive ? "" : " collapsed")" href="#" id="carSubmenuToggle" onclick="toggleCarSubmenu(event)" aria-expanded="@(isCarSectionActive ? "false" : "true")" aria-controls="carSubmenu">
-                            <i class="bi bi-folder2-open"></i>CAR
-                            <i class="bi bi-chevron-down app-sidebar-chevron ms-auto"></i>
+                            <span class="icon-chip"><i class="bi bi-folder2-open"></i></span>
+                            CAR
+                            <i class="bi bi-chevron-down app-sidebar-chevron"></i>
                         </a>
                         <ul class="app-sidebar-nav app-sidebar-submenu@(isCarSectionActive ? " open" : "")" id="carSubmenu">
                             <li class="nav-item">
-                                <a class="@navClass("Capa", "CapaList")" href="@Url.Action("CapaList", "Capa")"><i class="bi bi-clipboard-data"></i>Dashboard</a>
+                                <a class="@navClass("Capa", "CapaList")" href="@Url.Action("CapaList", "Capa")">
+                                    <span class="icon-chip"><i class="bi bi-clipboard-data"></i></span>
+                                    Dashboard
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="@navClass("Capa", "Quality")" href="@Url.Action("Quality", "Capa")"><i class="bi bi-file-earmark-plus"></i>CAR Report Form</a>
+                                <a class="@navClass("Capa", "Quality")" href="@Url.Action("Quality", "Capa")">
+                                    <span class="icon-chip"><i class="bi bi-file-earmark-plus"></i></span>
+                                    CAR Report Form
+                                </a>
                             </li>
                         </ul>
                     </li>
