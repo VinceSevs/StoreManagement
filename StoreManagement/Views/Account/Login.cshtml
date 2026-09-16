@@ -1,39 +1,790 @@
 @model StoreManagement.Models.LoginViewModel
+@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh; border-radius: 50px;">
-    <div class="card shadow-sm" style="width: 100%; max-width: 400px; ">
-        <div class="card-header bg-white border-bottom-0 pt-4 text-center">
-            @*<div class="lead-page-icon mx-auto mb-2"><i class="bi bi-box-arrow-in-right"></i></div>*@
-            @*<div class="lead-eyebrow">Store Management</div>*@
-            <h5 class="mb-0">Login to your Account</h5>
+<style>
+    :root {
+        --login-primary: #7d1f27;
+        --login-primary-dark: #5e161f;
+        --login-border: #e8dcda;
+        --login-muted: #8a7472;
+    }
+
+    .login-shell {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* ---------- Brand panel (flat, no gradient) ---------- */
+    .login-brand-panel {
+        flex: 0 0 42%;
+        background: var(--login-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .login-brand-inner {
+        text-align: center;
+        color: #fff;
+    }
+
+    .login-logo-ring {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        background: #fff;
+        margin-bottom: 1.6rem;
+    }
+
+    .login-logo-ring::before,
+    .login-logo-ring::after {
+        content: "";
+        position: absolute;
+        inset: -10px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,.45);
+        animation: loginRingPulse 2.6s ease-out infinite;
+    }
+
+    .login-logo-ring::after {
+        animation-delay: 1.3s;
+    }
+
+    @@keyframes loginRingPulse {
+        0%   { transform: scale(1);   opacity: .7; }
+        100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    .login-logo-ring img {
+        height: 72px;
+        width: auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .login-brand-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.35rem;
+        line-height: 1.3;
+        margin-bottom: .5rem;
+    }
+
+    .login-brand-sub {
+        font-size: .88rem;
+        color: rgba(255,255,255,.75);
+        letter-spacing: .02em;
+    }
+
+    /* ---------- Form panel ---------- */
+    .login-form-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        padding: 2rem 1.25rem 1.25rem;
+    }
+
+    .login-form-center {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-form-box {
+        width: 100%;
+        max-width: 380px;
+        background: #fff;
+        border: 1px solid var(--login-border);
+        border-radius: 18px;
+        box-shadow: 0 12px 32px rgba(36,19,22,.08);
+        padding: 2.2rem 2rem;
+        box-sizing: border-box;
+        opacity: 0;
+        transform: translateY(14px);
+        animation: loginBoxIn .5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    .login-form-box.shake {
+        animation: loginShake .4s ease;
+    }
+
+    @@keyframes loginBoxIn {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@keyframes loginShake {
+        10%, 90% { transform: translateX(-2px); }
+        20%, 80% { transform: translateX(4px); }
+        30%, 50%, 70% { transform: translateX(-7px); }
+        40%, 60% { transform: translateX(7px); }
+    }
+
+    .login-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: #241316;
+        margin-bottom: .2rem;
+    }
+
+    .login-subtitle {
+        font-size: .88rem;
+        color: var(--login-muted);
+        margin-bottom: 1.7rem;
+    }
+
+    #loginServerError {
+        background: #fdf1f0;
+        border: 1px solid #f2c9c6;
+        border-radius: 10px;
+        padding: .6rem .8rem;
+    }
+
+    .login-field {
+        margin-bottom: 1.1rem;
+    }
+
+    .login-field label {
+        font-size: .78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: var(--login-muted);
+        margin-bottom: .35rem;
+        display: block;
+    }
+
+    .login-input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .login-input-group .field-icon {
+        position: absolute;
+        left: 14px;
+        color: #b89694;
+        font-size: 1rem;
+        pointer-events: none;
+    }
+
+    .login-input-group input.form-control {
+        padding-left: 2.6rem;
+        border-radius: 10px;
+        border: 1px solid var(--login-border);
+        background: #fdfbfa;
+        height: 46px;
+        transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+
+    .login-input-group input.form-control:focus {
+        border-color: var(--login-primary);
+        box-shadow: 0 0 0 .2rem rgba(125,31,39,.12);
+        background: #fff;
+    }
+
+    .login-input-group.has-toggle input.form-control {
+        padding-right: 2.6rem;
+    }
+
+    /* Hide the browser's own built-in password-reveal icon (Edge/IE) so it
+       doesn't sit on top of our custom eye toggle. */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #b89694;
+        font-size: 1.05rem;
+        padding: 4px 6px;
+        line-height: 1;
+        cursor: pointer;
+        transition: color .15s ease;
+    }
+
+    .password-toggle-btn:hover {
+        color: var(--login-primary);
+    }
+
+    .login-remember {
+        display: flex;
+        align-items: center;
+        gap: .45rem;
+        margin-bottom: .3rem;
+    }
+
+    .login-remember label {
+        font-size: .85rem;
+        color: #5a4a48;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .login-remember-hint {
+        font-size: .74rem;
+        color: #a68d8a;
+        margin: 0 0 1.3rem 0;
+    }
+
+    .login-submit-btn {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        padding: .7rem 1rem;
+        font-weight: 600;
+        font-size: .95rem;
+        color: #fff;
+        background: var(--login-primary);
+        transition: background-color .15s ease, transform .15s ease;
+    }
+
+    .login-submit-btn:hover:not(:disabled) {
+        background: var(--login-primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .login-submit-btn:disabled {
+        opacity: .75;
+        cursor: default;
+    }
+
+    .login-footer-link {
+        text-align: center;
+        margin-top: 1.3rem;
+        font-size: .85rem;
+    }
+
+    .login-footer-link a {
+        color: var(--login-primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-footer-link a:hover {
+        text-decoration: underline;
+    }
+
+    /* ---------- Truck & warehouse scene ---------- */
+    .login-scene {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        height: 130px;
+        margin-top: 1.6rem;
+        overflow: hidden;
+    }
+
+    .login-scene-centered {
+        align-self: center;
+        margin-top: 0;
+    }
+
+    .login-scene-ground {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 28px;
+        border-top: 2px dashed var(--login-border);
+    }
+
+    .login-scene-warehouse {
+        position: absolute;
+        right: 8px;
+        bottom: 28px;
+        width: 104px;
+    }
+
+    .warehouse-roof {
+        width: 0;
+        height: 0;
+        border-left: 55px solid transparent;
+        border-right: 55px solid transparent;
+        border-bottom: 22px solid var(--login-primary-dark);
+        margin-left: -3px;
+    }
+
+    .warehouse-body {
+        position: relative;
+        width: 104px;
+        height: 64px;
+        background: var(--login-primary);
+        border-radius: 3px 3px 0 0;
+    }
+
+    .warehouse-door {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 28px;
+        height: 42px;
+        transform: translateX(-50%);
+        background: var(--login-primary-dark);
+        border-radius: 3px 3px 0 0;
+    }
+
+    .warehouse-window {
+        position: absolute;
+        top: 13px;
+        width: 15px;
+        height: 15px;
+        background: #fdfbfa;
+        border-radius: 3px;
+        opacity: .85;
+    }
+
+    .warehouse-window:nth-of-type(2) { left: 11px; }
+    .warehouse-window:nth-of-type(3) { right: 11px; }
+
+    .login-scene-truck {
+        position: absolute;
+        bottom: 28px;
+        left: 0;
+        width: 87px;
+        height: 48px;
+        animation: truckDrive 9s linear infinite;
+    }
+
+    .login-scene-truck-2 {
+        animation-delay: -4.5s;
+    }
+
+    @@keyframes truckDrive {
+        from { transform: translateX(-100px); }
+        to   { transform: translateX(680px); }
+    }
+
+    .truck-cargo {
+        position: absolute;
+        left: 0;
+        bottom: 11px;
+        width: 53px;
+        height: 34px;
+        background: var(--login-muted);
+        border-radius: 3px;
+    }
+
+    .truck-cab {
+        position: absolute;
+        left: 50px;
+        bottom: 11px;
+        width: 31px;
+        height: 25px;
+        background: var(--login-primary);
+        border-radius: 3px 7px 0 0;
+    }
+
+    .truck-window {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        width: 17px;
+        height: 11px;
+        background: #fdfbfa;
+        border-radius: 2px;
+        opacity: .9;
+    }
+
+    .truck-wheel {
+        position: absolute;
+        bottom: 3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #241316;
+        animation: wheelSpin .5s linear infinite;
+    }
+
+    .truck-wheel-1 { left: 8px; }
+    .truck-wheel-2 { left: 59px; }
+
+    /* Desktop: give the scene noticeably more road to drive on */
+    @@media (min-width: 1200px) {
+        .login-scene {
+            max-width: 900px;
+        }
+
+        @@keyframes truckDrive {
+            from { transform: translateX(-100px); }
+            to   { transform: translateX(960px); }
+        }
+    }
+
+    @@keyframes wheelSpin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .login-scene-truck,
+        .truck-wheel {
+            animation: none;
+        }
+    }
+
+    /* ---------- Responsive ---------- */
+    html, body {
+        overflow-x: hidden;
+    }
+
+    /* Tablets: keep the side-by-side layout but tighten it up */
+    @@media (max-width: 991.98px) {
+        .login-brand-panel {
+            flex-basis: 38%;
+            padding: 1.75rem;
+        }
+
+        .login-form-panel {
+            padding: 1.75rem 1.25rem;
+        }
+    }
+
+    /* Phones (and narrow tablets in portrait): stack the panels */
+    @@media (max-width: 899.98px) {
+        .login-shell {
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .login-brand-panel {
+            flex: 0 0 auto;
+            padding: 1.75rem 1rem 1.4rem;
+        }
+
+        .login-form-panel {
+            flex: 1 1 auto;
+            padding: 1.5rem 1rem 2rem;
+        }
+
+        .login-logo-ring {
+            width: 84px;
+            height: 84px;
+            margin-bottom: .85rem;
+        }
+
+        .login-logo-ring img {
+            height: 46px;
+        }
+
+        .login-brand-title {
+            font-size: 1.05rem;
+        }
+
+        .login-brand-sub {
+            font-size: .8rem;
+        }
+
+        .login-form-box {
+            max-width: 420px;
+            padding: 1.75rem 1.5rem;
+        }
+    }
+
+    /* Small phones */
+    @@media (max-width: 420px) {
+        .login-brand-panel {
+            padding: 1.4rem .75rem 1.1rem;
+        }
+
+        .login-form-panel {
+            padding: 1rem .75rem 1.75rem;
+        }
+
+        .login-form-box {
+            padding: 1.4rem 1.1rem;
+            border-radius: 14px;
+        }
+
+        .login-title {
+            font-size: 1.2rem;
+        }
+
+        .login-input-group input.form-control {
+            height: 44px;
+        }
+
+        .login-scene {
+            height: 76px;
+            transform: scale(.88);
+            transform-origin: top center;
+        }
+    }
+
+    /* Large / widescreen desktops: don't let the brand panel or form box
+       stretch too wide */
+    @@media (min-width: 1600px) {
+        .login-brand-panel {
+            flex-basis: 34%;
+        }
+
+        .login-form-box {
+            max-width: 400px;
+        }
+    }
+
+    /* ---------- Success overlay ---------- */
+    .login-success-overlay {
+        position: fixed;
+        inset: 0;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .35s ease;
+    }
+
+    .login-success-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .success-check-svg {
+        width: 96px;
+        height: 96px;
+    }
+
+    .success-check-circle {
+        stroke: var(--login-primary);
+        stroke-width: 3;
+        stroke-dasharray: 226;
+        stroke-dashoffset: 226;
+    }
+
+    .success-check-path {
+        stroke: var(--login-primary);
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+    }
+
+    .login-success-overlay.show .success-check-circle {
+        animation: successDrawCircle .5s ease forwards;
+    }
+
+    .login-success-overlay.show .success-check-path {
+        animation: successDrawPath .35s .45s ease forwards;
+    }
+
+    @@keyframes successDrawCircle {
+        to { stroke-dashoffset: 0; }
+    }
+
+    @@keyframes successDrawPath {
+        to { stroke-dashoffset: 0; }
+    }
+
+    .success-message {
+        margin-top: 1.2rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #241316;
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    .login-success-overlay.show .success-message {
+        animation: successMessageIn .4s .7s ease forwards;
+    }
+
+    @@keyframes successMessageIn {
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="login-shell">
+    <div class="login-brand-panel">
+        <div class="login-brand-inner">
+            <div class="login-logo-ring">
+                <img src="data:image/png;base64,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" alt="LEAD Logistics Innovations, Inc.">
+            </div>
+            <div class="login-brand-title">LEAD Logistics<br>Innovations, Inc.</div>
+            <div class="login-brand-sub">Corrective Action Report System</div>
         </div>
-        <div class="card-body">
-            @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    </div>
+
+    <div class="login-form-panel">
+      <div class="login-form-center">
+        <div class="login-form-box" id="loginFormBox">
+            <div class="login-title">Welcome back</div>
+            <div class="login-subtitle">Sign in to continue</div>
+
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm" }))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                <div class="mb-3">
-                    @Html.LabelFor(m => m.Username, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
-                </div>
-                <div class="mb-3">
-                    @Html.LabelFor(m => m.Password, new { @class = "form-label" })
-                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                <div id="loginServerError" class="text-danger small mb-3" style="@(ViewData.ModelState.IsValid ? "display:none;" : "")">
+                    @Html.ValidationSummary(true, "", new { })
                 </div>
 
-                <div class="mb-3 form-check">
-                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
-                    @Html.LabelFor(m => m.RememberMe, "Remember me", new { @class = "form-check-label" })
+                <div class="login-field">
+                    @Html.LabelFor(m => m.Username)
+                    <div class="login-input-group">
+                        <i class="bi bi-person-fill field-icon"></i>
+                        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", autocomplete = "username", placeholder = "Enter your username" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger small" })
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <div class="login-field">
+                    @Html.LabelFor(m => m.Password)
+                    <div class="login-input-group has-toggle">
+                        <i class="bi bi-lock-fill field-icon"></i>
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "passwordInput", autocomplete = "current-password", placeholder = "Enter your password" })
+                        <button type="button" class="password-toggle-btn" id="togglePasswordBtn" aria-label="Show password">
+                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="login-remember">
+                    @Html.CheckBoxFor(m => m.RememberMe, new { id = "rememberMeCheck", @class = "form-check-input" })
+                    @Html.LabelFor(m => m.RememberMe, "Remember me", new { @for = "rememberMeCheck" })
+                </div>
+                <div class="login-remember-hint">Stay signed in on this device for up to 48 hours.</div>
+
+                <button type="submit" class="login-submit-btn" id="loginSubmitBtn">
+                    <span id="loginBtnLabel">Login</span>
+                </button>
             }
+
+            @*<div class="login-footer-link">
+                @Html.ActionLink("Register a new account", "Register", "Account")
+            </div>*@
         </div>
-        @*<div class="card-footer text-center">
-            @Html.ActionLink("Register a new account", "Register", "Account")
-        </div>*@
+      </div>
+
+        <div class="login-scene login-scene-centered" aria-hidden="true">
+            <div class="login-scene-ground"></div>
+
+            <div class="login-scene-warehouse">
+                <div class="warehouse-roof"></div>
+                <div class="warehouse-body">
+                    <div class="warehouse-door"></div>
+                    <div class="warehouse-window"></div>
+                    <div class="warehouse-window"></div>
+                </div>
+            </div>
+
+            <div class="login-scene-truck">
+                <div class="truck-cargo"></div>
+                <div class="truck-cab">
+                    <div class="truck-window"></div>
+                </div>
+                <div class="truck-wheel truck-wheel-1"></div>
+                <div class="truck-wheel truck-wheel-2"></div>
+            </div>
+
+            <div class="login-scene-truck login-scene-truck-2">
+                <div class="truck-cargo"></div>
+                <div class="truck-cab">
+                    <div class="truck-window"></div>
+                </div>
+                <div class="truck-wheel truck-wheel-1"></div>
+                <div class="truck-wheel truck-wheel-2"></div>
+            </div>
+        </div>
     </div>
 </div>
+
+<div class="login-success-overlay" id="loginSuccessOverlay">
+    <svg class="success-check-svg" viewBox="0 0 80 80">
+        <circle class="success-check-circle" cx="40" cy="40" r="36" fill="none"></circle>
+        <path class="success-check-path" fill="none" d="M22 41 L34 53 L58 27"></path>
+    </svg>
+    <div class="success-message">Signed in! Redirecting...</div>
+</div>
+
+@section scripts {
+<script>
+    (function () {
+        var toggleBtn = document.getElementById('togglePasswordBtn');
+        var toggleIcon = document.getElementById('togglePasswordIcon');
+        var passwordInput = document.getElementById('passwordInput');
+
+        if (toggleBtn && passwordInput) {
+            toggleBtn.addEventListener('click', function () {
+                var isHidden = passwordInput.type === 'password';
+                passwordInput.type = isHidden ? 'text' : 'password';
+                toggleIcon.classList.toggle('bi-eye', !isHidden);
+                toggleIcon.classList.toggle('bi-eye-slash', isHidden);
+                toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            });
+        }
+
+        var form = document.getElementById('loginForm');
+        var submitBtn = document.getElementById('loginSubmitBtn');
+        var btnLabel = document.getElementById('loginBtnLabel');
+        var serverErrorBox = document.getElementById('loginServerError');
+        var formBox = document.getElementById('loginFormBox');
+        var overlay = document.getElementById('loginSuccessOverlay');
+
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            btnLabel.textContent = 'Signing in…';
+            serverErrorBox.style.display = 'none';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: new FormData(form)
+            })
+                .then(function (response) {
+                    return response.json().catch(function () { return null; }).then(function (data) {
+                        return { ok: response.ok, data: data };
+                    });
+                })
+                .then(function (result) {
+                    if (result.ok && result.data && result.data.success) {
+                        overlay.classList.add('show');
+                        setTimeout(function () {
+                            window.location.href = result.data.redirectUrl || '/';
+                        }, 1150);
+                        return;
+                    }
+
+                    var message = (result.data && result.data.message) || 'Invalid username or password.';
+                    serverErrorBox.textContent = message;
+                    serverErrorBox.style.display = 'block';
+
+                    formBox.classList.remove('shake');
+                    void formBox.offsetWidth;
+                    formBox.classList.add('shake');
+
+                    submitBtn.disabled = false;
+                    btnLabel.textContent = 'Login';
+                })
+                .catch(function () {
+                    serverErrorBox.textContent = 'Network error — please try again.';
+                    serverErrorBox.style.display = 'block';
+                    submitBtn.disabled = false;
+                    btnLabel.textContent = 'Login';
+                });
+        });
+    })();
+</script>
+}
