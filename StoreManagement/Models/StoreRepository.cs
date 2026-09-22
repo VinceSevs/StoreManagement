@@ -274,9 +274,6 @@ namespace StoreManagement.Models
 
             bool cityChanged = oldCityID != CityID;
 
-            // Normalize before comparing — a NULL in the database and an
-            // empty/whitespace value posted back from the form are the same
-            // "no coordinates", not a change.
             string normalizedOldCoordinates = (oldCoordinates ?? string.Empty).Trim();
             string normalizedNewCoordinates = (Coordinates ?? string.Empty).Trim();
             bool coordinatesChanged = normalizedOldCoordinates != normalizedNewCoordinates;

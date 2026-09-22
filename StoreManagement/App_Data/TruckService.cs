@@ -1,6 +1,7 @@
 using IsseERP.Models;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
+using StoreManagement.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,42 +13,39 @@ using System.Web.Helpers;
 
 namespace IsseERP.Services
 {
-    //public class TruckService : BaseApiClient
-    //{
-    //    private readonly HttpClient _httpClient;
-
-    //    public TruckService()
-    //    {
-    //        _httpClient = new HttpClient
-    //        {
-    //            BaseAddress = new Uri(_apiBaseUrl)
-    //        };
-    //    }
-
-    //    public async Task<List<Trucker>> GetTrucksAsync()
-    //    {
-    //        List<Trucker> vendors = new List<Trucker>();
-
-    //        try
-    //        {
-    //            var response = await _httpClient.GetAsync("api/truck");
-    //            if (!response.IsSuccessStatusCode) return new List<Trucker>();
-
-    //            var body = await response.Content.ReadAsStringAsync();
-    //            var result = JsonConvert.DeserializeObject<List<Trucker>>(body) ?? new List<Trucker>();
-    //            vendors = result.OrderByDescending(t => t.TruckID).ToList();
-    //            return vendors;
-    //        }
-    //        catch
-    //        {
-    //            return new List<Trucker>();
-    //        }
-    //    }
-    //}
-
-    public class TruckService
+    public class TruckService : BaseApiClient
     {
-        private readonly string connectionString = 
+        //private readonly HttpClient _httpClient;
+
+        //public TruckService()
+        //{
+        //    _httpClient = new HttpClient
+        //    {
+        //        BaseAddress = new Uri(ConfigurationManager.AppSettings["LocalApiBaseUrl"])
+        //    };
+        //}
+
+        //public async Task<List<City>> GetCityAsync()
+        //{
+        //    List<City> vendors = new List<City>();
+
+        //    try
+        //    {
+        //        var response = await _httpClient.GetAsync("api/cities");
+        //        if (!response.IsSuccessStatusCode) return new List<City>();
+
+        //        var body = await response.Content.ReadAsStringAsync();
+        //        var result = JsonConvert.DeserializeObject<List<City>>(body) ?? new List<City>();
+        //        vendors = result.OrderByDescending(t => t.CityID).ToList();
+        //        return vendors;
+        //    }
+        //    catch
+        //    {
+        //        return new List<City>();
+        //    }
+        //}
+
+        private readonly string connectionString =
             ConfigurationManager.ConnectionStrings["StoreContext"].ConnectionString;
 
         public async Task<List<Trucker>> GetTruckers()
