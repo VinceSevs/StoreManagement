@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title Store Management</title>
+    <title>@ViewBag.Title Lead Logistics Innovation, Inc.</title>
+    <link rel="icon" type="image/x-icon" href="@Url.Content("~/content/icon/favicon.ico")" />
     @Styles.Render("~/Content/bootstrap.min.css")
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -164,15 +165,36 @@
                 animation: sidebarItemIn .35s ease forwards;
             }
 
-                .app-sidebar-nav .nav-item:nth-child(1) { animation-delay: .03s; }
-                .app-sidebar-nav .nav-item:nth-child(2) { animation-delay: .08s; }
-                .app-sidebar-nav .nav-item:nth-child(3) { animation-delay: .13s; }
-                .app-sidebar-nav .nav-item:nth-child(4) { animation-delay: .18s; }
-                .app-sidebar-nav .nav-item:nth-child(5) { animation-delay: .23s; }
+                .app-sidebar-nav .nav-item:nth-child(1) {
+                    animation-delay: .03s;
+                }
+
+                .app-sidebar-nav .nav-item:nth-child(2) {
+                    animation-delay: .08s;
+                }
+
+                .app-sidebar-nav .nav-item:nth-child(3) {
+                    animation-delay: .13s;
+                }
+
+                .app-sidebar-nav .nav-item:nth-child(4) {
+                    animation-delay: .18s;
+                }
+
+                .app-sidebar-nav .nav-item:nth-child(5) {
+                    animation-delay: .23s;
+                }
 
         @@keyframes sidebarItemIn {
-            from { opacity: 0; transform: translateX(-8px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .app-sidebar-link {
@@ -240,9 +262,9 @@
             transition: transform .2s ease;
         }
 
-            .app-sidebar-toggle.collapsed .app-sidebar-chevron {
-                transform: rotate(-90deg);
-            }
+        .app-sidebar-toggle.collapsed .app-sidebar-chevron {
+            transform: rotate(-90deg);
+        }
 
         .app-sidebar-submenu {
             display: none;
@@ -299,11 +321,11 @@
                 padding: .45rem .5rem;
             }
 
-            .app-sidebar-link .icon-chip {
-                width: 28px;
-                height: 28px;
-                font-size: .92rem;
-            }
+                .app-sidebar-link .icon-chip {
+                    width: 28px;
+                    height: 28px;
+                    font-size: .92rem;
+                }
         }
 
         /* Tablets in portrait and phones: off-canvas drawer */
