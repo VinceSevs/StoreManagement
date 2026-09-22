@@ -1,4 +1,15 @@
 @model StoreManagement.Models.Store
+@{
+    string selectedCityText = "";
+    foreach (SelectListItem item in (SelectList)ViewBag.Cities)
+    {
+        if (item.Value == Model.CityID.ToString())
+        {
+            selectedCityText = item.Text;
+            break;
+        }
+    }
+}
 
 <div class="modal-header" style="border-bottom-color:var(--lead-border)">
     <h5 class="modal-title"><i class="bi bi-pencil-square me-1" style="color:var(--lead-primary)"></i> Edit @Model.StoreName <span class="text-muted">#@Model.StoreNumber</span></h5>
@@ -9,9 +20,12 @@
     @Html.HiddenFor(m => m.StoreName)
 
     <div class="modal-body">
-        <div class="mb-3">
+        <div class="mb-3 position-relative" id="cityFieldWrap">
             @Html.LabelFor(m => m.CityID, "City Name", new { @class = "form-label small text-uppercase text-secondary" })
-            @Html.DropDownListFor(m => m.CityID, (SelectList)ViewBag.Cities, new { @class = "form-select" })
+            <input type="text" class="form-control" id="citySearchInput" placeholder="Search city..." autocomplete="off" value="@selectedCityText" />
+            <div id="citySuggestions" class="list-group position-absolute w-100 shadow-sm mt-1"
+                 style="display:none; z-index:1080; max-height:220px; overflow-y:auto;"></div>
+            @Html.DropDownListFor(m => m.CityID, (SelectList)ViewBag.Cities, new { @class = "form-select d-none" })
         </div>
         <div class="mb-0">
             @Html.LabelFor(m => m.Coordinates, new { @class = "form-label small text-uppercase text-secondary" })
@@ -23,3 +37,50 @@
         <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
     </div>
 </form>
+
+<script>
+    (function () {
+        var $search = $('#citySearchInput');
+        var $box = $('#citySuggestions');
+        var $select = $('#CityID');
+
+        function renderMatches(query) {
+            var q = $.trim(query).toLowerCase();
+            $box.empty();
+
+            var $options = $select.find('option').filter(function () {
+                return $(this).text().toLowerCase().indexOf(q) !== -1;
+            }).slice(0, 8);
+
+            if ($options.length === 0) {
+                $box.append('<div class="list-group-item text-muted small">No matching city</div>');
+                $box.show();
+                return;
+            }
+
+            $options.each(function () {
+                var text = $(this).text().trim();
+                var value = $(this).val();
+                $('<button type="button" class="list-group-item list-group-item-action"></button>')
+                    .text(text)
+                    .on('click', function () {
+                        $select.val(value);
+                        $search.val(text);
+                        $box.hide().empty();
+                    })
+                    .appendTo($box);
+            });
+            $box.show();
+        }
+
+        $search.on('focus click input', function () {
+            renderMatches($(this).val());
+        });
+
+        $(document).off('click.cityFieldWrap').on('click.cityFieldWrap', function (e) {
+            if (!$(e.target).closest('#cityFieldWrap').length) {
+                $box.hide();
+            }
+        });
+    })();
+</script>
