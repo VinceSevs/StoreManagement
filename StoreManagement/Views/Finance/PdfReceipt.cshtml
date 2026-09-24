@@ -1,0 +1,450 @@
+@{
+    ViewBag.Title = "PDF Receipt";
+}
+
+<style>
+    .rcpt-card {
+        padding: 1.5rem 1.75rem;
+    }
+
+    /* ---------- Upload drop zone ---------- */
+    .rcpt-drop {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1.1rem;
+        padding: 1.4rem 1.5rem;
+        border: 2px dashed var(--lead-border);
+        border-radius: 14px;
+        background: #fffaf9;
+        cursor: pointer;
+        transition: border-color .15s ease, background-color .15s ease;
+    }
+
+        .rcpt-drop:hover,
+        .rcpt-drop.dragover {
+            border-color: var(--lead-primary);
+            background: var(--lead-primary-light);
+        }
+
+        .rcpt-drop input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+    .rcpt-drop-icon {
+        width: 52px;
+        height: 52px;
+        flex: none;
+        border-radius: 12px;
+        background: var(--lead-primary);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .rcpt-drop-title {
+        font-weight: 600;
+        font-size: .98rem;
+    }
+
+    .rcpt-drop-sub {
+        font-size: .8rem;
+        color: var(--lead-text-muted);
+    }
+
+    .rcpt-drop-files {
+        font-size: .8rem;
+        color: var(--lead-primary);
+        font-weight: 600;
+        margin-top: .15rem;
+        word-break: break-all;
+    }
+
+    .rcpt-status {
+        font-size: .82rem;
+        margin-top: .75rem;
+        min-height: 1.2em;
+    }
+
+    /* ---------- Account + summary tiles ---------- */
+    .rcpt-account-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .rcpt-account-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .35rem 1.25rem;
+        font-size: .82rem;
+        color: var(--lead-text-muted);
+        margin-top: .15rem;
+    }
+
+        .rcpt-account-meta i {
+            color: var(--lead-primary);
+            margin-right: .2rem;
+        }
+
+    .rcpt-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: .75rem;
+    }
+
+    .rcpt-stat {
+        border: 1px solid var(--lead-border);
+        border-radius: 12px;
+        padding: .75rem .9rem;
+        background: #fff;
+        min-width: 0;
+    }
+
+        .rcpt-stat .label {
+            text-transform: uppercase;
+            font-size: .64rem;
+            letter-spacing: .06em;
+            font-weight: 700;
+            color: var(--lead-text-muted);
+        }
+
+        .rcpt-stat .value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-top: .15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rcpt-stat.accent {
+            background: var(--lead-primary);
+            border-color: var(--lead-primary);
+            color: #fff;
+        }
+
+            .rcpt-stat.accent .label {
+                color: rgba(255,255,255,.75);
+            }
+
+    /* ---------- Toolbar + tabs ---------- */
+    .rcpt-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: .75rem;
+        margin: 1.25rem 0 1rem;
+    }
+
+    .rcpt-tabs {
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 999px;
+        background: #f6eeec;
+        border: 1px solid var(--lead-border);
+    }
+
+        .rcpt-tabs button {
+            border: 0;
+            background: transparent;
+            border-radius: 999px;
+            padding: .35rem 1rem;
+            font-size: .82rem;
+            font-weight: 600;
+            color: #6b5856;
+        }
+
+            .rcpt-tabs button.active {
+                background: #fff;
+                color: var(--lead-primary);
+                box-shadow: 0 1px 4px rgba(36,19,22,.12);
+            }
+
+    .rcpt-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+        .rcpt-actions .form-check {
+            margin: 0 .5rem 0 0;
+            font-size: .82rem;
+        }
+
+    .rcpt-preview {
+        width: 100%;
+        height: 78vh;
+        min-height: 520px;
+        border: 1px solid var(--lead-border);
+        border-radius: 12px;
+        background: #f6f1f0;
+    }
+
+    .rcpt-table-wrap {
+        max-height: 78vh;
+        overflow: auto;
+        border: 1px solid var(--lead-border);
+        border-radius: 12px;
+    }
+
+        .rcpt-table-wrap table {
+            font-size: .8rem;
+            white-space: nowrap;
+        }
+
+        .rcpt-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+    .rcpt-muted-row td {
+        color: var(--lead-text-muted);
+    }
+
+    .rcpt-empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: var(--lead-text-muted);
+        font-size: .88rem;
+    }
+
+        .rcpt-empty i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: .5rem;
+            color: var(--lead-border);
+        }
+</style>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-receipt"></i></div>
+    <div>
+        <div class="lead-eyebrow">Finance</div>
+        <h1>PDF Receipt</h1>
+    </div>
+</div>
+
+<div class="card shadow-sm rcpt-card mb-3">
+    <label class="rcpt-drop" id="rcptDrop" for="rcptFile">
+        <input type="file" id="rcptFile" accept="application/pdf,.pdf" multiple />
+        <span class="rcpt-drop-icon"><i class="bi bi-cloud-arrow-up"></i></span>
+        <span>
+            <span class="rcpt-drop-title d-block">Drop the Transaction History Report PDF here, or click to browse</span>
+            <span class="rcpt-drop-sub d-block">Receipts are generated automatically &middot; 4 per A4 page &middot; VAT 12%</span>
+            <span class="rcpt-drop-files d-block" id="rcptFileNames"></span>
+        </span>
+    </label>
+    <div class="rcpt-status" id="rcptStatus"></div>
+</div>
+
+<div class="card shadow-sm rcpt-card mb-4 d-none" id="rcptResult">
+    <div class="rcpt-account mb-3">
+        <div class="rcpt-account-name" id="rcptAccountName"></div>
+        <div class="rcpt-account-meta" id="rcptAccountMeta"></div>
+    </div>
+    <div class="rcpt-stats" id="rcptStats"></div>
+
+    <div class="rcpt-toolbar">
+        <div class="rcpt-tabs" role="tablist">
+            <button type="button" class="active" data-tab="preview"><i class="bi bi-eye"></i> Receipt Preview</button>
+            <button type="button" data-tab="rows"><i class="bi bi-table"></i> Transactions</button>
+        </div>
+        <div class="rcpt-actions">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rcptOnlyEsi" checked />
+                <label class="form-check-label" for="rcptOnlyEsi">Only rows with E-SI No.</label>
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="rcptExcelBtn">
+                <i class="bi bi-file-earmark-excel"></i> Excel
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="rcptPdfBtn">
+                <i class="bi bi-download"></i> Download Receipts
+            </button>
+        </div>
+    </div>
+
+    <div data-panel="preview">
+        <iframe class="rcpt-preview" id="rcptPreview" title="Receipt preview"></iframe>
+    </div>
+    <div data-panel="rows" class="d-none">
+        <div class="rcpt-table-wrap">
+            <table class="table table-hover align-middle mb-0 lead-table">
+                <thead>
+                    <tr>
+                        <th>Plate No.</th>
+                        <th>Ref No.</th>
+                        <th>Sales Invoice No.</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Zone</th>
+                        <th>Entry</th>
+                        <th>Exit</th>
+                        <th class="text-end">Vatable Sales</th>
+                        <th class="text-end">VAT</th>
+                        <th class="text-end">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="rcptRows"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="~/Scripts/finance/pdf-to-excel.js"></script>
+<script src="~/Scripts/finance/receipt-pdf.js"></script>
+<script>
+    (function () {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        var drop = document.getElementById('rcptDrop');
+        var fileInput = document.getElementById('rcptFile');
+        var onlyEsi = document.getElementById('rcptOnlyEsi');
+        var statusEl = document.getElementById('rcptStatus');
+        var resultCard = document.getElementById('rcptResult');
+        var preview = document.getElementById('rcptPreview');
+        var money = FinanceReceiptPdf.money;
+
+        var parsed = [];      // FinancePdfToExcel.parse() results, one per file
+        var receiptRows = []; // all rows mapped for receipts
+        var pdfDoc = null;
+        var pdfUrl = null;
+        var baseName = 'TollReceipts';
+
+        function setStatus(html, cls) {
+            statusEl.className = 'rcpt-status ' + (cls || '');
+            statusEl.innerHTML = html;
+        }
+
+        function esc(s) {
+            var d = document.createElement('div');
+            d.textContent = s == null ? '' : String(s);
+            return d.innerHTML;
+        }
+
+        function selectedRows() {
+            return onlyEsi.checked ? receiptRows.filter(function (r) { return r.esi; }) : receiptRows;
+        }
+
+        function stat(label, value, accent) {
+            return '<div class="rcpt-stat' + (accent ? ' accent' : '') + '"><div class="label">' + label +
+                '</div><div class="value" title="' + esc(value) + '">' + esc(value) + '</div></div>';
+        }
+
+        function generate() {
+            var rows = selectedRows();
+            if (pdfUrl) { URL.revokeObjectURL(pdfUrl); pdfUrl = null; }
+            pdfDoc = rows.length ? FinanceReceiptPdf.buildPdf(rows) : null;
+            if (pdfDoc) {
+                pdfUrl = URL.createObjectURL(pdfDoc.output('blob'));
+                preview.src = pdfUrl + '#view=FitH';
+            } else {
+                preview.removeAttribute('src');
+            }
+
+            var total = rows.reduce(function (a, r) { return a + r.amounts.total; }, 0);
+            var vat = rows.reduce(function (a, r) { return a + r.amounts.vat; }, 0);
+            var h = parsed.length ? parsed[0].header : {};
+            document.getElementById('rcptAccountName').textContent = h.accountName || 'Transaction History Report';
+            document.getElementById('rcptAccountMeta').innerHTML =
+                (h.accountNumber ? '<span><i class="bi bi-person-vcard"></i> Account ' + esc(h.accountNumber) + '</span>' : '') +
+                (h.period ? '<span><i class="bi bi-calendar3"></i> ' + esc(h.period) + '</span>' : '') +
+                (h.tin ? '<span><i class="bi bi-hash"></i> TIN ' + esc(h.tin) + '</span>' : '');
+            document.getElementById('rcptStats').innerHTML =
+                stat('Receipts', rows.length.toLocaleString()) +
+                stat('Pages', Math.ceil(rows.length / 4).toLocaleString()) +
+                stat('Total VAT', 'Php ' + money(vat)) +
+                stat('Total Amount', 'Php ' + money(total), true);
+
+            document.getElementById('rcptRows').innerHTML = receiptRows.map(function (r) {
+                var included = !onlyEsi.checked || r.esi;
+                return '<tr' + (included ? '' : ' class="rcpt-muted-row" title="Not included (no E-SI No.)"') + '>' +
+                    '<td>' + esc(r.plateNumber) + '</td><td class="font-mono">' + esc(r.refNo) +
+                    '</td><td class="font-mono">' + (r.esi ? esc(r.esi) : '&mdash;') + '</td><td>' + esc(r.date) +
+                    '</td><td>' + esc(r.time) + '</td><td>' + esc(r.zone) + '</td><td>' + esc(r.entry) +
+                    '</td><td>' + esc(r.exit) + '</td><td class="text-end">' + money(r.amounts.vatable) +
+                    '</td><td class="text-end">' + money(r.amounts.vat) + '</td><td class="text-end fw-semibold">' +
+                    money(r.amounts.total) + '</td></tr>';
+            }).join('');
+
+            document.getElementById('rcptPdfBtn').disabled = !pdfDoc;
+            resultCard.classList.remove('d-none');
+        }
+
+        async function handleFiles(fileList) {
+            var files = Array.prototype.slice.call(fileList || []).filter(function (f) {
+                return /\.pdf$/i.test(f.name) || f.type === 'application/pdf';
+            });
+            if (!files.length) {
+                setStatus('<i class="bi bi-exclamation-circle"></i> Please choose a PDF file.', 'text-danger');
+                return;
+            }
+
+            document.getElementById('rcptFileNames').textContent = files.map(function (f) { return f.name; }).join(', ');
+            baseName = files[0].name.replace(/\.[^.]+$/, '');
+            setStatus('<span class="spinner-border spinner-border-sm me-1"></span> Reading PDF and generating receipts...', 'text-secondary');
+
+            try {
+                parsed = [];
+                for (var i = 0; i < files.length; i++) {
+                    parsed.push(await FinancePdfToExcel.parse(await files[i].arrayBuffer()));
+                }
+                receiptRows = FinanceReceiptPdf.fromParsed(parsed);
+                if (!receiptRows.length) {
+                    resultCard.classList.add('d-none');
+                    setStatus('<i class="bi bi-exclamation-circle"></i> No toll transactions were found. Make sure this is a Transaction History Report PDF.', 'text-danger');
+                    return;
+                }
+                generate();
+                setStatus('<i class="bi bi-check-circle-fill"></i> ' + receiptRows.length + ' transaction(s) read &mdash; receipts generated.', 'text-success');
+            } catch (e) {
+                resultCard.classList.add('d-none');
+                setStatus('<i class="bi bi-exclamation-circle"></i> Could not read the PDF: ' + esc(e.message), 'text-danger');
+            }
+        }
+
+        fileInput.addEventListener('change', function () {
+            handleFiles(fileInput.files);
+            fileInput.value = '';
+        });
+
+        ['dragenter', 'dragover'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(function (ev) {
+            drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('dragover'); });
+        });
+        drop.addEventListener('drop', function (e) { handleFiles(e.dataTransfer.files); });
+
+        onlyEsi.addEventListener('change', function () { if (receiptRows.length) generate(); });
+
+        document.querySelectorAll('.rcpt-tabs button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.rcpt-tabs button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+                document.querySelectorAll('[data-panel]').forEach(function (p) {
+                    p.classList.toggle('d-none', p.getAttribute('data-panel') !== btn.getAttribute('data-tab'));
+                });
+            });
+        });
+
+        document.getElementById('rcptPdfBtn').addEventListener('click', function () {
+            if (pdfDoc) pdfDoc.save(baseName + '_Receipts.pdf');
+        });
+
+        document.getElementById('rcptExcelBtn').addEventListener('click', function () {
+            if (parsed.length) XLSX.writeFile(FinancePdfToExcel.buildWorkbook(parsed), baseName + '.xlsx');
+        });
+    })();
+</script>

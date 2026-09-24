@@ -221,6 +221,24 @@
         color: var(--login-primary);
     }
 
+    #capsLockWarning {
+        display: none;
+        align-items: center;
+        gap: .35rem;
+        font-size: .78rem;
+        font-weight: 600;
+        color: #92620a;
+        background: #fff6e6;
+        border: 1px solid #f2dba6;
+        border-radius: 8px;
+        padding: .35rem .6rem;
+        margin-top: .5rem;
+    }
+
+    #capsLockWarning.show {
+        display: flex;
+    }
+
     .login-remember {
         display: flex;
         align-items: center;
@@ -655,6 +673,9 @@
                             <i class="bi bi-eye" id="togglePasswordIcon"></i>
                         </button>
                     </div>
+                    <div id="capsLockWarning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                    </div>
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
                 </div>
 
@@ -722,6 +743,20 @@
         var toggleBtn = document.getElementById('togglePasswordBtn');
         var toggleIcon = document.getElementById('togglePasswordIcon');
         var passwordInput = document.getElementById('passwordInput');
+        var capsLockWarning = document.getElementById('capsLockWarning');
+
+        if (passwordInput && capsLockWarning) {
+            var checkCapsLock = function (e) {
+                if (typeof e.getModifierState !== 'function') return;
+                var isOn = e.getModifierState('CapsLock');
+                capsLockWarning.classList.toggle('show', isOn);
+            };
+            passwordInput.addEventListener('keydown', checkCapsLock);
+            passwordInput.addEventListener('keyup', checkCapsLock);
+            passwordInput.addEventListener('blur', function () {
+                capsLockWarning.classList.remove('show');
+            });
+        }
 
         if (toggleBtn && passwordInput) {
             toggleBtn.addEventListener('click', function () {

@@ -1,0 +1,310 @@
+@model StoreManagement.Models.Login
+@{
+    ViewBag.Title = "My Account";
+    string username = Model != null ? Model.Username : "";
+    string displayName = Model != null ? Model.DisplayName : username;
+    string roleTitle = Model != null ? Model.RoleJobTitle : "";
+    int userId = Model != null ? Model.UserID : 0;
+    string empId = Model != null ? Model.EmpId : "";
+    string initials = StoreManagement.Models.UserDisplayHelper.GetInitials(displayName);
+}
+
+<style>
+    .account-card {
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .account-avatar-circle {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: var(--lead-primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+
+    .account-section-header {
+        background: var(--lead-primary);
+        color: #fff;
+        font-weight: 600;
+        font-size: .92rem;
+        padding: .65rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .pwd-input-wrap {
+        position: relative;
+    }
+
+        .pwd-input-wrap input {
+            padding-right: 2.4rem;
+        }
+
+    .pwd-toggle-btn {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #b89694;
+        cursor: pointer;
+        padding: 4px 6px;
+        line-height: 1;
+    }
+
+        .pwd-toggle-btn:hover {
+            color: var(--lead-primary);
+        }
+
+    .pwd-strength-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: #eee;
+        margin-top: .5rem;
+        overflow: hidden;
+    }
+
+    .pwd-strength-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: #dc3545;
+        transition: width .2s ease, background-color .2s ease;
+    }
+
+    .pwd-strength-label {
+        font-size: .72rem;
+        margin-top: .25rem;
+        display: block;
+        color: var(--lead-text-muted, #8f7d7b);
+        min-height: 1.1em;
+    }
+
+    /* Hide the browser's own built-in password-reveal icon (Edge/IE) so it
+       doesn't sit on top of our custom eye toggle. */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
+
+    .caps-lock-warning {
+        display: none;
+        align-items: center;
+        gap: .35rem;
+        font-size: .76rem;
+        font-weight: 600;
+        color: #92620a;
+        background: #fff6e6;
+        border: 1px solid #f2dba6;
+        border-radius: 8px;
+        padding: .3rem .55rem;
+        margin-top: .4rem;
+    }
+
+        .caps-lock-warning.show {
+            display: flex;
+        }
+</style>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-person-circle"></i></div>
+    <div>
+        <div class="lead-eyebrow">My Account</div>
+        <h1>Account Settings</h1>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm account-card">
+            <div class="card-body text-center py-4">
+                <div class="account-avatar-circle mx-auto mb-3" id="profileAvatar">@initials</div>
+                <h5 class="mb-1" id="profileUsername">@displayName</h5>
+                @if (!string.IsNullOrWhiteSpace(roleTitle))
+                {
+                    <div class="text-secondary small mb-1">@roleTitle</div>
+                }
+                <span class="text-secondary small d-block">@username</span>
+                <span class="text-secondary small">Employee ID: @empId</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        @Html.AntiForgeryToken()
+
+        <div class="card shadow-sm account-card">
+            <div class="account-section-header"><i class="bi bi-key"></i> Change Password</div>
+            <div class="card-body">
+                <div id="changePasswordAlert" class="alert py-2 small" style="display:none;"></div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Current Password</label>
+                    <div class="pwd-input-wrap">
+                        <input type="password" class="form-control" id="currentPassword" autocomplete="current-password" />
+                        <button type="button" class="pwd-toggle-btn" id="toggleCurrentPwd" aria-label="Show password">
+                            <i class="bi bi-eye" id="toggleCurrentPwdIcon"></i>
+                        </button>
+                    </div>
+                    <div class="caps-lock-warning" id="capsLockCurrent">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                    </div>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label small fw-semibold">New Password</label>
+                    <div class="pwd-input-wrap">
+                        <input type="password" class="form-control" id="newPassword" autocomplete="new-password" />
+                        <button type="button" class="pwd-toggle-btn" id="toggleNewPwd" aria-label="Show password">
+                            <i class="bi bi-eye" id="toggleNewPwdIcon"></i>
+                        </button>
+                    </div>
+                    <div class="caps-lock-warning" id="capsLockNew">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                    </div>
+                    <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="pwdStrengthFill"></div></div>
+                    <span class="pwd-strength-label" id="pwdStrengthLabel"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Confirm New Password</label>
+                    <div class="pwd-input-wrap">
+                        <input type="password" class="form-control" id="confirmPassword" autocomplete="new-password" />
+                        <button type="button" class="pwd-toggle-btn" id="toggleConfirmPwd" aria-label="Show password">
+                            <i class="bi bi-eye" id="toggleConfirmPwdIcon"></i>
+                        </button>
+                    </div>
+                    <div class="caps-lock-warning" id="capsLockConfirm">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                    </div>
+                </div>
+
+                <button type="button" id="changePasswordBtn" class="btn btn-primary btn-sm">
+                    <i class="bi bi-check-circle"></i> Update Password
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script>
+    function setupPasswordToggle(inputId, btnId, iconId) {
+        var input = document.getElementById(inputId);
+        var btn = document.getElementById(btnId);
+        var icon = document.getElementById(iconId);
+        if (!input || !btn || !icon) return;
+
+        btn.addEventListener('click', function () {
+            var isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.classList.toggle('bi-eye', !isHidden);
+            icon.classList.toggle('bi-eye-slash', isHidden);
+            btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        });
+    }
+
+    setupPasswordToggle('currentPassword', 'toggleCurrentPwd', 'toggleCurrentPwdIcon');
+    setupPasswordToggle('newPassword', 'toggleNewPwd', 'toggleNewPwdIcon');
+    setupPasswordToggle('confirmPassword', 'toggleConfirmPwd', 'toggleConfirmPwdIcon');
+
+    function setupCapsLockWarning(inputId, warningId) {
+        var input = document.getElementById(inputId);
+        var warning = document.getElementById(warningId);
+        if (!input || !warning) return;
+
+        var checkCapsLock = function (e) {
+            if (typeof e.getModifierState !== 'function') return;
+            warning.classList.toggle('show', e.getModifierState('CapsLock'));
+        };
+
+        input.addEventListener('keydown', checkCapsLock);
+        input.addEventListener('keyup', checkCapsLock);
+        input.addEventListener('blur', function () { warning.classList.remove('show'); });
+    }
+
+    setupCapsLockWarning('currentPassword', 'capsLockCurrent');
+    setupCapsLockWarning('newPassword', 'capsLockNew');
+    setupCapsLockWarning('confirmPassword', 'capsLockConfirm');
+
+    function calcPasswordScore(pwd) {
+        var score = 0;
+        if (pwd.length >= 6) score++;
+        if (pwd.length >= 10) score++;
+        if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+        if (/[0-9]/.test(pwd)) score++;
+        if (/[^A-Za-z0-9]/.test(pwd)) score++;
+        return score;
+    }
+
+    $('#newPassword').on('input', function () {
+        var pwd = $(this).val();
+        var score = calcPasswordScore(pwd);
+        var pct = (score / 5) * 100;
+        var label = '';
+        var color = '#dc3545';
+
+        if (!pwd) {
+            pct = 0;
+        } else if (score >= 4) {
+            label = 'Strong'; color = '#198754';
+        } else if (score >= 3) {
+            label = 'Medium'; color = '#fd7e14';
+        } else {
+            label = 'Weak'; color = '#dc3545';
+        }
+
+        $('#pwdStrengthFill').css({ width: pct + '%', 'background-color': color });
+        $('#pwdStrengthLabel').text(label);
+    });
+
+    $(function () {
+        $('#changePasswordBtn').on('click', function () {
+            var currentPassword = $('#currentPassword').val();
+            var newPassword = $('#newPassword').val();
+            var confirmPassword = $('#confirmPassword').val();
+            var alertBox = $('#changePasswordAlert');
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alertBox.removeClass('alert-success').addClass('alert-danger').text('All fields are required.').show();
+                return;
+            }
+
+            $('#changePasswordBtn').prop('disabled', true);
+
+            $.ajax({
+                url: '@Url.Action("ChangePassword", "Account")',
+                type: 'POST',
+                data: {
+                    currentPassword: currentPassword,
+                    newPassword: newPassword,
+                    confirmPassword: confirmPassword,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alertBox.removeClass('alert-danger').addClass('alert-success').text(response.message).show();
+                        $('#currentPassword, #newPassword, #confirmPassword').val('');
+                        $('#pwdStrengthFill').css('width', '0%');
+                        $('#pwdStrengthLabel').text('');
+                    } else {
+                        alertBox.removeClass('alert-success').addClass('alert-danger').text(response.message).show();
+                    }
+                    $('#changePasswordBtn').prop('disabled', false);
+                },
+                error: function () {
+                    alertBox.removeClass('alert-success').addClass('alert-danger').text('Server error. Please try again later.').show();
+                    $('#changePasswordBtn').prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>

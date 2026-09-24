@@ -12,12 +12,31 @@ namespace StoreManagement.Controllers
     {
         private AccountRepository repo = new AccountRepository();
 
+        // Landing page depends on the user's department (see UserAccess).
+        private string HomeUrl(Login user)
+        {
+            var home = UserAccess.HomeRoute(user);
+            return home != null ? Url.Action(home[0], home[1]) : Url.Action("NoAccess", "Account");
+        }
+
+        private ActionResult RedirectToHome(Login user)
+        {
+            return Redirect(HomeUrl(user));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult NoAccess()
+        {
+            return View("AccessDenied");
+        }
+
         [HttpGet]
         public ActionResult Login()
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("CapaList", "Capa");
+                return RedirectToHome(repo.GetByUsername(User.Identity.Name));
             }
 
             return View();
@@ -54,9 +73,9 @@ namespace StoreManagement.Controllers
 
                     if (isAjax)
                     {
-                        return Json(new { success = true, redirectUrl = Url.Action("CapaList", "Capa") });
+                        return Json(new { success = true, redirectUrl = HomeUrl(user) });
                     }
-                    return RedirectToAction("CapaList", "Capa");
+                    return RedirectToHome(user);
                 }
             }
 
@@ -103,6 +122,42 @@ namespace StoreManagement.Controllers
             FormsAuthentication.SignOut();
             Session.Clear();
             return RedirectToAction("Login", "Account");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult Account()
+        {
+            var user = repo.GetByUsername(User.Identity.Name);
+            return View(user);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+                return Json(new { success = false, message = "All fields are required." });
+
+            if (newPassword != confirmPassword)
+                return Json(new { success = false, message = "New password and confirmation do not match." });
+
+            if (newPassword.Length < 6)
+                return Json(new { success = false, message = "New password must be at least 6 characters." });
+
+            var user = repo.GetByUsername(User.Identity.Name);
+            if (user == null)
+                return Json(new { success = false, message = "Account not found." });
+
+            var crypto = new Encryptionv2.Encryptionv2();
+
+            if (user.Password != crypto.EncryptPassword(currentPassword))
+                return Json(new { success = false, message = "Current password is incorrect." });
+
+            repo.UpdatePassword(user.UserID, crypto.EncryptPassword(newPassword));
+
+            return Json(new { success = true, message = "Password updated successfully." });
         }
     }
 }

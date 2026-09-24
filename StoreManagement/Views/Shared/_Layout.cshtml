@@ -87,34 +87,137 @@
                 background: rgba(255,255,255,.22);
             }
 
-        .app-user-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            color: #f4e2e0;
-            font-size: .82rem;
-            font-weight: 500;
+        /* ---------- User avatar menu ---------- */
+        .app-user-menu {
+            position: relative;
         }
 
-        .app-logout-btn {
-            background: rgba(255,255,255,.1);
-            border: 1px solid rgba(255,255,255,.35);
-            color: #fff;
-            border-radius: 999px;
-            padding: .35rem 1rem;
-            font-size: .82rem;
-            font-weight: 600;
+        .app-user-avatar-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: .4rem;
+            gap: .3rem;
+        }
+
+        .app-user-chevron {
+            color: rgba(255,255,255,.75);
+            font-size: .68rem;
+            transition: transform .2s ease;
+        }
+
+        .app-user-avatar-btn[aria-expanded="true"] .app-user-chevron {
+            transform: rotate(180deg);
+        }
+
+        .app-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.18);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .82rem;
+            letter-spacing: .02em;
+            border: 1.5px solid rgba(255,255,255,.35);
             transition: background-color .15s ease, transform .15s ease;
         }
 
-            .app-logout-btn:hover {
-                background: rgba(255,255,255,.22);
+            .app-user-avatar-btn:hover .app-user-avatar {
+                background: rgba(255,255,255,.3);
                 transform: translateY(-1px);
-                color: #fff;
             }
+
+        .app-user-avatar-lg {
+            width: 44px;
+            height: 44px;
+            font-size: 1rem;
+            background: var(--app-primary);
+            border: none;
+            flex: none;
+        }
+
+        .app-user-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            min-width: 220px;
+            background: #fff;
+            border: 1px solid var(--app-border);
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(36,19,22,.16);
+            padding: .6rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity .15s ease, transform .15s ease, visibility .15s ease;
+            z-index: 1040;
+        }
+
+            .app-user-dropdown.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+        .app-user-dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            padding: .3rem .5rem .6rem;
+        }
+
+        .app-user-dropdown-name {
+            font-weight: 600;
+            font-size: .88rem;
+            color: #241316;
+            word-break: break-word;
+        }
+
+        .app-user-dropdown-role {
+            font-size: .74rem;
+            color: var(--app-primary);
+            font-weight: 500;
+        }
+
+        .app-user-dropdown-divider {
+            height: 1px;
+            background: var(--app-border);
+            margin: 0 .2rem .5rem;
+        }
+
+        .app-user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            width: 100%;
+            padding: .55rem .6rem;
+            border: none;
+            background: none;
+            border-radius: 10px;
+            font-size: .87rem;
+            font-weight: 500;
+            color: #4a3a38;
+            text-align: left;
+            text-decoration: none;
+            transition: background-color .15s ease, color .15s ease;
+        }
+
+            .app-user-dropdown-item:hover {
+                background: var(--app-primary-light);
+                color: var(--app-primary-dark);
+                text-decoration: none;
+            }
+
+        .app-user-dropdown-item-danger:hover {
+            background: #fdf1f0;
+            color: #b3261e;
+        }
 
         /* ---------- Layout shell ---------- */
         .app-shell {
@@ -363,6 +466,34 @@
             flex: 1 1 auto;
             min-width: 0;
         }
+
+        @@media print {
+            .app-navbar,
+            .app-sidebar,
+            .app-sidebar-overlay,
+            .no-print {
+                display: none !important;
+            }
+
+            .app-shell {
+                display: block !important;
+                min-height: 0 !important;
+            }
+
+            .app-content {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .app-content > hr,
+            .app-content > footer {
+                display: none !important;
+            }
+
+            body {
+                background: #fff !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -375,6 +506,20 @@
                 && string.Equals(currentAction, a, System.StringComparison.OrdinalIgnoreCase)
                 ? " active" : "");
         bool isCarSectionActive = string.Equals(currentController, "Capa", System.StringComparison.OrdinalIgnoreCase);
+        bool isComplaintSectionActive = string.Equals(currentController, "ComplaintReport", System.StringComparison.OrdinalIgnoreCase)
+            || string.Equals(currentController, "Ncr", System.StringComparison.OrdinalIgnoreCase);
+
+        var currentUserProfile = StoreManagement.Models.UserAccess.Current(Context);
+        bool canDashboard = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Dashboard);
+        bool canCar = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Car);
+        bool canComplaint = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.ComplaintReport);
+        bool canPdfReceipt = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.PdfReceipt);
+        var homeRoute = StoreManagement.Models.UserAccess.HomeRoute(currentUserProfile);
+        string homeUrl = homeRoute != null ? Url.Action(homeRoute[0], homeRoute[1]) : Url.Action("NoAccess", "Account");
+        string userDisplayName = currentUserProfile != null ? currentUserProfile.DisplayName : User.Identity.Name;
+        string userRoleTitle = currentUserProfile != null ? currentUserProfile.RoleJobTitle : "";
+        string userInitials = StoreManagement.Models.UserDisplayHelper.GetInitials(
+            currentUserProfile != null ? currentUserProfile.DisplayName : User.Identity.Name);
 
         <nav class="app-navbar navbar-dark">
             <div class="app-navbar-inner">
@@ -382,19 +527,40 @@
                     <button class="sidebar-toggle-btn d-lg-none" id="sidebarToggleBtn" type="button" aria-label="Toggle menu">
                         <i class="bi bi-list"></i>
                     </button>
-                    <a class="app-brand" href="@Url.Action("CapaList", "Capa")">
+                    <a class="app-brand" href="@homeUrl">
                         <i class="bi bi-boxes" style="font-size:1.3rem;"></i>
                         @*<span class="app-brand-text">Store Management</span>*@
                     </a>
                 </div>
                 <div class="d-flex align-items-center gap-3">
-                    <span class="app-user-chip d-none d-sm-inline-flex">
-                        <i class="bi bi-person-circle"></i> @User.Identity.Name
-                    </span>
-                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
-                    {
-                        <button type="submit" class="app-logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</button>
-                    }
+                    <div class="app-user-menu" id="appUserMenu">
+                        <button type="button" class="app-user-avatar-btn" id="appUserAvatarBtn" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
+                            <span class="app-user-avatar">@userInitials</span>
+                            <i class="bi bi-chevron-down app-user-chevron"></i>
+                        </button>
+                        <div class="app-user-dropdown" id="appUserDropdown">
+                            <div class="app-user-dropdown-header">
+                                <span class="app-user-avatar app-user-avatar-lg">@userInitials</span>
+                                <div>
+                                    <div class="app-user-dropdown-name">@userDisplayName</div>
+                                    @if (!string.IsNullOrWhiteSpace(userRoleTitle))
+                                    {
+                                        <div class="app-user-dropdown-role">@userRoleTitle</div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="app-user-dropdown-divider"></div>
+                            <a class="app-user-dropdown-item" href="@Url.Action("Account", "Account")">
+                                <i class="bi bi-person"></i> Account
+                            </a>
+                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
+                            {
+                                <button type="submit" class="app-user-dropdown-item app-user-dropdown-item-danger">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -402,15 +568,33 @@
         <div class="app-shell">
             <div class="app-sidebar-overlay" id="sidebarOverlay"></div>
             <aside class="app-sidebar" id="appSidebar">
+                @if (canDashboard || canCar || canComplaint)
+                {
                 <div class="app-sidebar-section">
                     <i class="bi bi-patch-check-fill"></i> Quality Assurance
                 </div>
-                @*<ul class="app-sidebar-nav">
+                }
+                @if (canDashboard)
+                {
+                <ul class="app-sidebar-nav mb-2">
                     <li class="nav-item">
-                        <a class="@navClass("Store", "Index")" href="@Url.Action("Index", "Store")"><i class="bi bi-shop"></i>Store List</a>
+                        <a class="@navClass("Dashboard", "Index")" href="@Url.Action("Index", "Dashboard")">
+                            <span class="icon-chip"><i class="bi bi-speedometer2"></i></span>
+                            Dashboard
+                        </a>
                     </li>
-                </ul>*@
+                </ul>
+                }
 
+
+                @*<ul class="app-sidebar-nav">
+            <li class="nav-item">
+                <a class="@navClass("Store", "Index")" href="@Url.Action("Index", "Store")"><i class="bi bi-shop"></i>Store List</a>
+            </li>
+        </ul>*@
+
+                @if (canCar)
+                {
                 <ul class="app-sidebar-nav mt-2">
                     <li class="nav-item">
                         <a class="app-sidebar-link app-sidebar-toggle@(isCarSectionActive ? "" : " collapsed")" href="#" id="carSubmenuToggle" onclick="toggleCarSubmenu(event)" aria-expanded="@(isCarSectionActive ? "false" : "true")" aria-controls="carSubmenu">
@@ -422,7 +606,7 @@
                             <li class="nav-item">
                                 <a class="@navClass("Capa", "CapaList")" href="@Url.Action("CapaList", "Capa")">
                                     <span class="icon-chip"><i class="bi bi-clipboard-data"></i></span>
-                                    Dashboard
+                                    CAR List
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -434,14 +618,54 @@
                         </ul>
                     </li>
                 </ul>
+                }
+
+                @if (canComplaint)
+                {
+                <ul class="app-sidebar-nav mt-2">
+                    <li class="nav-item">
+                        <a class="app-sidebar-link app-sidebar-toggle@(isComplaintSectionActive ? "" : " collapsed")" href="#" id="complaintSubmenuToggle" onclick="toggleComplaintSubmenu(event)" aria-expanded="@(isComplaintSectionActive ? "false" : "true")" aria-controls="complaintSubmenu">
+                            <span class="icon-chip"><i class="bi bi-clipboard-x"></i></span>
+                            Complaint Report
+                            <i class="bi bi-chevron-down app-sidebar-chevron"></i>
+                        </a>
+                        <ul class="app-sidebar-nav app-sidebar-submenu@(isComplaintSectionActive ? " open" : "")" id="complaintSubmenu">
+                            <li class="nav-item">
+                                <a class="@navClass("ComplaintReport", "Index")" href="@Url.Action("Index", "ComplaintReport")">
+                                    <span class="icon-chip"><i class="bi bi-file-earmark-text"></i></span>
+                                    Product Complaint Report
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Ncr", "Index")" href="@Url.Action("Index", "Ncr")">
+                                    <span class="icon-chip"><i class="bi bi-exclamation-diamond"></i></span>
+                                    Non-Conformance Report
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                }
+
+                @if (canPdfReceipt)
+                {
+                <ul class="app-sidebar-nav mt-2">
+                    <li class="nav-item">
+                        <a class="@navClass("Finance", "PdfReceipt")" href="@Url.Action("PdfReceipt", "Finance")">
+                            <span class="icon-chip"><i class="bi bi-receipt"></i></span>
+                            PDF Receipt
+                        </a>
+                    </li>
+                </ul>
+                }
             </aside>
 
             <div class="app-content container-fluid body-content p-4">
+                @if (TempData["AccessDeniedMessage"] != null)
+                {
+                    <div class="alert alert-warning py-2 small"><i class="bi bi-shield-lock"></i> @TempData["AccessDeniedMessage"]</div>
+                }
                 @RenderBody()
-                <hr />
-                <footer>
-                    <p>&copy; @DateTime.Now.Year Corrective Action Report</p>
-                </footer>
             </div>
         </div>
 
@@ -472,6 +696,33 @@
                 }
             })();
 
+            (function () {
+                var menu = document.getElementById('appUserMenu');
+                var btn = document.getElementById('appUserAvatarBtn');
+                var dropdown = document.getElementById('appUserDropdown');
+                if (!menu || !btn || !dropdown) return;
+
+                function closeMenu() {
+                    dropdown.classList.remove('show');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+                function toggleMenu() {
+                    var isOpen = dropdown.classList.toggle('show');
+                    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                }
+
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target)) closeMenu();
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') closeMenu();
+                });
+            })();
+
             function toggleCarSubmenu(event) {
                 event.preventDefault();
                 var toggle = document.getElementById('carSubmenuToggle');
@@ -480,7 +731,15 @@
                 toggle.classList.toggle('collapsed', !isOpen);
                 toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             }
-        </script>
+
+            function toggleComplaintSubmenu(event) {
+                event.preventDefault();
+                var toggle = document.getElementById('complaintSubmenuToggle');
+                var submenu = document.getElementById('complaintSubmenu');
+                var isOpen = submenu.classList.toggle('open');
+                toggle.classList.toggle('collapsed', !isOpen);
+                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }        </script>
     }
     @if (!User.Identity.IsAuthenticated)
     {
@@ -493,11 +752,7 @@
             </div>
         </nav>
         <div class="container body-content">
-            <footer>
-                @RenderBody()
-                <hr />
-                <p>&copy; @DateTime.Now.Year Corrective Action Report</p>
-            </footer>
+            @RenderBody()
         </div>
 
         <script>

@@ -14,6 +14,7 @@ using System.Web.Mvc;
 
 namespace IsseERP.Controllers
 {
+    [SectionAccess(AppSection.Car)]
     public class CapaController : BaseController
     {
         private readonly CapaService _capaService = new CapaService();

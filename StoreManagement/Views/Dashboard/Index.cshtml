@@ -1,0 +1,933 @@
+@model StoreManagement.Models.DashboardViewModel
+
+@{
+    ViewBag.Title = "Main Dashboard";
+
+    string carStatusSummary = "";
+    if (Model.CarStats.Total > 0)
+    {
+        string dominantLabel; int dominantCount;
+        if (Model.CarStats.Open >= Model.CarStats.InVerification && Model.CarStats.Open >= Model.CarStats.Closed && Model.CarStats.Open >= Model.CarStats.Cancelled)
+        { dominantLabel = "awaiting response"; dominantCount = Model.CarStats.Open; }
+        else if (Model.CarStats.InVerification >= Model.CarStats.Closed && Model.CarStats.InVerification >= Model.CarStats.Cancelled)
+        { dominantLabel = "awaiting verification"; dominantCount = Model.CarStats.InVerification; }
+        else if (Model.CarStats.Closed >= Model.CarStats.Cancelled)
+        { dominantLabel = "closed"; dominantCount = Model.CarStats.Closed; }
+        else
+        { dominantLabel = "cancelled"; dominantCount = Model.CarStats.Cancelled; }
+
+        int pct = (int)System.Math.Round(dominantCount * 100.0 / Model.CarStats.Total);
+        carStatusSummary = "Most CAR reports (" + dominantCount + " of " + Model.CarStats.Total + ", " + pct + "%) are " + dominantLabel + ".";
+    }
+
+    string carClassificationSummary = "";
+    if (Model.CarClassificationLabels.Count > 0 && Model.CarStats.Total > 0)
+    {
+        int pct = (int)System.Math.Round(Model.CarClassificationCounts[0] * 100.0 / Model.CarStats.Total);
+        carClassificationSummary = "Most CAR reports are attributed to " + Model.CarClassificationLabels[0]
+            + " (" + Model.CarClassificationCounts[0] + " of " + Model.CarStats.Total + ", " + pct + "%).";
+    }
+
+    string pcrVsNcrSummary = "";
+    int complaintTotalForSummary = Model.PcrTotal + Model.NcrTotal;
+    if (complaintTotalForSummary > 0)
+    {
+        int pcrPct = (int)System.Math.Round(Model.PcrTotal * 100.0 / complaintTotalForSummary);
+        pcrVsNcrSummary = "PCRs make up " + pcrPct + "% of all complaint records (" + Model.PcrTotal + " PCR vs " + Model.NcrTotal + " NCR).";
+    }
+}
+
+<style>
+    .dash-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .dash-toolbar-controls {
+        display: flex;
+        align-items: flex-end;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .dash-filter-select {
+        min-width: 200px;
+    }
+
+    .dash-section {
+        margin-top: 1.75rem;
+    }
+
+    .dash-section-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--lead-text, #241316);
+        margin-bottom: 1rem;
+    }
+
+        .dash-section-title .icon-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--lead-primary-light);
+            color: var(--lead-primary);
+            font-size: 1rem;
+        }
+
+    .dash-stat-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: .8rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .dash-stat-card {
+        background: #fff;
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        padding: 1rem 1.1rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform .15s ease, box-shadow .15s ease;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .dash-stat-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent, var(--lead-primary));
+        }
+
+        .dash-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(36,19,22,.08);
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a.dash-stat-card {
+            cursor: pointer;
+        }
+
+        .dash-stat-card .dash-stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--lead-text, #241316);
+            line-height: 1.1;
+        }
+
+        .dash-stat-card .dash-stat-label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: 700;
+            color: var(--lead-text-muted, #8f7d7b);
+            margin-top: .3rem;
+        }
+
+        .dash-stat-card .dash-stat-delta {
+            margin-top: .3rem;
+            min-height: 1.1em;
+        }
+
+    .dash-card {
+        background: #fff;
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        padding: 1.1rem 1.25rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .dash-card h6 {
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: 700;
+            color: var(--lead-text-muted, #8f7d7b);
+            margin-bottom: .75rem;
+        }
+
+    .dash-summary {
+        display: flex;
+        align-items: flex-start;
+        gap: .5rem;
+        background: #fbf6f5;
+        border: 1px solid var(--lead-border);
+        border-radius: 10px;
+        padding: .55rem .75rem;
+        font-size: .82rem;
+        color: var(--lead-text, #241316);
+        margin-bottom: 1rem;
+        line-height: 1.35;
+        min-height: 2.4em;
+    }
+
+        .dash-summary i {
+            color: var(--lead-primary);
+            font-size: .95rem;
+            margin-top: .15rem;
+            flex: none;
+        }
+
+        .dash-summary:empty {
+            display: none;
+        }
+
+    .dash-chart-wrap {
+        position: relative;
+        height: 220px;
+    }
+
+    .dash-chart-wrap.dash-chart-tall {
+        height: 260px;
+    }
+
+    .dash-mini-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        font-size: .76rem;
+        font-weight: 600;
+        padding: .3rem .65rem;
+        border-radius: 999px;
+        background: var(--lead-primary-light);
+        color: var(--lead-primary);
+        margin-right: .4rem;
+        text-decoration: none;
+        transition: background-color .15s ease, transform .15s ease;
+    }
+
+        .dash-mini-pill:hover {
+            background: var(--lead-primary);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .dash-empty {
+        color: var(--lead-text-muted, #8f7d7b);
+        font-size: .86rem;
+        padding: 3rem 0;
+        text-align: center;
+    }
+
+    .dash-data-table {
+        margin-top: 1rem;
+        font-size: .82rem;
+    }
+
+        .dash-data-table th, .dash-data-table td {
+            padding: .4rem .5rem;
+        }
+
+        .dash-data-table thead th {
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--lead-text-muted, #8f7d7b);
+            border-bottom: 1px solid var(--lead-border);
+            font-weight: 700;
+        }
+
+        .dash-data-table tbody td {
+            border-bottom: 1px solid var(--lead-border);
+        }
+
+        .dash-data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .dash-scope-select {
+        min-width: 170px;
+    }
+
+    .dash-view-all {
+        margin-top: 1.25rem;
+        display: flex;
+        gap: .6rem;
+        flex-wrap: wrap;
+    }
+</style>
+
+<div class="lead-page-header dash-toolbar">
+    <div class="d-flex align-items-center gap-3">
+        <div class="lead-page-icon"><i class="bi bi-speedometer2"></i></div>
+        <div>
+            <div class="lead-eyebrow">Overview</div>
+            <h1>Dashboard</h1>
+        </div>
+    </div>
+    <div class="dash-toolbar-controls">
+        <div>
+            <label class="small fw-semibold text-secondary d-block mb-1" for="dashTrendRangeSelect">Trend Range</label>
+            <select id="dashTrendRangeSelect" class="form-select dash-filter-select">
+                <option value="3">Last 3 Months</option>
+                <option value="6" selected>Last 6 Months</option>
+                <option value="12">Last 12 Months</option>
+                <option value="24">Last 24 Months</option>
+            </select>
+        </div>
+        <div>
+            <label class="small fw-semibold text-secondary d-block mb-1" for="dashFilterSelect">View</label>
+            <select id="dashFilterSelect" class="form-select dash-filter-select">
+                <option value="all">All Modules</option>
+                <option value="car">CAR</option>
+                <option value="complaint">Complaint Report</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== CAR SECTION ===================== -->
+<div class="dash-section" data-section="car" id="carSection">
+    <div class="dash-section-title">
+        <span class="icon-chip"><i class="bi bi-folder2-open"></i></span> CAR (Corrective Action Report)
+    </div>
+
+    <div class="dash-stat-row">
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#7d1f27;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Total</div>
+            <div class="dash-stat-label">Total</div>
+            <div class="dash-stat-delta" id="carTotalDelta"></div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#c07a00;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Open</div>
+            <div class="dash-stat-label">Awaiting Response</div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#2f6690;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.InVerification</div>
+            <div class="dash-stat-label">Awaiting Verification</div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#2f6b46;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Closed</div>
+            <div class="dash-stat-label">Closed</div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#8f7d7b;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Cancelled</div>
+            <div class="dash-stat-label">Cancelled</div>
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="dash-card">
+                <h6>Status Breakdown</h6>
+                @if (Model.CarStats.Total == 0)
+                {
+                    <div class="dash-empty">No CAR reports yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@carStatusSummary</span></div>
+                    <div class="dash-chart-wrap"><canvas id="carStatusChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
+                        <tbody>
+                            <tr><td>Awaiting Response</td><td class="text-end">@Model.CarStats.Open</td></tr>
+                            <tr><td>Awaiting Verification</td><td class="text-end">@Model.CarStats.InVerification</td></tr>
+                            <tr><td>Closed</td><td class="text-end">@Model.CarStats.Closed</td></tr>
+                            <tr><td>Cancelled</td><td class="text-end">@Model.CarStats.Cancelled</td></tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="dash-card">
+                <h6>Reports Filed Over Time</h6>
+                @if (Model.CarStats.Total == 0)
+                {
+                    <div class="dash-empty">No CAR reports yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary" id="carTrendSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-chart-wrap"><canvas id="carTrendChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead id="carTrendHead"></thead>
+                        <tbody id="carTrendBody"></tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="dash-card">
+                <h6>Reports by Classification (who's responsible)</h6>
+                @if (Model.CarClassificationLabels.Count == 0)
+                {
+                    <div class="dash-empty">No CAR reports yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@carClassificationSummary</span></div>
+                    <div class="dash-chart-wrap dash-chart-tall"><canvas id="carClassificationChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Classification</th><th class="text-end">Count</th></tr></thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.CarClassificationLabels.Count; i++)
+                            {
+                                <tr><td>@Model.CarClassificationLabels[i]</td><td class="text-end">@Model.CarClassificationCounts[i]</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-view-all">
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="btn btn-outline-primary btn-sm">
+            View All CAR Reports <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- ================ COMPLAINT REPORT SECTION ================ -->
+<div class="dash-section" data-section="complaint" id="complaintSection">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <div class="dash-section-title mb-0">
+            <span class="icon-chip"><i class="bi bi-file-earmark-text"></i></span> Complaint Report
+        </div>
+        <div>
+            <label class="small fw-semibold text-secondary d-block mb-1" for="complaintScopeSelect">Scope</label>
+            <select id="complaintScopeSelect" class="form-select form-select-sm dash-scope-select">
+                <option value="all">All (PCR + NCR)</option>
+                <option value="pcr">PCR Only</option>
+                <option value="ncr">NCR Only</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="dash-mini-pill" title="View all PCR records">
+            <i class="bi bi-file-earmark-text"></i> PCR: @Model.PcrTotal
+        </a>
+        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="dash-mini-pill" title="View all NCR records">
+            <i class="bi bi-exclamation-diamond"></i> NCR: @Model.NcrTotal
+        </a>
+    </div>
+
+    <div class="dash-stat-row">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" id="complaintTotalLink" class="dash-stat-card" style="--accent:#7d1f27;" title="View records">
+            <div class="dash-stat-value" id="complaintTotalValue">@Model.ComplaintStats.Total</div>
+            <div class="dash-stat-label">Total</div>
+            <div class="dash-stat-delta" id="complaintTotalDelta"></div>
+        </a>
+        <div class="dash-stat-card" style="--accent:#c07a00;">
+            <div class="dash-stat-value" id="complaintOpenValue">@Model.ComplaintStats.Open</div>
+            <div class="dash-stat-label">Open / Ongoing</div>
+        </div>
+        <div class="dash-stat-card" style="--accent:#2f6b46;">
+            <div class="dash-stat-value" id="complaintClosedValue">@Model.ComplaintStats.Closed</div>
+            <div class="dash-stat-label">Closed</div>
+        </div>
+        <div class="dash-stat-card" style="--accent:#8f7d7b;">
+            <div class="dash-stat-value" id="complaintCancelledValue">@Model.ComplaintStats.Cancelled</div>
+            <div class="dash-stat-label">Cancelled / Invalid</div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="dash-card">
+                <h6>Status Breakdown</h6>
+                @if (Model.ComplaintStats.Total == 0)
+                {
+                    <div class="dash-empty">No PCR/NCR records yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary" id="complaintStatusSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-chart-wrap"><canvas id="complaintStatusChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
+                        <tbody>
+                            <tr><td>Open / Ongoing</td><td class="text-end" id="complaintStatusOpenCell">@Model.ComplaintStats.Open</td></tr>
+                            <tr><td>Closed</td><td class="text-end" id="complaintStatusClosedCell">@Model.ComplaintStats.Closed</td></tr>
+                            <tr><td>Cancelled / Invalid</td><td class="text-end" id="complaintStatusCancelledCell">@Model.ComplaintStats.Cancelled</td></tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="dash-card">
+                <h6 id="complaintTrendTitle">PCR + NCR Filed Over Time</h6>
+                @if (Model.ComplaintStats.Total == 0)
+                {
+                    <div class="dash-empty">No PCR/NCR records yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary" id="complaintTrendSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-chart-wrap"><canvas id="complaintTrendChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead id="complaintTrendHead"></thead>
+                        <tbody id="complaintTrendBody"></tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-12" id="pcrVsNcrCard">
+            <div class="dash-card">
+                <h6>PCR vs NCR by Status</h6>
+                @if (Model.PcrTotal == 0 && Model.NcrTotal == 0)
+                {
+                    <div class="dash-empty">No PCR/NCR records yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@pcrVsNcrSummary</span></div>
+                    <div class="dash-chart-wrap dash-chart-tall"><canvas id="pcrVsNcrChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Status</th><th class="text-end">PCR</th><th class="text-end">NCR</th></tr></thead>
+                        <tbody>
+                            <tr><td>Open / Ongoing</td><td class="text-end">@Model.PcrStats.Open</td><td class="text-end">@Model.NcrStats.Open</td></tr>
+                            <tr><td>Closed</td><td class="text-end">@Model.PcrStats.Closed</td><td class="text-end">@Model.NcrStats.Closed</td></tr>
+                            <tr><td>Cancelled / Invalid</td><td class="text-end">@Model.PcrStats.Cancelled</td><td class="text-end">@Model.NcrStats.Cancelled</td></tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-view-all">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="btn btn-outline-primary btn-sm">
+            View All PCR Records <i class="bi bi-arrow-right"></i>
+        </a>
+        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="btn btn-outline-primary btn-sm">
+            View All NCR Records <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+<script>
+    var trendYearMonths = @Html.Raw(Json.Encode(Model.TrendYearMonths));
+    var trendLabels = @Html.Raw(Json.Encode(Model.TrendLabels));
+    var carTrend = @Html.Raw(Json.Encode(Model.CarTrend));
+    var pcrTrend = @Html.Raw(Json.Encode(Model.PcrTrend));
+    var ncrTrend = @Html.Raw(Json.Encode(Model.NcrTrend));
+    var complaintTrend = @Html.Raw(Json.Encode(Model.ComplaintTrend));
+    var carClassificationLabels = @Html.Raw(Json.Encode(Model.CarClassificationLabels));
+    var carClassificationCounts = @Html.Raw(Json.Encode(Model.CarClassificationCounts));
+
+    var carStats = {
+        open: @Model.CarStats.Open,
+        verify: @Model.CarStats.InVerification,
+        closed: @Model.CarStats.Closed,
+        cancelled: @Model.CarStats.Cancelled
+    };
+
+    var scopeData = {
+        all: {
+            total: @Model.ComplaintStats.Total,
+            open: @Model.ComplaintStats.Open,
+            closed: @Model.ComplaintStats.Closed,
+            cancelled: @Model.ComplaintStats.Cancelled,
+            trend: complaintTrend,
+            trendLabel: 'PCR + NCR Filed',
+            trendTitle: 'PCR + NCR Filed Over Time',
+            summaryLabel: 'PCR/NCR',
+            listUrl: '@Url.Action("Index", "ComplaintReport")'
+        },
+        pcr: {
+            total: @Model.PcrStats.Total,
+            open: @Model.PcrStats.Open,
+            closed: @Model.PcrStats.Closed,
+            cancelled: @Model.PcrStats.Cancelled,
+            trend: pcrTrend,
+            trendLabel: 'PCR Filed',
+            trendTitle: 'PCR Filed Over Time',
+            summaryLabel: 'PCR',
+            listUrl: '@Url.Action("Index", "ComplaintReport")'
+        },
+        ncr: {
+            total: @Model.NcrStats.Total,
+            open: @Model.NcrStats.Open,
+            closed: @Model.NcrStats.Closed,
+            cancelled: @Model.NcrStats.Cancelled,
+            trend: ncrTrend,
+            trendLabel: 'NCR Filed',
+            trendTitle: 'NCR Filed Over Time',
+            summaryLabel: 'NCR',
+            listUrl: '@Url.Action("Index", "Ncr")'
+        }
+    };
+
+    var pcrStats = { open: @Model.PcrStats.Open, closed: @Model.PcrStats.Closed, cancelled: @Model.PcrStats.Cancelled };
+    var ncrStats = { open: @Model.NcrStats.Open, closed: @Model.NcrStats.Closed, cancelled: @Model.NcrStats.Cancelled };
+
+    var currentComplaintScope = 'all';
+    var currentRangeMonths = 6;
+
+    Chart.defaults.font.family = "'Inter', Arial, sans-serif";
+    Chart.defaults.color = '#8f7d7b';
+
+    // A bad/empty dataset in one chart must never stop the rest of the
+    // dashboard's charts from being created, so each one is isolated here.
+    function safeCreateChart(canvasId, config) {
+        var canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        try {
+            return new Chart(canvas, config);
+        } catch (e) {
+            console.error('Dashboard chart "' + canvasId + '" failed to render:', e);
+            return null;
+        }
+    }
+
+    function setSummary(elementId, text) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        var span = el.querySelector('span');
+        if (span) span.textContent = text;
+    }
+
+    function buildStatusSummary(open, closed, cancelled, total, label) {
+        if (total === 0) return 'No ' + label + ' records yet.';
+        var buckets = [
+            { name: 'open/ongoing', count: open },
+            { name: 'closed', count: closed },
+            { name: 'cancelled/invalid', count: cancelled }
+        ];
+        buckets.sort(function (a, b) { return b.count - a.count; });
+        var top = buckets[0];
+        var pct = Math.round((top.count / total) * 100);
+        return 'Most ' + label + ' records (' + top.count + ' of ' + total + ', ' + pct + '%) are ' + top.name + '.';
+    }
+
+    // ---------- Simple linear-regression forecast (least squares) ----------
+    var FORECAST_PERIODS = 2;
+
+    function linearForecast(values, periodsAhead) {
+        var n = values.length;
+        if (n < 2) return new Array(periodsAhead).fill(0);
+        var sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+        for (var i = 0; i < n; i++) {
+            sumX += i; sumY += values[i]; sumXY += i * values[i]; sumXX += i * i;
+        }
+        var denom = (n * sumXX - sumX * sumX) || 1;
+        var slope = (n * sumXY - sumX * sumY) / denom;
+        var intercept = (sumY - slope * sumX) / n;
+        var out = [];
+        for (var p = 1; p <= periodsAhead; p++) {
+            out.push(Math.max(0, Math.round(slope * (n - 1 + p) + intercept)));
+        }
+        return out;
+    }
+
+    function monthLabelAfter(yearMonth, offset) {
+        var parts = yearMonth.split('-');
+        var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
+        d.setMonth(d.getMonth() + offset);
+        return d.toLocaleString('en-US', { month: 'short' }) + ' ' + d.getFullYear();
+    }
+
+    function monthOverMonthDelta(values) {
+        if (values.length < 2) return null;
+        var last = values[values.length - 1];
+        var prev = values[values.length - 2];
+        if (prev === 0) return last === 0 ? 0 : null;
+        return Math.round(((last - prev) / prev) * 100);
+    }
+
+    function renderDeltaBadge(elementId, values) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        var delta = monthOverMonthDelta(values);
+        if (delta === null) { el.innerHTML = ''; return; }
+        var isUp = delta > 0;
+        var icon = delta === 0 ? 'bi-dash' : (isUp ? 'bi-arrow-up-short' : 'bi-arrow-down-short');
+        var cls = delta === 0 ? 'text-secondary' : (isUp ? 'text-danger' : 'text-success');
+        el.innerHTML = '<span class="' + cls + ' small fw-semibold"><i class="bi ' + icon + '"></i> '
+            + Math.abs(delta) + '% vs last month</span>';
+    }
+
+    function buildTrendSummary(valueSlice, forecastValues, label) {
+        if (!valueSlice.length) return '';
+        var first = valueSlice[0];
+        var last = valueSlice[valueSlice.length - 1];
+        var direction = last > first ? 'risen' : (last < first ? 'fallen' : 'stayed flat');
+        var nextProj = forecastValues[forecastValues.length - 1];
+        var projDirection = nextProj > last ? 'keep rising' : (nextProj < last ? 'ease off' : 'stay level');
+        return label + ' have ' + direction + ' over the shown period and are projected (dashed) to ' + projDirection + ' over the next ' + forecastValues.length + ' months.';
+    }
+
+    // Slices to the selected range, appends a projected segment to the chart
+    // and mirrors both (actual + projected) into the accompanying table.
+    function renderTrend(opts) {
+        var n = Math.min(opts.months, opts.yearMonths.length);
+        var ymSlice = opts.yearMonths.slice(-n);
+        var labelSlice = opts.labels.slice(-n);
+        var valueSlice = opts.values.slice(-n);
+
+        var forecastValues = linearForecast(valueSlice, FORECAST_PERIODS);
+        var forecastLabels = [];
+        for (var p = 1; p <= FORECAST_PERIODS; p++) {
+            forecastLabels.push(monthLabelAfter(ymSlice[ymSlice.length - 1], p));
+        }
+
+        var allLabels = labelSlice.concat(forecastLabels);
+        var actualData = valueSlice.concat(new Array(FORECAST_PERIODS).fill(null));
+        var forecastData = new Array(valueSlice.length - 1).fill(null)
+            .concat([valueSlice[valueSlice.length - 1]])
+            .concat(forecastValues);
+
+        if (opts.chart) {
+            opts.chart.data.labels = allLabels;
+            opts.chart.data.datasets[0].data = actualData;
+            opts.chart.data.datasets[0].label = opts.seriesLabel;
+            if (!opts.chart.data.datasets[1]) {
+                opts.chart.data.datasets[1] = {
+                    fill: false, tension: .35, pointRadius: 3, pointStyle: 'rectRot',
+                    borderDash: [6, 4], backgroundColor: 'transparent'
+                };
+            }
+            opts.chart.data.datasets[1].label = 'Projected';
+            opts.chart.data.datasets[1].data = forecastData;
+            opts.chart.data.datasets[1].borderColor = opts.color;
+            opts.chart.update();
+        }
+
+        var head = document.getElementById(opts.tableHeadId);
+        var body = document.getElementById(opts.tableBodyId);
+        if (head && body) {
+            head.innerHTML = '<tr>' + allLabels.map(function (l, i) {
+                var proj = i >= labelSlice.length;
+                return '<th' + (proj ? ' class="text-muted fst-italic"' : '') + '>' + l + (proj ? ' (proj.)' : '') + '</th>';
+            }).join('') + '</tr>';
+
+            var rowValues = valueSlice.concat(forecastValues);
+            body.innerHTML = '<tr>' + rowValues.map(function (v, i) {
+                var proj = i >= valueSlice.length;
+                return '<td' + (proj ? ' class="text-muted fst-italic"' : '') + '>' + v + '</td>';
+            }).join('') + '</tr>';
+        }
+
+        if (opts.summaryId) {
+            setSummary(opts.summaryId, buildTrendSummary(valueSlice, forecastValues, opts.summaryLabel));
+        }
+    }
+
+    function renderCarTrend() {
+        renderTrend({
+            chart: carTrendChart,
+            tableHeadId: 'carTrendHead',
+            tableBodyId: 'carTrendBody',
+            yearMonths: trendYearMonths,
+            labels: trendLabels,
+            values: carTrend,
+            seriesLabel: 'CAR Filed',
+            color: '#7d1f27',
+            months: currentRangeMonths,
+            summaryId: 'carTrendSummary',
+            summaryLabel: 'CAR filings'
+        });
+        renderDeltaBadge('carTotalDelta', carTrend);
+    }
+
+    function renderComplaintTrend() {
+        var d = scopeData[currentComplaintScope];
+        renderTrend({
+            chart: complaintTrendChart,
+            tableHeadId: 'complaintTrendHead',
+            tableBodyId: 'complaintTrendBody',
+            yearMonths: trendYearMonths,
+            labels: trendLabels,
+            values: d.trend,
+            seriesLabel: d.trendLabel,
+            color: '#c07a00',
+            months: currentRangeMonths,
+            summaryId: 'complaintTrendSummary',
+            summaryLabel: d.summaryLabel + ' filings'
+        });
+        renderDeltaBadge('complaintTotalDelta', d.trend);
+    }
+
+    function renderComplaintStatusSummary() {
+        var d = scopeData[currentComplaintScope];
+        setSummary('complaintStatusSummary', buildStatusSummary(d.open, d.closed, d.cancelled, d.total, d.summaryLabel));
+    }
+
+    var carStatusChart = safeCreateChart('carStatusChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Awaiting Response', 'Awaiting Verification', 'Closed', 'Cancelled'],
+            datasets: [{
+                data: [carStats.open, carStats.verify, carStats.closed, carStats.cancelled],
+                backgroundColor: ['#c07a00', '#2f6690', '#2f6b46', '#8f7d7b'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            onClick: function () { window.open('@Url.Action("CapaList", "Capa")', '_blank'); },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } } }
+        }
+    });
+
+    var carTrendChart = safeCreateChart('carTrendChart', {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: '#7d1f27', backgroundColor: 'rgba(125,31,39,.12)', fill: true, tension: .35, pointRadius: 3 }] },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    var carClassificationChart = safeCreateChart('carClassificationChart', {
+        type: 'bar',
+        data: {
+            labels: carClassificationLabels,
+            datasets: [{
+                label: 'CAR Reports',
+                data: carClassificationCounts,
+                backgroundColor: '#7d1f27',
+                borderRadius: 6,
+                maxBarThickness: 42
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            onClick: function () { window.open('@Url.Action("CapaList", "Capa")', '_blank'); },
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    var complaintStatusChart = safeCreateChart('complaintStatusChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Open / Ongoing', 'Closed', 'Cancelled / Invalid'],
+            datasets: [{
+                data: [scopeData.all.open, scopeData.all.closed, scopeData.all.cancelled],
+                backgroundColor: ['#c07a00', '#2f6b46', '#8f7d7b'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            onClick: function () { window.open(scopeData[currentComplaintScope].listUrl, '_blank'); },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } } }
+        }
+    });
+
+    var complaintTrendChart = safeCreateChart('complaintTrendChart', {
+        type: 'line',
+        data: { labels: [], datasets: [{ data: [], borderColor: '#7d1f27', backgroundColor: 'rgba(125,31,39,.12)', fill: true, tension: .35, pointRadius: 3 }] },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    var pcrVsNcrChart = safeCreateChart('pcrVsNcrChart', {
+        type: 'bar',
+        data: {
+            labels: ['Open / Ongoing', 'Closed', 'Cancelled / Invalid'],
+            datasets: [
+                { label: 'PCR', data: [pcrStats.open, pcrStats.closed, pcrStats.cancelled], backgroundColor: '#7d1f27', borderRadius: 6, maxBarThickness: 46 },
+                { label: 'NCR', data: [ncrStats.open, ncrStats.closed, ncrStats.cancelled], backgroundColor: '#c07a00', borderRadius: 6, maxBarThickness: 46 }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            onClick: function (evt, elements) {
+                if (!elements || !elements.length) return;
+                var url = elements[0].datasetIndex === 0 ? scopeData.pcr.listUrl : scopeData.ncr.listUrl;
+                window.open(url, '_blank');
+            },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    var charts = {
+        car: [carStatusChart, carTrendChart, carClassificationChart].filter(Boolean),
+        complaint: [complaintStatusChart, complaintTrendChart, pcrVsNcrChart].filter(Boolean)
+    };
+
+    renderCarTrend();
+    renderComplaintTrend();
+    renderComplaintStatusSummary();
+
+    document.getElementById('dashFilterSelect').addEventListener('change', function () {
+        var value = this.value;
+        var carSection = document.getElementById('carSection');
+        var complaintSection = document.getElementById('complaintSection');
+
+        var showCar = value === 'all' || value === 'car';
+        var showComplaint = value === 'all' || value === 'complaint';
+
+        carSection.style.display = showCar ? '' : 'none';
+        complaintSection.style.display = showComplaint ? '' : 'none';
+
+        if (showCar) charts.car.forEach(function (c) { c.resize(); });
+        if (showComplaint) charts.complaint.forEach(function (c) { c.resize(); });
+    });
+
+    document.getElementById('dashTrendRangeSelect').addEventListener('change', function () {
+        currentRangeMonths = parseInt(this.value, 10);
+        renderCarTrend();
+        renderComplaintTrend();
+    });
+
+    document.getElementById('complaintScopeSelect').addEventListener('change', function () {
+        currentComplaintScope = this.value;
+        var d = scopeData[currentComplaintScope];
+        if (!d) return;
+
+        var setText = function (id, val) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+
+        setText('complaintTotalValue', d.total);
+        setText('complaintOpenValue', d.open);
+        setText('complaintClosedValue', d.closed);
+        setText('complaintCancelledValue', d.cancelled);
+        setText('complaintStatusOpenCell', d.open);
+        setText('complaintStatusClosedCell', d.closed);
+        setText('complaintStatusCancelledCell', d.cancelled);
+
+        var titleEl = document.getElementById('complaintTrendTitle');
+        if (titleEl) titleEl.textContent = d.trendTitle;
+
+        var totalLink = document.getElementById('complaintTotalLink');
+        if (totalLink) totalLink.setAttribute('href', d.listUrl);
+
+        if (complaintStatusChart) {
+            complaintStatusChart.data.datasets[0].data = [d.open, d.closed, d.cancelled];
+            complaintStatusChart.update();
+        }
+
+        renderComplaintTrend();
+        renderComplaintStatusSummary();
+
+        var comparisonCard = document.getElementById('pcrVsNcrCard');
+        if (comparisonCard) comparisonCard.style.display = (currentComplaintScope === 'all') ? '' : 'none';
+    });
+</script>

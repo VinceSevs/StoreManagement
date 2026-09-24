@@ -12,6 +12,7 @@ using System.Drawing.Drawing2D;
 namespace StoreManagement.Controllers
 {
     [Authorize]
+    [SectionAccess(AppSection.Store)]
     public class StoreController : BaseController
     {
         private StoreRepository repo = new StoreRepository();
