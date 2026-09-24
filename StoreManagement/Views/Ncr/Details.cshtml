@@ -1,0 +1,473 @@
+@model StoreManagement.Models.Ncr
+@using System.Linq
+@using System.Configuration
+
+@{
+    ViewBag.Title = "NCR Details";
+    string attachmentsBaseUrl = ConfigurationManager.AppSettings["PCRAttachmentsBaseUrl"] ?? "";
+
+    string statusBadgeClass = "bg-info"; string statusBadgeText = "TRANSMITTED";
+    switch (Model.NcrStatus)
+    {
+        case 23: statusBadgeClass = "bg-warning"; statusBadgeText = "FOR FURTHER INVESTIGATION"; break;
+        case 24: statusBadgeClass = "bg-primary"; statusBadgeText = "CLOSED"; break;
+        case 29: statusBadgeClass = "bg-secondary"; statusBadgeText = "CANCELLED"; break;
+    }
+}
+
+<style>
+    .ncr-card {
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .ncr-section-header {
+        background: var(--lead-primary, #7d1f27);
+        color: #fff;
+        font-weight: 600;
+        font-size: .92rem;
+        padding: .65rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .ncr-field {
+        margin-bottom: .25rem;
+    }
+
+    .ncr-field-label {
+        display: block;
+        text-transform: uppercase;
+        font-size: .68rem;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--lead-text-muted, #8f7d7b);
+        margin-bottom: .2rem;
+    }
+
+    .ncr-field-value {
+        font-size: .92rem;
+        font-weight: 500;
+        color: var(--lead-text, #241316);
+    }
+
+    .ncr-status-panel {
+        background: #fbf6f5;
+    }
+
+    @@media (min-width: 768px) {
+        .ncr-status-panel {
+            border-right: 1px solid var(--lead-border);
+        }
+    }
+
+    .attachment-file {
+        max-width: 100%;
+        max-height: 220px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform .2s ease;
+    }
+
+        .attachment-file:hover {
+            transform: scale(1.04);
+        }
+
+    .attachment-box {
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .attachment-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .35rem;
+        min-height: 160px;
+        background: #f3ecea;
+        border-radius: 8px;
+        color: var(--lead-text-muted, #8f7d7b);
+        font-size: .8rem;
+        padding: 1rem;
+    }
+
+        .attachment-placeholder i {
+            font-size: 1.9rem;
+            color: #c9b7b4;
+        }
+
+    textarea.ncr-findings-readonly {
+        background: #fbf6f5;
+        font-size: .88rem;
+        min-height: 160px;
+    }
+
+    textarea#CSFindings {
+        min-height: 160px;
+    }
+
+    .ncr-print-text {
+        display: none;
+    }
+
+    @@media print {
+        @@page {
+            margin: 0;
+        }
+
+        body {
+            padding: 12mm 10mm !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .ncr-card {
+            border: 1px solid #ccc !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        textarea.ncr-findings-readonly {
+            display: none !important;
+        }
+
+        .ncr-print-text {
+            display: block !important;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid var(--lead-border);
+            border-radius: 6px;
+            padding: .55rem .7rem;
+            background: #fbf6f5;
+            font-size: .85rem;
+            min-height: 50px;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        .ncr-status-panel {
+            border-right: none !important;
+            border-bottom: 1px solid var(--lead-border);
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .ncr-status-panel + div {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .attachment-box,
+        .attachment-placeholder {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+    <a href="@Url.Action("Index", "Ncr")" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="printNcrDetails()">
+            <i class="bi bi-printer"></i> Print
+        </button>
+        <span class="badge @statusBadgeClass px-3 py-2">@statusBadgeText</span>
+    </div>
+</div>
+
+<div class="d-none d-print-block mb-3">
+    <span class="badge @statusBadgeClass px-3 py-2">@statusBadgeText</span>
+</div>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-exclamation-diamond"></i></div>
+    <div>
+        <div class="lead-eyebrow">Complaint Report / Non-Conformance Report</div>
+        <h1>NCR No: @Model.NcrNumber</h1>
+    </div>
+</div>
+
+<div class="card shadow-sm ncr-card mb-4">
+    <div class="ncr-section-header"><i class="bi bi-info-circle"></i> Main Details</div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Create Date/Time</span>
+                    <span class="ncr-field-value">@Model.DateCreated.ToString("MM/dd/yyyy hh:mm tt")</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Store</span>
+                    <span class="ncr-field-value">@Model.StoreNumber - @Model.StoreName</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Manager-In-Charge</span>
+                    <span class="ncr-field-value">@Model.ManagerInCharge</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Filed By</span>
+                    <span class="ncr-field-value">@Model.FiledBy</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Store Contact</span>
+                    <span class="ncr-field-value">@Model.StoreContact</span>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Store Email</span>
+                    <span class="ncr-field-value">@Model.StoreEmail</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm ncr-card mb-4">
+    <div class="ncr-section-header"><i class="bi bi-card-text"></i> Complaint</div>
+    <div class="card-body">
+        <div class="row g-4 mb-3">
+            <div class="col-md-4">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Complaint Issue</span>
+                    <span class="ncr-field-value">@Model.ComplaintIssueDesc</span>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="ncr-field">
+                    <span class="ncr-field-label">Subject</span>
+                    <span class="ncr-field-value">@Model.Subject</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ncr-field">
+            <span class="ncr-field-label">Message</span>
+            <textarea class="form-control ncr-findings-readonly" rows="6" disabled>@Model.Remarks</textarea>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm ncr-card mb-4">
+    <div class="ncr-section-header"><i class="bi bi-paperclip"></i> Attachments</div>
+    <div class="card-body">
+        @{
+            var attachments = new[] { Model.Attachment1, Model.Attachment2, Model.Attachment3, Model.Attachment4 };
+            var labels = new[] { "Attachment 1", "Attachment 2", "Attachment 3", "Attachment 4" };
+            bool hasAny = attachments.Any(a => !string.IsNullOrEmpty(a));
+            var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic", ".heif" };
+            var videoExtensions = new[] { ".mp4", ".webm", ".ogg" };
+        }
+        @if (hasAny && !string.IsNullOrEmpty(attachmentsBaseUrl))
+        {
+            <div class="row g-3">
+                @for (int i = 0; i < attachments.Length; i++)
+                {
+                    var file = attachments[i];
+                    if (string.IsNullOrEmpty(file)) { continue; }
+                    var filePath = attachmentsBaseUrl.TrimEnd('/') + "/" + file;
+                    var extension = System.IO.Path.GetExtension(file)?.ToLower() ?? "";
+                    var fileTypeLabel = extension.TrimStart('.').ToUpper();
+
+                    <div class="col-md-6 col-sm-6 text-center">
+                        <div class="attachment-box p-2 border rounded shadow-sm">
+                            <h6 class="small text-uppercase text-secondary fw-semibold">@labels[i]</h6>
+                            @if (imageExtensions.Contains(extension))
+                            {
+                                <img src="@filePath" class="attachment-file img-fluid" alt="@labels[i]"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="attachment-placeholder" style="display:none;">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                    <span>Preview not available@(extension == ".heic" || extension == ".heif" ? " (HEIC/HEIF isn't supported by most browsers)" : "")</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                            else if (extension == ".pdf")
+                            {
+                                <embed src="@filePath" type="application/pdf" class="attachment-file" style="width:100%;height:220px;" />
+                            }
+                            else if (videoExtensions.Contains(extension))
+                            {
+                                <video class="attachment-file" style="width:100%;height:220px;object-fit:cover;" controls
+                                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <source src="@filePath" type="video/@extension.Replace(".", "")" />
+                                </video>
+                                <div class="attachment-placeholder" style="display:none;">
+                                    <i class="bi bi-file-earmark-play"></i>
+                                    <span>Preview not available</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="attachment-placeholder">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>@(string.IsNullOrEmpty(fileTypeLabel) ? "File" : fileTypeLabel + " file")</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (hasAny)
+        {
+            <span class="text-muted">Attachments exist for this NCR, but the attachments file server URL has not been configured yet. Set "PCRAttachmentsBaseUrl" in Web.config.</span>
+        }
+        else
+        {
+            <span class="text-muted">No attachments</span>
+        }
+    </div>
+</div>
+
+<div class="card shadow-sm ncr-card mb-4">
+    <div class="ncr-section-header"><i class="bi bi-headset"></i> LLII Customer Care Remarks / Findings</div>
+    <div class="row g-0">
+        <div class="col-md-3 p-3 ncr-status-panel">
+            @{
+                string csBadgeClass = "bg-info"; string csBadgeText = "TRANSMITTED";
+                switch (Model.CSRemarks)
+                {
+                    case 21: csBadgeClass = "bg-success"; csBadgeText = "VALID"; break;
+                    case 22: csBadgeClass = "bg-warning"; csBadgeText = "INVALID"; break;
+                    case 23: csBadgeClass = "bg-primary"; csBadgeText = "FOR FURTHER INVESTIGATION"; break;
+                }
+            }
+            <span class="badge @csBadgeClass">@csBadgeText</span>
+            <div class="ncr-field mt-3">
+                <span class="ncr-field-label">Response Date</span>
+                <span class="ncr-field-value">@(Model.CSResDate.HasValue ? Model.CSResDate.Value.ToString("MM/dd/yyyy hh:mm tt") : "-")</span>
+            </div>
+
+            @if (Model.NcrStatus != 24)
+            {
+                <div class="mt-3 no-print">
+                    <span class="ncr-field-label">New Remarks</span>
+                    <select class="form-select form-select-sm" id="CSRemarks">
+                        <option value="21">Valid</option>
+                        <option value="22">Invalid</option>
+                        <option value="23">For Further Investigation</option>
+                    </select>
+                </div>
+            }
+        </div>
+        <div class="col-md-9 p-3">
+            <div class="ncr-field">
+                <span class="ncr-field-label">Latest Findings</span>
+                <textarea class="form-control ncr-findings-readonly" rows="6" disabled>@Model.CSFindings</textarea>
+            </div>
+
+            @if (Model.NcrStatus != 24)
+            {
+                <div class="ncr-field mt-3 no-print">
+                    <span class="ncr-field-label">Add Findings</span>
+                    <textarea class="form-control" id="CSFindings" rows="4" placeholder="Add your findings..."></textarea>
+                </div>
+                <input type="hidden" id="DocID" value="@Model.DocID" />
+                <button id="saveCSFindings" class="btn btn-primary btn-sm mt-2 no-print">
+                    <i class="bi bi-send-check"></i> Update Findings
+                </button>
+            }
+            else
+            {
+                <div class="alert alert-warning mt-3 mb-0 py-2 small">
+                    This NCR has been finalized. You cannot edit the Customer Care Remarks/Findings.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script>
+    var ncrPrintTextNodes = [];
+
+    function insertNcrPrintTextBlocks() {
+        ncrPrintTextNodes = [];
+        document.querySelectorAll('textarea.ncr-findings-readonly').forEach(function (ta) {
+            var div = document.createElement('div');
+            div.className = 'ncr-print-text';
+            div.textContent = ta.value;
+            ta.insertAdjacentElement('afterend', div);
+            ncrPrintTextNodes.push(div);
+        });
+    }
+
+    function removeNcrPrintTextBlocks() {
+        ncrPrintTextNodes.forEach(function (div) { div.remove(); });
+        ncrPrintTextNodes = [];
+    }
+
+    function printNcrDetails() {
+        var originalTitle = document.title;
+
+        function cleanup() {
+            document.title = originalTitle;
+            removeNcrPrintTextBlocks();
+            window.removeEventListener('afterprint', cleanup);
+        }
+
+        insertNcrPrintTextBlocks();
+        document.title = '​';
+        window.addEventListener('afterprint', cleanup);
+        window.print();
+    }
+
+    $(function () {
+        $('#saveCSFindings').on('click', function () {
+            var csFindings = $('#CSFindings').val().trim();
+            var docId = $('#DocID').val();
+            var csRemarks = $('#CSRemarks').val();
+
+            if (csFindings === '') {
+                alert('Please enter your findings before saving.');
+                return;
+            }
+
+            if (!confirm('Submit these Customer Care Remarks/Findings?')) return;
+
+            $('#saveCSFindings').prop('disabled', true);
+
+            $.ajax({
+                url: '@Url.Action("Respond", "Ncr")',
+                type: 'POST',
+                data: { docId: docId, csRemarks: csRemarks, csFindings: csFindings },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message || 'Something went wrong.');
+                        $('#saveCSFindings').prop('disabled', false);
+                    }
+                },
+                error: function () {
+                    alert('Server error. Please try again later.');
+                    $('#saveCSFindings').prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>

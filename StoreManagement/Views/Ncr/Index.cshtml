@@ -1,0 +1,469 @@
+@model IEnumerable<StoreManagement.Models.Ncr>
+
+@{
+    ViewBag.Title = "Non-Conformance Report";
+}
+
+<style>
+    .ncr-filter-card .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .ncr-filter-label {
+        display: block;
+        text-transform: uppercase;
+        font-size: .68rem;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--lead-text-muted, #8f7d7b);
+        margin-bottom: .35rem;
+    }
+
+    .ncr-list-card {
+        padding: 1.5rem 1.75rem;
+        margin-top: 1.5rem;
+    }
+
+        .ncr-list-card table th,
+        .ncr-list-card table td {
+            padding: 0.85rem 1rem;
+        }
+
+    .ncr-sortable {
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+        .ncr-sortable:hover {
+            color: var(--lead-primary);
+        }
+
+        .ncr-sortable .sort-icon {
+            font-size: .7rem;
+            margin-left: .25rem;
+            opacity: .35;
+        }
+
+        .ncr-sortable.sort-asc,
+        .ncr-sortable.sort-desc {
+            color: var(--lead-primary);
+        }
+
+            .ncr-sortable.sort-asc .sort-icon,
+            .ncr-sortable.sort-desc .sort-icon {
+                opacity: 1;
+            }
+
+    #ncrPagination {
+        gap: 4px;
+    }
+
+        #ncrPagination .page-item .page-link {
+            border: 1px solid var(--lead-border);
+            border-radius: 999px;
+            color: #4a3a38;
+            font-size: .8rem;
+            font-weight: 600;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 .55rem;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: none;
+        }
+
+            #ncrPagination .page-item .page-link:hover {
+                background: var(--lead-primary-light);
+                border-color: var(--lead-primary);
+                color: var(--lead-primary);
+                transform: translateY(-1px);
+            }
+
+        #ncrPagination .page-item.active .page-link {
+            background: var(--lead-primary);
+            border-color: var(--lead-primary);
+            color: #fff;
+        }
+
+        #ncrPagination .page-item.disabled .page-link {
+            background: #fbf6f5;
+            color: #c9b7b4;
+            border-color: var(--lead-border);
+        }
+</style>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-exclamation-diamond"></i></div>
+    <div>
+        <div class="lead-eyebrow">Complaint Report</div>
+        <h1>Non-Conformance Report</h1>
+    </div>
+</div>
+
+<div class="card shadow-sm ncr-filter-card mb-3">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label class="ncr-filter-label" for="ncrSearch">Search</label>
+                <input type="text" id="ncrSearch" class="form-control lead-search" placeholder="NCR No., store, filed by..." autocomplete="off" />
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="ncr-filter-label" for="ncrStatusFilter">Status</label>
+                <select id="ncrStatusFilter" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="20">Transmitted</option>
+                    <option value="23">For Further Investigation</option>
+                    <option value="24">Closed</option>
+                    <option value="29">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="ncr-filter-label" for="ncrDateFrom">Date From</label>
+                <input type="date" id="ncrDateFrom" class="form-control" />
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="ncr-filter-label" for="ncrDateTo">Date To</label>
+                <input type="date" id="ncrDateTo" class="form-control" />
+            </div>
+            <div class="col-lg-2 col-md-12">
+                <button type="button" id="ncrClearFilters" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle"></i> Clear Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm ncr-list-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <span class="fw-semibold text-secondary small text-uppercase" style="letter-spacing:.04em"></span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="small text-secondary" id="ncrResultCount"></span>
+            <button type="button" id="ncrExportBtn" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 lead-table" id="ncrTable">
+            <thead>
+                <tr>
+                    <th class="ncr-sortable" data-col="0">Status <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="1">Create Date <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="2">NCR No. <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="3">Store Name <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="4">Filed By <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    int filterStatus = item.NcrStatus == 0 ? 20 : item.NcrStatus;
+                    <tr class="ncr-row" data-status="@filterStatus" data-date="@item.DateCreated.ToString("yyyy-MM-dd")">
+                        <td>
+                            @{
+                                string badgeClass = "bg-info";
+                                string badgeText = "TRANSMITTED";
+                                switch (item.NcrStatus)
+                                {
+                                    case 23: badgeClass = "bg-warning"; badgeText = "FOR FURTHER INVESTIGATION"; break;
+                                    case 24: badgeClass = "bg-primary"; badgeText = "CLOSED"; break;
+                                    case 29: badgeClass = "bg-secondary"; badgeText = "CANCELLED"; break;
+                                }
+                            }
+                            <span class="badge @badgeClass">@badgeText</span>
+                        </td>
+                        <td>@item.DateCreated.ToString("MMM dd yyyy")</td>
+                        <td class="font-mono fw-semibold" style="color:var(--lead-primary)">@item.NcrNumber</td>
+                        <td>@item.StoreName</td>
+                        <td>@item.FiledBy</td>
+                        <td class="text-end">
+                            <a href="@Url.Action("Details", "Ncr", new { docId = item.DocID })" class="btn btn-primary btn-sm">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 mt-2 border-top">
+        <span class="small text-secondary" id="ncrPageInfo"></span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <ul class="pagination pagination-sm mb-0" id="ncrPagination"></ul>
+            <div class="input-group input-group-sm" style="width:150px;">
+                <input type="number" min="1" class="form-control" id="ncrPageJumpInput" placeholder="Page #">
+                <button class="btn btn-outline-primary" type="button" id="ncrPageJumpBtn">Go</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    $(function () {
+        setupNcrTable();
+    });
+
+    function setupNcrTable() {
+        var PAGE_SIZE = 10;
+        var currentPage = 1;
+        var allRows = Array.from(document.querySelectorAll('#ncrTable tbody tr.ncr-row'));
+        var originalRowOrder = allRows.slice();
+        var visibleRows = allRows.slice();
+        var sortState = { column: null, direction: null };
+
+        var searchInput = document.getElementById('ncrSearch');
+        var statusSelect = document.getElementById('ncrStatusFilter');
+        var dateFromInput = document.getElementById('ncrDateFrom');
+        var dateToInput = document.getElementById('ncrDateTo');
+
+        function reorderDom(rows) {
+            var tbody = document.querySelector('#ncrTable tbody');
+            rows.forEach(function (row) { tbody.appendChild(row); });
+        }
+
+        function getSortValue(row, colIndex) {
+            if (colIndex === 0) return parseInt(row.getAttribute('data-status'), 10) || 0;
+            if (colIndex === 1) return row.getAttribute('data-date') || '';
+            var cell = row.querySelectorAll('td')[colIndex];
+            return cell ? cell.textContent.trim() : '';
+        }
+
+        function compareRows(a, b, colIndex) {
+            var va = getSortValue(a, colIndex);
+            var vb = getSortValue(b, colIndex);
+            if (typeof va === 'number' && typeof vb === 'number') return va - vb;
+            return String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('.ncr-sortable').forEach(function (th) {
+                th.classList.remove('sort-asc', 'sort-desc');
+                var icon = th.querySelector('.sort-icon');
+                if (icon) icon.className = 'bi bi-arrow-down-up sort-icon';
+            });
+
+            if (sortState.column === null) return;
+
+            var activeTh = document.querySelector('.ncr-sortable[data-col="' + sortState.column + '"]');
+            if (!activeTh) return;
+
+            activeTh.classList.add(sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            var activeIcon = activeTh.querySelector('.sort-icon');
+            if (activeIcon) {
+                activeIcon.className = 'bi ' + (sortState.direction === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill') + ' sort-icon';
+            }
+        }
+
+        function sortByColumn(colIndex) {
+            sortState.direction = (sortState.column === colIndex && sortState.direction === 'asc') ? 'desc' : 'asc';
+            sortState.column = colIndex;
+
+            allRows.sort(function (a, b) {
+                var cmp = compareRows(a, b, colIndex);
+                return sortState.direction === 'asc' ? cmp : -cmp;
+            });
+            reorderDom(allRows);
+            updateSortIndicators();
+            applyFilters();
+        }
+
+        function resetSort() {
+            sortState = { column: null, direction: null };
+            allRows = originalRowOrder.slice();
+            reorderDom(allRows);
+            updateSortIndicators();
+        }
+
+        document.querySelectorAll('.ncr-sortable').forEach(function (th) {
+            th.addEventListener('click', function () {
+                sortByColumn(parseInt(th.getAttribute('data-col'), 10));
+            });
+        });
+
+        function rowMatches(row) {
+            var term = (searchInput.value || '').trim().toLowerCase();
+            if (term && row.textContent.toLowerCase().indexOf(term) === -1) return false;
+
+            var status = statusSelect.value;
+            if (status && row.getAttribute('data-status') !== status) return false;
+
+            var rowDate = row.getAttribute('data-date');
+            var from = dateFromInput.value;
+            var to = dateToInput.value;
+            if (from && rowDate < from) return false;
+            if (to && rowDate > to) return false;
+
+            return true;
+        }
+
+        function applyFilters() {
+            visibleRows = allRows.filter(rowMatches);
+            currentPage = 1;
+            renderPage();
+        }
+
+        function clearFilters() {
+            searchInput.value = '';
+            statusSelect.value = '';
+            dateFromInput.value = '';
+            dateToInput.value = '';
+            resetSort();
+            applyFilters();
+        }
+
+        function renderPage() {
+            var totalRows = visibleRows.length;
+            var totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            var startIndex = (currentPage - 1) * PAGE_SIZE;
+            var endIndex = startIndex + PAGE_SIZE;
+            var visibleSet = new Set(visibleRows.slice(startIndex, endIndex));
+
+            allRows.forEach(function (row) {
+                row.style.display = visibleSet.has(row) ? '' : 'none';
+            });
+
+            var infoEl = document.getElementById('ncrPageInfo');
+            if (infoEl) {
+                infoEl.textContent = totalRows === 0
+                    ? 'No NCRs found'
+                    : (startIndex + 1) + ' to ' + Math.min(endIndex, totalRows) + ' of ' + totalRows + ' shown';
+            }
+
+            var countEl = document.getElementById('ncrResultCount');
+            if (countEl) {
+                countEl.textContent = totalRows === allRows.length
+                    ? totalRows + ' total'
+                    : totalRows + ' of ' + allRows.length + ' match filters';
+            }
+
+            renderPaginationControls(totalPages);
+        }
+
+        function renderPaginationControls(totalPages) {
+            var pager = document.getElementById('ncrPagination');
+            if (!pager) return;
+            pager.innerHTML = '';
+
+            function addPageItem(label, page, opts) {
+                opts = opts || {};
+                var li = document.createElement('li');
+                li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
+
+                if (opts.ellipsis) {
+                    li.innerHTML = '<span class="page-link" style="border:none;background:transparent;box-shadow:none;">&hellip;</span>';
+                    pager.appendChild(li);
+                    return;
+                }
+
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'page-link';
+                btn.textContent = label;
+                if (!opts.disabled && !opts.active) {
+                    btn.addEventListener('click', function () {
+                        currentPage = page;
+                        renderPage();
+                    });
+                }
+                li.appendChild(btn);
+                pager.appendChild(li);
+            }
+
+            if (totalPages <= 1) return;
+
+            addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1 });
+
+            addPageItem('1', 1, { active: currentPage === 1 });
+
+            var windowStart = Math.max(2, currentPage - 1);
+            var windowEnd = Math.min(totalPages - 1, currentPage + 1);
+
+            if (windowStart > 2) {
+                addPageItem(null, null, { ellipsis: true });
+            }
+
+            for (var p = windowStart; p <= windowEnd; p++) {
+                addPageItem(String(p), p, { active: p === currentPage });
+            }
+
+            if (windowEnd < totalPages - 1) {
+                addPageItem(null, null, { ellipsis: true });
+            }
+
+            if (totalPages > 1) {
+                addPageItem(String(totalPages), totalPages, { active: currentPage === totalPages });
+            }
+
+            addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages });
+        }
+
+        function exportToExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert('Excel export library failed to load. Check your internet connection and try again.');
+                return;
+            }
+
+            var headers = ['Status', 'Create Date', 'NCR No.', 'Store Name', 'Filed By'];
+            var data = [headers];
+
+            visibleRows.forEach(function (row) {
+                var cells = row.querySelectorAll('td');
+                var rowData = [];
+                for (var i = 0; i < cells.length - 1; i++) { // skip the trailing Action column
+                    rowData.push(cells[i].textContent.trim());
+                }
+                data.push(rowData);
+            });
+
+            var worksheet = XLSX.utils.aoa_to_sheet(data);
+            worksheet['!cols'] = headers.map(function () { return { wch: 18 }; });
+
+            var workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'NCR List');
+
+            var today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(workbook, 'NonConformanceReport_' + today + '.xlsx');
+        }
+
+        function jumpToPage() {
+            var input = document.getElementById('ncrPageJumpInput');
+            if (!input) return;
+            var totalPages = Math.max(1, Math.ceil(visibleRows.length / PAGE_SIZE));
+            var target = parseInt(input.value, 10);
+            if (isNaN(target) || target < 1) target = 1;
+            if (target > totalPages) target = totalPages;
+            currentPage = target;
+            renderPage();
+            input.value = '';
+        }
+
+        document.getElementById('ncrPageJumpBtn').addEventListener('click', jumpToPage);
+        document.getElementById('ncrPageJumpInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); jumpToPage(); }
+        });
+
+        var searchTimer;
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(applyFilters, 200);
+        });
+        statusSelect.addEventListener('change', applyFilters);
+        dateFromInput.addEventListener('change', applyFilters);
+        dateToInput.addEventListener('change', applyFilters);
+        document.getElementById('ncrClearFilters').addEventListener('click', clearFilters);
+        document.getElementById('ncrExportBtn').addEventListener('click', exportToExcel);
+
+        renderPage();
+    }
+</script>
