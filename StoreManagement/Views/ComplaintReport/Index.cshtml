@@ -1,0 +1,491 @@
+@model IEnumerable<StoreManagement.Models.Pcr>
+
+@{
+    ViewBag.Title = "Product Complaint Report";
+}
+
+<style>
+    .pcr-filter-card .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .pcr-filter-label {
+        display: block;
+        text-transform: uppercase;
+        font-size: .68rem;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--lead-text-muted, #8f7d7b);
+        margin-bottom: .35rem;
+    }
+
+    .pcr-list-card {
+        padding: 1.5rem 1.75rem;
+        margin-top: 1.5rem;
+    }
+
+        .pcr-list-card table th,
+        .pcr-list-card table td {
+            padding: 0.85rem 1rem;
+        }
+
+    #pcrPagination {
+        gap: 4px;
+    }
+
+        #pcrPagination .page-item .page-link {
+            border: 1px solid var(--lead-border);
+            border-radius: 999px;
+            color: #4a3a38;
+            font-size: .8rem;
+            font-weight: 600;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 .55rem;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: none;
+        }
+
+            #pcrPagination .page-item .page-link:hover {
+                background: var(--lead-primary-light);
+                border-color: var(--lead-primary);
+                color: var(--lead-primary);
+                transform: translateY(-1px);
+            }
+
+        #pcrPagination .page-item.active .page-link {
+            background: var(--lead-primary);
+            border-color: var(--lead-primary);
+            color: #fff;
+        }
+
+        #pcrPagination .page-item.disabled .page-link {
+            background: #fbf6f5;
+            color: #c9b7b4;
+            border-color: var(--lead-border);
+        }
+
+    .pcr-sortable {
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+        .pcr-sortable:hover {
+            color: var(--lead-primary);
+        }
+
+        .pcr-sortable .sort-icon {
+            font-size: .7rem;
+            margin-left: .25rem;
+            opacity: .35;
+        }
+
+        .pcr-sortable.sort-asc,
+        .pcr-sortable.sort-desc {
+            color: var(--lead-primary);
+        }
+
+            .pcr-sortable.sort-asc .sort-icon,
+            .pcr-sortable.sort-desc .sort-icon {
+                opacity: 1;
+            }
+</style>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-file-earmark-text"></i></div>
+    <div>
+        <div class="lead-eyebrow">Complaint Report</div>
+        <h1>Product Complaint Report</h1>
+    </div>
+</div>
+
+<div class="card shadow-sm pcr-filter-card mb-3">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label class="pcr-filter-label" for="pcrSearch">Search</label>
+                <input type="text" id="pcrSearch" class="form-control lead-search" placeholder="PCR No., store, item, vendor..." autocomplete="off" />
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="pcr-filter-label" for="pcrStatusFilter">Status</label>
+                <select id="pcrStatusFilter" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="1">Transmitted</option>
+                    <option value="2">Closed</option>
+                    <option value="3">Re-opened</option>
+                    @*<option value="4">Valid</option>
+                    <option value="5">Invalid</option>
+                    <option value="6">For Further Investigation</option>
+                    <option value="7">Revalidated</option>
+                    <option value="8">Lead Responsibility</option>
+                    <option value="9">GADC Responsibility</option>
+                    <option value="10">AutoValid</option>
+                    <option value="11">Cancelled</option>*@
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="pcr-filter-label" for="pcrDateFrom">Date From</label>
+                <input type="date" id="pcrDateFrom" class="form-control" />
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="pcr-filter-label" for="pcrDateTo">Date To</label>
+                <input type="date" id="pcrDateTo" class="form-control" />
+            </div>
+            <div class="col-lg-2 col-md-12">
+                <button type="button" id="pcrClearFilters" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle"></i> Clear Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm pcr-list-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <span class="fw-semibold text-secondary small text-uppercase" style="letter-spacing:.04em"></span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="small text-secondary" id="pcrResultCount"></span>
+            <button type="button" id="pcrExportBtn" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 lead-table" id="pcrTable">
+            <thead>
+                <tr>
+                    <th class="pcr-sortable" data-col="0">Status <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="1">Create Date <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="2">PCR No. <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="3">Store Name <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="4">Item <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="5">Complaint Issue <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="6">Vendor <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="7">Vendor Remarks <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="pcr-sortable" data-col="8">QA Remarks <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    int filterStatus = item.PcrStatus == 0 ? 1 : item.PcrStatus;
+                    <tr class="pcr-row" data-status="@filterStatus" data-date="@item.DateCreated.ToString("yyyy-MM-dd")">
+                        <td>
+                            @{
+                                string badgeClass = "bg-info";
+                                string badgeText = "TRANSMITTED";
+                                switch (item.PcrStatus)
+                                {
+                                    case 2: badgeClass = "bg-primary"; badgeText = "CLOSED"; break;
+                                    case 3: badgeClass = "bg-info"; badgeText = "RE-OPENED"; break;
+                                        //case 4: badgeClass = "bg-primary"; badgeText = "VALID"; break;
+                                        //case 5: badgeClass = "bg-danger"; badgeText = "INVALID"; break;
+                                        //case 6: badgeClass = "bg-danger"; badgeText = "FOR FURTHER INVESTIGATION"; break;
+                                        //case 7: badgeClass = "bg-danger"; badgeText = "REVALIDATED"; break;
+                                        //case 8: badgeClass = "bg-danger"; badgeText = "LEAD RESPONSIBILITY"; break;
+                                        //case 9: badgeClass = "bg-danger"; badgeText = "GADC RESPONSIBILITY"; break;
+                                        //case 10: badgeClass = "bg-danger"; badgeText = "AUTOVALID"; break;
+                                        //case 11: badgeClass = "bg-secondary"; badgeText = "CANCELLED"; break;
+                                }
+                            }
+                            <span class="badge @badgeClass">@badgeText</span>
+                        </td>
+                        <td>@item.DateCreated.ToString("MMM dd yyyy")</td>
+                        <td class="font-mono fw-semibold" style="color:var(--lead-primary)">@item.PcrNumber</td>
+                        <td>@item.StoreName</td>
+                        <td>@item.ItemID</td>
+                        <td>@item.ComplaintIssueDesc</td>
+                        <td>@item.VendorName</td>
+                        <td>@item.SupplierRemarksDesc</td>
+                        <td>@item.QARemarksDesc</td>
+                        <td class="text-end">
+                            <a href="@Url.Action("Details", "ComplaintReport", new { docId = item.DocID })" class="btn btn-primary btn-sm">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 mt-2 border-top">
+        <span class="small text-secondary" id="pcrPageInfo"></span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <ul class="pagination pagination-sm mb-0" id="pcrPagination"></ul>
+            <div class="input-group input-group-sm" style="width:150px;">
+                <input type="number" min="1" class="form-control" id="pcrPageJumpInput" placeholder="Page #">
+                <button class="btn btn-outline-primary" type="button" id="pcrPageJumpBtn">Go</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    $(function () {
+        setupPcrTable();
+    });
+
+    function setupPcrTable() {
+        var PAGE_SIZE = 10;
+        var currentPage = 1;
+        var allRows = Array.from(document.querySelectorAll('#pcrTable tbody tr.pcr-row'));
+        var originalRowOrder = allRows.slice();
+        var visibleRows = allRows.slice();
+        var sortState = { column: null, direction: null };
+
+        var searchInput = document.getElementById('pcrSearch');
+        var statusSelect = document.getElementById('pcrStatusFilter');
+        var dateFromInput = document.getElementById('pcrDateFrom');
+        var dateToInput = document.getElementById('pcrDateTo');
+
+        function reorderDom(rows) {
+            var tbody = document.querySelector('#pcrTable tbody');
+            rows.forEach(function (row) { tbody.appendChild(row); });
+        }
+
+        function getSortValue(row, colIndex) {
+            if (colIndex === 0) return parseInt(row.getAttribute('data-status'), 10) || 0;
+            if (colIndex === 1) return row.getAttribute('data-date') || '';
+            var cell = row.querySelectorAll('td')[colIndex];
+            return cell ? cell.textContent.trim() : '';
+        }
+
+        function compareRows(a, b, colIndex) {
+            var va = getSortValue(a, colIndex);
+            var vb = getSortValue(b, colIndex);
+            if (typeof va === 'number' && typeof vb === 'number') return va - vb;
+            return String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('.pcr-sortable').forEach(function (th) {
+                th.classList.remove('sort-asc', 'sort-desc');
+                var icon = th.querySelector('.sort-icon');
+                if (icon) icon.className = 'bi bi-arrow-down-up sort-icon';
+            });
+
+            if (sortState.column === null) return;
+
+            var activeTh = document.querySelector('.pcr-sortable[data-col="' + sortState.column + '"]');
+            if (!activeTh) return;
+
+            activeTh.classList.add(sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            var activeIcon = activeTh.querySelector('.sort-icon');
+            if (activeIcon) {
+                activeIcon.className = 'bi ' + (sortState.direction === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill') + ' sort-icon';
+            }
+        }
+
+        function sortByColumn(colIndex) {
+            sortState.direction = (sortState.column === colIndex && sortState.direction === 'asc') ? 'desc' : 'asc';
+            sortState.column = colIndex;
+
+            allRows.sort(function (a, b) {
+                var cmp = compareRows(a, b, colIndex);
+                return sortState.direction === 'asc' ? cmp : -cmp;
+            });
+            reorderDom(allRows);
+            updateSortIndicators();
+            applyFilters();
+        }
+
+        function resetSort() {
+            sortState = { column: null, direction: null };
+            allRows = originalRowOrder.slice();
+            reorderDom(allRows);
+            updateSortIndicators();
+        }
+
+        document.querySelectorAll('.pcr-sortable').forEach(function (th) {
+            th.addEventListener('click', function () {
+                sortByColumn(parseInt(th.getAttribute('data-col'), 10));
+            });
+        });
+
+        function rowMatches(row) {
+            var term = (searchInput.value || '').trim().toLowerCase();
+            if (term && row.textContent.toLowerCase().indexOf(term) === -1) return false;
+
+            var status = statusSelect.value;
+            if (status && row.getAttribute('data-status') !== status) return false;
+
+            var rowDate = row.getAttribute('data-date');
+            var from = dateFromInput.value;
+            var to = dateToInput.value;
+            if (from && rowDate < from) return false;
+            if (to && rowDate > to) return false;
+
+            return true;
+        }
+
+        function applyFilters() {
+            visibleRows = allRows.filter(rowMatches);
+            currentPage = 1;
+            renderPage();
+        }
+
+        function clearFilters() {
+            searchInput.value = '';
+            statusSelect.value = '';
+            dateFromInput.value = '';
+            dateToInput.value = '';
+            resetSort();
+            applyFilters();
+        }
+
+        function renderPage() {
+            var totalRows = visibleRows.length;
+            var totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            var startIndex = (currentPage - 1) * PAGE_SIZE;
+            var endIndex = startIndex + PAGE_SIZE;
+            var visibleSet = new Set(visibleRows.slice(startIndex, endIndex));
+
+            allRows.forEach(function (row) {
+                row.style.display = visibleSet.has(row) ? '' : 'none';
+            });
+
+            var infoEl = document.getElementById('pcrPageInfo');
+            if (infoEl) {
+                infoEl.textContent = totalRows === 0
+                    ? 'No PCRs found'
+                    : (startIndex + 1) + ' to ' + Math.min(endIndex, totalRows) + ' of ' + totalRows + ' shown';
+            }
+
+            var countEl = document.getElementById('pcrResultCount');
+            if (countEl) {
+                countEl.textContent = totalRows === allRows.length
+                    ? totalRows + ' total'
+                    : totalRows + ' of ' + allRows.length + ' match filters';
+            }
+
+            renderPaginationControls(totalPages);
+        }
+
+        function renderPaginationControls(totalPages) {
+            var pager = document.getElementById('pcrPagination');
+            if (!pager) return;
+            pager.innerHTML = '';
+
+            function addPageItem(label, page, opts) {
+                opts = opts || {};
+                var li = document.createElement('li');
+                li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
+
+                if (opts.ellipsis) {
+                    li.innerHTML = '<span class="page-link" style="border:none;background:transparent;box-shadow:none;">&hellip;</span>';
+                    pager.appendChild(li);
+                    return;
+                }
+
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'page-link';
+                btn.textContent = label;
+                if (!opts.disabled && !opts.active) {
+                    btn.addEventListener('click', function () {
+                        currentPage = page;
+                        renderPage();
+                    });
+                }
+                li.appendChild(btn);
+                pager.appendChild(li);
+            }
+
+            if (totalPages <= 1) return;
+
+            addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1 });
+
+            addPageItem('1', 1, { active: currentPage === 1 });
+
+            var windowStart = Math.max(2, currentPage - 1);
+            var windowEnd = Math.min(totalPages - 1, currentPage + 1);
+
+            if (windowStart > 2) {
+                addPageItem(null, null, { ellipsis: true });
+            }
+
+            for (var p = windowStart; p <= windowEnd; p++) {
+                addPageItem(String(p), p, { active: p === currentPage });
+            }
+
+            if (windowEnd < totalPages - 1) {
+                addPageItem(null, null, { ellipsis: true });
+            }
+
+            if (totalPages > 1) {
+                addPageItem(String(totalPages), totalPages, { active: currentPage === totalPages });
+            }
+
+            addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages });
+        }
+
+        function exportToExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert('Excel export library failed to load. Check your internet connection and try again.');
+                return;
+            }
+
+            var headers = ['Status', 'Create Date', 'PCR No.', 'Store Name', 'Item', 'Complaint Issue', 'Vendor', 'Vendor Remarks', 'QA Remarks'];
+            var data = [headers];
+
+            visibleRows.forEach(function (row) {
+                var cells = row.querySelectorAll('td');
+                var rowData = [];
+                for (var i = 0; i < cells.length - 1; i++) { 
+                    rowData.push(cells[i].textContent.trim());
+                }
+                data.push(rowData);
+            });
+
+            var worksheet = XLSX.utils.aoa_to_sheet(data);
+            worksheet['!cols'] = headers.map(function () { return { wch: 18 }; });
+
+            var workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'PCR List');
+
+            var today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(workbook, 'ProductComplaintReport_' + today + '.xlsx');
+        }
+
+        function jumpToPage() {
+            var input = document.getElementById('pcrPageJumpInput');
+            if (!input) return;
+            var totalPages = Math.max(1, Math.ceil(visibleRows.length / PAGE_SIZE));
+            var target = parseInt(input.value, 10);
+            if (isNaN(target) || target < 1) target = 1;
+            if (target > totalPages) target = totalPages;
+            currentPage = target;
+            renderPage();
+            input.value = '';
+        }
+
+        document.getElementById('pcrPageJumpBtn').addEventListener('click', jumpToPage);
+        document.getElementById('pcrPageJumpInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); jumpToPage(); }
+        });
+
+        var searchTimer;
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(applyFilters, 200);
+        });
+        statusSelect.addEventListener('change', applyFilters);
+        dateFromInput.addEventListener('change', applyFilters);
+        dateToInput.addEventListener('change', applyFilters);
+        document.getElementById('pcrClearFilters').addEventListener('click', clearFilters);
+        document.getElementById('pcrExportBtn').addEventListener('click', exportToExcel);
+
+        renderPage();
+    }
+</script>

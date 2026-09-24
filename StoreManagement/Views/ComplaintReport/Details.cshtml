@@ -1,0 +1,592 @@
+@model StoreManagement.Models.Pcr
+@using System.Linq
+@using System.Configuration
+
+@{
+    ViewBag.Title = "PCR Details";
+    string attachmentsBaseUrl = ConfigurationManager.AppSettings["PCRAttachmentsBaseUrl"] ?? "";
+
+    string statusBadgeClass = "bg-info"; string statusBadgeText = "TRANSMITTED";
+    switch (Model.PcrStatus)
+    {
+        case 2: statusBadgeClass = "bg-primary"; statusBadgeText = "CLOSED"; break;
+        case 3: statusBadgeClass = "bg-info"; statusBadgeText = "RE-OPENED"; break;
+        case 4: statusBadgeClass = "bg-primary"; statusBadgeText = "VALID"; break;
+        case 5: statusBadgeClass = "bg-danger"; statusBadgeText = "INVALID"; break;
+        case 6: statusBadgeClass = "bg-danger"; statusBadgeText = "FOR FURTHER INVESTIGATION"; break;
+        case 7: statusBadgeClass = "bg-danger"; statusBadgeText = "REVALIDATED"; break;
+        case 8: statusBadgeClass = "bg-danger"; statusBadgeText = "LEAD RESPONSIBILITY"; break;
+        case 9: statusBadgeClass = "bg-danger"; statusBadgeText = "GADC RESPONSIBILITY"; break;
+        case 10: statusBadgeClass = "bg-danger"; statusBadgeText = "AUTOVALID"; break;
+        case 11: statusBadgeClass = "bg-secondary"; statusBadgeText = "CANCELLED"; break;
+    }
+}
+
+<style>
+    .pcr-card {
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .pcr-section-header {
+        background: var(--lead-primary, #7d1f27);
+        color: #fff;
+        font-weight: 600;
+        font-size: .92rem;
+        padding: .65rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .pcr-field {
+        margin-bottom: .25rem;
+    }
+
+    .pcr-field-label {
+        display: block;
+        text-transform: uppercase;
+        font-size: .68rem;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--lead-text-muted, #8f7d7b);
+        margin-bottom: .2rem;
+    }
+
+    .pcr-field-value {
+        font-size: .92rem;
+        font-weight: 500;
+        color: var(--lead-text, #241316);
+    }
+
+    .pcr-status-panel {
+        background: #fbf6f5;
+    }
+
+    @@media (min-width: 768px) {
+        .pcr-status-panel {
+            border-right: 1px solid var(--lead-border);
+        }
+    }
+
+    .attachment-file {
+        max-width: 100%;
+        max-height: 220px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform .2s ease;
+    }
+
+        .attachment-file:hover {
+            transform: scale(1.04);
+        }
+
+    .attachment-box {
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .attachment-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .35rem;
+        min-height: 160px;
+        background: #f3ecea;
+        border-radius: 8px;
+        color: var(--lead-text-muted, #8f7d7b);
+        font-size: .8rem;
+        padding: 1rem;
+    }
+
+        .attachment-placeholder i {
+            font-size: 1.9rem;
+            color: #c9b7b4;
+        }
+
+    textarea.pcr-findings-readonly {
+        background: #fbf6f5;
+        font-size: .88rem;
+    }
+
+    .pcr-findings-readonly,
+    textarea#QAFindings {
+        min-height: 160px;
+    }
+
+    .pcr-print-text {
+        display: none;
+    }
+
+    @@media print {
+        @@page {
+            margin: 0;
+        }
+
+        body {
+            padding: 12mm 10mm !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .pcr-card {
+            border: 1px solid #ccc !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        textarea.pcr-findings-readonly {
+            display: none !important;
+        }
+
+        .pcr-print-text {
+            display: block !important;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid var(--lead-border);
+            border-radius: 6px;
+            padding: .55rem .7rem;
+            background: #fbf6f5;
+            font-size: .85rem;
+            min-height: 50px;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        .pcr-status-panel {
+            border-right: none !important;
+            border-bottom: 1px solid var(--lead-border);
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .pcr-status-panel + div {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .attachment-box,
+        .attachment-placeholder {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+    <a href="@Url.Action("Index", "ComplaintReport")" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="printPcrDetails()">
+            <i class="bi bi-printer"></i> Print
+        </button>
+        <span class="badge @statusBadgeClass px-3 py-2">@statusBadgeText</span>
+    </div>
+</div>
+
+<div class="d-none d-print-block mb-3">
+    <span class="badge @statusBadgeClass px-3 py-2">@statusBadgeText</span>
+</div>
+
+<div class="lead-page-header">
+    <div class="lead-page-icon"><i class="bi bi-file-earmark-text"></i></div>
+    <div>
+        <div class="lead-eyebrow">Complaint Report / Product Complaint Report</div>
+        <h1>PCR No: @Model.PcrNumber</h1>
+    </div>
+</div>
+
+<div class="card shadow-sm pcr-card mb-4">
+    <div class="pcr-section-header"><i class="bi bi-info-circle"></i> Main Details</div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Create Date/Time</span>
+                    <span class="pcr-field-value">@Model.DateCreated.ToString("MM/dd/yyyy hh:mm tt")</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Store</span>
+                    <span class="pcr-field-value">@Model.StoreNumber - @Model.StoreName</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Manager-In-Charge</span>
+                    <span class="pcr-field-value">@Model.ManagerInCharge</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Filed By</span>
+                    <span class="pcr-field-value">@Model.FiledBy</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Store Contact</span>
+                    <span class="pcr-field-value">@Model.StoreContact</span>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Store Email</span>
+                    <span class="pcr-field-value">@Model.StoreEmail</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm pcr-card mb-4">
+    <div class="pcr-section-header"><i class="bi bi-box-seam"></i> Product Being Complained</div>
+    <div class="card-body">
+        <div class="row g-4 mb-3">
+            <div class="col-md-2">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Incident Date</span>
+                    <span class="pcr-field-value">@Model.IncidentDate.ToString("MM/dd/yyyy")</span>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Delivery Date</span>
+                    <span class="pcr-field-value">@(Model.DeliveryDate.HasValue ? Model.DeliveryDate.Value.ToString("MM/dd/yyyy") : "-")</span>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Complaint Issue</span>
+                    <span class="pcr-field-value">@Model.ComplaintIssueDesc</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="pcr-field">
+                    <span class="pcr-field-label">Particulars</span>
+                    <span class="pcr-field-value">@Model.Particulars</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-3">
+            <table class="table table-bordered lead-table mb-0">
+                <thead class="text-center">
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>UOM</th>
+                        <th>Batch Code</th>
+                        <th>UTD</th>
+                        <th>Vendor</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    <tr>
+                        <td>@Model.ItemID</td>
+                        <td>@Model.ItemDesc</td>
+                        <td>@Model.Qty</td>
+                        <td>@Model.UOM</td>
+                        <td>@Model.BatchCode</td>
+                        <td>@Model.UTD.ToString("MM/dd/yyyy")</td>
+                        <td>@Model.VendorName</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pcr-field">
+            <span class="pcr-field-label">Additional Message</span>
+            <textarea class="form-control pcr-findings-readonly" rows="6" disabled>@Model.Remarks</textarea>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm pcr-card mb-4">
+    <div class="pcr-section-header"><i class="bi bi-paperclip"></i> Attachments</div>
+    <div class="card-body">
+        @{
+            var attachments = new[] { Model.Attachment1, Model.Attachment2, Model.Attachment3, Model.Attachment4 };
+            var labels = new[] { "Attachment 1", "Attachment 2", "Attachment 3", "Attachment 4" };
+            bool hasAny = attachments.Any(a => !string.IsNullOrEmpty(a));
+        }
+        @if (hasAny && !string.IsNullOrEmpty(attachmentsBaseUrl))
+        {
+            <div class="row g-3">
+                @{
+                    var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic", ".heif" };
+                    var videoExtensions = new[] { ".mp4", ".webm", ".ogg" };
+                }
+                @for (int i = 0; i < attachments.Length; i++)
+                {
+                    var file = attachments[i];
+                    if (string.IsNullOrEmpty(file)) { continue; }
+                    var filePath = attachmentsBaseUrl.TrimEnd('/') + "/" + file;
+                    var extension = System.IO.Path.GetExtension(file)?.ToLower() ?? "";
+                    var fileTypeLabel = extension.TrimStart('.').ToUpper();
+
+                    <div class="col-md-6 col-sm-6 text-center">
+                        <div class="attachment-box p-2 border rounded shadow-sm">
+                            <h6 class="small text-uppercase text-secondary fw-semibold">@labels[i]</h6>
+                            @if (imageExtensions.Contains(extension))
+                            {
+                                <img src="@filePath" class="attachment-file img-fluid" alt="@labels[i]"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="attachment-placeholder" style="display:none;">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                    <span>Preview not available@(extension == ".heic" || extension == ".heif" ? " (HEIC/HEIF isn't supported by most browsers)" : "")</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                            else if (extension == ".pdf")
+                            {
+                                <embed src="@filePath" type="application/pdf" class="attachment-file" style="width:100%;height:220px;" />
+                            }
+                            else if (videoExtensions.Contains(extension))
+                            {
+                                <video class="attachment-file" style="width:100%;height:220px;object-fit:cover;" controls
+                                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <source src="@filePath" type="video/@extension.Replace(".", "")" />
+                                </video>
+                                <div class="attachment-placeholder" style="display:none;">
+                                    <i class="bi bi-file-earmark-play"></i>
+                                    <span>Preview not available</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="attachment-placeholder">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>@(string.IsNullOrEmpty(fileTypeLabel) ? "File" : fileTypeLabel + " file")</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (hasAny)
+        {
+            <span class="text-muted">Attachments exist for this PCR, but the attachments file server URL has not been configured yet. Set "PCRAttachmentsBaseUrl" in Web.config.</span>
+        }
+        else
+        {
+            <span class="text-muted">No attachments</span>
+        }
+    </div>
+</div>
+
+@if (Model.ComFlag == 0)
+{
+    <div class="card shadow-sm pcr-card mb-4">
+        <div class="pcr-section-header">
+            <i class="bi bi-truck"></i> Vendor Remarks / Findings
+            <span class="badge bg-light text-dark ms-auto">View Only</span>
+        </div>
+        <div class="row g-0">
+            <div class="col-md-3 p-3 pcr-status-panel">
+                @{
+                    string vBadgeClass = "bg-info"; string vBadgeText = "TRANSMITTED";
+                    switch (Model.SupplierRemarks)
+                    {
+                        case 4: vBadgeClass = "bg-success"; vBadgeText = "VALID"; break;
+                        case 5: vBadgeClass = "bg-warning"; vBadgeText = "INVALID"; break;
+                        case 6: vBadgeClass = "bg-primary"; vBadgeText = "FOR FURTHER INVESTIGATION"; break;
+                    }
+                }
+                <span class="badge @vBadgeClass">@vBadgeText</span>
+                <div class="pcr-field mt-3">
+                    <span class="pcr-field-label">Response Date</span>
+                    <span class="pcr-field-value">@(Model.SupplierResDate.HasValue ? Model.SupplierResDate.Value.ToString("MM/dd/yyyy hh:mm tt") : "-")</span>
+                </div>
+            </div>
+            <div class="col-md-9 p-3">
+                <textarea class="form-control pcr-findings-readonly" rows="6" disabled>@Model.SupplierFindings</textarea>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm pcr-card mb-4">
+    <div class="pcr-section-header"><i class="bi bi-patch-check-fill"></i> LLII QA Remarks / Findings</div>
+    <div class="row g-0">
+        <div class="col-md-3 p-3 pcr-status-panel">
+            @{
+                string qBadgeClass = "bg-info"; string qBadgeText = "TRANSMITTED";
+                switch (Model.QARemarks)
+                {
+                    case 5: qBadgeClass = "bg-warning"; qBadgeText = "INVALID"; break;
+                    case 6: qBadgeClass = "bg-primary"; qBadgeText = "FOR FURTHER INVESTIGATION"; break;
+                    case 7: qBadgeClass = "bg-info"; qBadgeText = "REVALIDATED"; break;
+                    case 8: qBadgeClass = "bg-success"; qBadgeText = "LEAD RESPONSIBILITY"; break;
+                    case 9: qBadgeClass = "bg-success"; qBadgeText = "GADC RESPONSIBILITY"; break;
+                    case 10: qBadgeClass = "bg-success"; qBadgeText = "AUTOVALID"; break;
+                }
+            }
+            <span class="badge @qBadgeClass">@qBadgeText</span>
+            <div class="pcr-field mt-3">
+                <span class="pcr-field-label">Response Date</span>
+                <span class="pcr-field-value">@(Model.QAResDate.HasValue ? Model.QAResDate.Value.ToString("MM/dd/yyyy hh:mm tt") : "-")</span>
+            </div>
+
+            @if (Model.PcrStatus != 2)
+            {
+                <div class="mt-3 no-print">
+                    <span class="pcr-field-label">New Remarks</span>
+                    <select class="form-select form-select-sm" id="QARemarks">
+                        <option value="6">For Further Investigation</option>
+                        <option value="10">AutoValid</option>
+                        <option value="7">Revalidated</option>
+                        <option value="5">Invalid</option>
+                        <option value="8">Lead Responsibility</option>
+                        <option value="9">GADC Responsibility</option>
+                    </select>
+                </div>
+            }
+        </div>
+        <div class="col-md-9 p-3">
+            <div class="pcr-field">
+                <span class="pcr-field-label">Latest Findings</span>
+                <textarea class="form-control pcr-findings-readonly" rows="6" disabled>@Model.QAFindings</textarea>
+            </div>
+
+            @if (Model.PcrStatus != 2)
+            {
+                <div class="pcr-field mt-3 no-print">
+                    <span class="pcr-field-label">Add Findings</span>
+                    <textarea class="form-control" id="QAFindings" rows="4" placeholder="Add your findings..."></textarea>
+                </div>
+                <input type="hidden" id="DocID" value="@Model.DocID" />
+                <button id="saveQAFindings" class="btn btn-primary btn-sm mt-2 no-print">
+                    <i class="bi bi-send-check"></i> Update Findings
+                </button>
+            }
+            else
+            {
+                <div class="alert alert-warning mt-3 mb-0 py-2 small">
+                    This PCR has been finalized. You cannot edit the QA Remarks/Findings.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.ComFlag == 0)
+{
+    <div class="card shadow-sm pcr-card mb-4">
+        <div class="pcr-section-header">
+            <i class="bi bi-shield-check"></i> GADC Remarks / Findings
+            <span class="badge bg-light text-dark ms-auto">View Only</span>
+        </div>
+        <div class="row g-0">
+            <div class="col-md-3 p-3 pcr-status-panel">
+                @{
+                    string gBadgeClass = "bg-info"; string gBadgeText = "TRANSMITTED";
+                    switch (Model.GADCRemarks)
+                    {
+                        case 5: gBadgeClass = "bg-warning"; gBadgeText = "INVALID"; break;
+                        case 6: gBadgeClass = "bg-primary"; gBadgeText = "FOR FURTHER INVESTIGATION"; break;
+                        case 7: gBadgeClass = "bg-info"; gBadgeText = "REVALIDATED"; break;
+                        case 8: gBadgeClass = "bg-success"; gBadgeText = "LEAD RESPONSIBILITY"; break;
+                        case 9: gBadgeClass = "bg-success"; gBadgeText = "GADC RESPONSIBILITY"; break;
+                        case 10: gBadgeClass = "bg-success"; gBadgeText = "AUTOVALID"; break;
+                    }
+                }
+                <span class="badge @gBadgeClass">@gBadgeText</span>
+                <div class="pcr-field mt-3">
+                    <span class="pcr-field-label">Response Date</span>
+                    <span class="pcr-field-value">@(Model.GADCResDate.HasValue ? Model.GADCResDate.Value.ToString("MM/dd/yyyy hh:mm tt") : "-")</span>
+                </div>
+            </div>
+            <div class="col-md-9 p-3">
+                <textarea class="form-control pcr-findings-readonly" rows="6" disabled>@Model.GADCFindings</textarea>
+            </div>
+        </div>
+    </div>
+}
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script>
+    var pcrPrintTextNodes = [];
+
+    function insertPrintTextBlocks() {
+        pcrPrintTextNodes = [];
+        document.querySelectorAll('textarea.pcr-findings-readonly').forEach(function (ta) {
+            var div = document.createElement('div');
+            div.className = 'pcr-print-text';
+            div.textContent = ta.value;
+            ta.insertAdjacentElement('afterend', div);
+            pcrPrintTextNodes.push(div);
+        });
+    }
+
+    function removePrintTextBlocks() {
+        pcrPrintTextNodes.forEach(function (div) { div.remove(); });
+        pcrPrintTextNodes = [];
+    }
+
+    function printPcrDetails() {
+        var originalTitle = document.title;
+
+        function cleanup() {
+            document.title = originalTitle;
+            removePrintTextBlocks();
+            window.removeEventListener('afterprint', cleanup);
+        }
+
+        insertPrintTextBlocks();
+        document.title = '​';
+        window.addEventListener('afterprint', cleanup);
+        window.print();
+    }
+
+    $(function () {
+        $('#saveQAFindings').on('click', function () {
+            var qaFindings = $('#QAFindings').val().trim();
+            var docId = $('#DocID').val();
+            var qaRemarks = $('#QARemarks').val();
+
+            if (qaFindings === '') {
+                alert('Please enter your findings before saving.');
+                return;
+            }
+
+            if (!confirm('Submit these QA Remarks/Findings?')) return;
+
+            $('#saveQAFindings').prop('disabled', true);
+
+            $.ajax({
+                url: '@Url.Action("Respond", "ComplaintReport")',
+                type: 'POST',
+                data: { docId: docId, qaRemarks: qaRemarks, qaFindings: qaFindings },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message || 'Something went wrong.');
+                        $('#saveQAFindings').prop('disabled', false);
+                    }
+                },
+                error: function () {
+                    alert('Server error. Please try again later.');
+                    $('#saveQAFindings').prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>
