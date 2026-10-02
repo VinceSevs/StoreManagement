@@ -1,0 +1,104 @@
+    .account-card {
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .account-avatar-circle {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: var(--lead-primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+
+    .account-section-header {
+        background: var(--lead-primary);
+        color: #fff;
+        font-weight: 600;
+        font-size: .92rem;
+        padding: .65rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .pwd-input-wrap {
+        position: relative;
+    }
+
+        .pwd-input-wrap input {
+            padding-right: 2.4rem;
+        }
+
+    .pwd-toggle-btn {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #b89694;
+        cursor: pointer;
+        padding: 4px 6px;
+        line-height: 1;
+    }
+
+        .pwd-toggle-btn:hover {
+            color: var(--lead-primary);
+        }
+
+    .pwd-strength-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: #eee;
+        margin-top: .5rem;
+        overflow: hidden;
+    }
+
+    .pwd-strength-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: #dc3545;
+        transition: width .2s ease, background-color .2s ease;
+    }
+
+    .pwd-strength-label {
+        font-size: .72rem;
+        margin-top: .25rem;
+        display: block;
+        color: var(--lead-text-muted, #8f7d7b);
+        min-height: 1.1em;
+    }
+
+    /* Hide the browser's own built-in password-reveal icon (Edge/IE) so it
+       doesn't sit on top of our custom eye toggle. */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
+
+    .caps-lock-warning {
+        display: none;
+        align-items: center;
+        gap: .35rem;
+        font-size: .76rem;
+        font-weight: 600;
+        color: #92620a;
+        background: #fff6e6;
+        border: 1px solid #f2dba6;
+        border-radius: 8px;
+        padding: .3rem .55rem;
+        margin-top: .4rem;
+    }
+
+        .caps-lock-warning.show {
+            display: flex;
+        }

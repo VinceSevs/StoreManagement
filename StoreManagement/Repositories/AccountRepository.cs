@@ -1,8 +1,9 @@
 ﻿using System.Configuration;
 using System.Data.SqlClient;
 using Encryptionv2;
+using StoreManagement.Models;
 
-namespace StoreManagement.Models
+namespace StoreManagement.Repositories
 {
     public class AccountRepository
     {

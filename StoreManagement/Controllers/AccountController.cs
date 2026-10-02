@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Web.Mvc;
 using System.Web.Security;
 using System.Diagnostics;
+using StoreManagement.Repositories;
 
 namespace StoreManagement.Controllers
 {
