@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using IsseERP.Models;
 using IsseERP.Services;
 using StoreManagement.Models;
+using StoreManagement.Repositories;
 
 namespace StoreManagement.Controllers
 {

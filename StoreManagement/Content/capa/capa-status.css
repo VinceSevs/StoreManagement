@@ -1,0 +1,167 @@
+    :root {
+        --bs-primary: #7d1f27;
+        --bs-primary-rgb: 125,31,39;
+        --bs-body-font-family: 'Inter', Arial, sans-serif;
+        --bs-body-color: #241316;
+        --bs-border-color: #e2d3d0;
+        --bs-link-color: #7d1f27;
+        --bs-link-hover-color: #4f1015;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+    }
+
+    .font-mono {
+        font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .card {
+        border-color: #e2d3d0;
+    }
+
+    .readonly-field {
+        background-color: #f6efee;
+    }
+
+    .brand-logo {
+        height: 48px;
+        width: auto;
+    }
+
+    .stage-card .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .stage-card,
+    .pdf-item-block,
+    .attach-thumb-btn,
+    .attach-thumb-btn img {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .stage-badge {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: .72rem;
+        letter-spacing: .02em;
+    }
+
+    /* ---------- Attachment thumbnails ---------- */
+    .attach-thumb-btn {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        line-height: 0;
+    }
+
+        .attach-thumb-btn img {
+            transition: transform .15s ease, opacity .15s ease;
+        }
+
+        .attach-thumb-btn:hover img {
+            transform: scale(1.03);
+            opacity: .9;
+        }
+
+    /* ---------- Lightbox (Facebook-style photo preview) ---------- */
+    .lightbox-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 8, 8, 0.92);
+        z-index: 1080;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .lightbox-overlay.active {
+            display: flex;
+        }
+
+    .lightbox-img {
+        max-width: 90vw;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+
+    .lightbox-btn {
+        position: absolute;
+        background: rgba(255,255,255,0.15);
+        border: none;
+        color: #fff;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .15s ease;
+    }
+
+        .lightbox-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+    .lightbox-close {
+        top: 20px;
+        right: 20px;
+    }
+
+    .lightbox-download {
+        top: 20px;
+        right: 76px;
+        font-size: 18px;
+    }
+
+    .lightbox-prev {
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .lightbox-next {
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .lightbox-caption {
+        position: absolute;
+        bottom: 24px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: rgba(255,255,255,0.85);
+        font-size: 13px;
+        padding: 0 80px;
+    }
+
+    .lightbox-counter {
+        position: absolute;
+        top: 30px;
+        left: 24px;
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        font-family: 'IBM Plex Mono', monospace;
+    }
