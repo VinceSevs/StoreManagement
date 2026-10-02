@@ -1,0 +1,53 @@
+@{
+        var currentUserProfile = StoreManagement.Models.UserAccess.Current(Context);
+        var homeRoute = StoreManagement.Models.UserAccess.HomeRoute(currentUserProfile);
+        string homeUrl = homeRoute != null ? Url.Action(homeRoute[0], homeRoute[1]) : Url.Action("NoAccess", "Account");
+        string userDisplayName = currentUserProfile != null ? currentUserProfile.DisplayName : User.Identity.Name;
+        string userRoleTitle = currentUserProfile != null ? currentUserProfile.RoleJobTitle : "";
+        string userInitials = StoreManagement.Models.UserDisplayHelper.GetInitials(
+            currentUserProfile != null ? currentUserProfile.DisplayName : User.Identity.Name);
+}
+
+        <nav class="app-navbar navbar-dark">
+            <div class="app-navbar-inner">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="sidebar-toggle-btn d-lg-none" id="sidebarToggleBtn" type="button" aria-label="Toggle menu">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <a class="app-brand" href="@homeUrl">
+                        <i class="bi bi-boxes" style="font-size:1.3rem;"></i>
+                        @*<span class="app-brand-text">Store Management</span>*@
+                    </a>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="app-user-menu" id="appUserMenu">
+                        <button type="button" class="app-user-avatar-btn" id="appUserAvatarBtn" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
+                            <span class="app-user-avatar">@userInitials</span>
+                            <i class="bi bi-chevron-down app-user-chevron"></i>
+                        </button>
+                        <div class="app-user-dropdown" id="appUserDropdown">
+                            <div class="app-user-dropdown-header">
+                                <span class="app-user-avatar app-user-avatar-lg">@userInitials</span>
+                                <div>
+                                    <div class="app-user-dropdown-name">@userDisplayName</div>
+                                    @if (!string.IsNullOrWhiteSpace(userRoleTitle))
+                                    {
+                                        <div class="app-user-dropdown-role">@userRoleTitle</div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="app-user-dropdown-divider"></div>
+                            <a class="app-user-dropdown-item" href="@Url.Action("Account", "Account")">
+                                <i class="bi bi-person"></i> Account
+                            </a>
+                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
+                            {
+                                <button type="submit" class="app-user-dropdown-item app-user-dropdown-item-danger">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
