@@ -8,6 +8,7 @@ using System.Data.Entity;
 using System.Reflection.Emit;
 using System.Web.UI.WebControls.Expressions;
 using System.Drawing.Drawing2D;
+using StoreManagement.Repositories;
 
 namespace StoreManagement.Controllers
 {
