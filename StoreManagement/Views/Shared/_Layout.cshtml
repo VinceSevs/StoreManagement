@@ -11,490 +11,7 @@
     <link href="~/Content/lead-theme.css" rel="stylesheet">
     @Scripts.Render("~/bundles/modernizr")
 
-    <style>
-        :root {
-            --app-primary: #7d1f27;
-            --app-primary-dark: #5e161f;
-            --app-primary-light: #f4e2e0;
-            --app-sidebar-bg: #fffaf9;
-            --app-border: #e8dcda;
-            --app-navbar-height: 56px;
-        }
-
-        body {
-            font-family: 'Inter', Arial, sans-serif;
-        }
-
-        /* ---------- Top navbar ---------- */
-        .app-navbar {
-            background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%);
-            box-shadow: 0 2px 12px rgba(36,19,22,.18);
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        .app-navbar-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: .55rem 1.25rem;
-            gap: 1rem;
-        }
-
-        .app-brand {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            text-decoration: none;
-            color: #fff;
-        }
-
-            .app-brand:hover {
-                color: #fff;
-            }
-
-        .app-brand-logo {
-            height: 34px;
-            width: auto;
-            border-radius: 6px;
-            background: #fff;
-            padding: 2px;
-        }
-
-        .app-brand-text {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 1.05rem;
-            letter-spacing: .01em;
-        }
-
-        .sidebar-toggle-btn {
-            background: rgba(255,255,255,.12);
-            border: none;
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: background-color .15s ease;
-        }
-
-            .sidebar-toggle-btn:hover {
-                background: rgba(255,255,255,.22);
-            }
-
-        /* ---------- User avatar menu ---------- */
-        .app-user-menu {
-            position: relative;
-        }
-
-        .app-user-avatar-btn {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: .3rem;
-        }
-
-        .app-user-chevron {
-            color: rgba(255,255,255,.75);
-            font-size: .68rem;
-            transition: transform .2s ease;
-        }
-
-        .app-user-avatar-btn[aria-expanded="true"] .app-user-chevron {
-            transform: rotate(180deg);
-        }
-
-        .app-user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.18);
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: .82rem;
-            letter-spacing: .02em;
-            border: 1.5px solid rgba(255,255,255,.35);
-            transition: background-color .15s ease, transform .15s ease;
-        }
-
-            .app-user-avatar-btn:hover .app-user-avatar {
-                background: rgba(255,255,255,.3);
-                transform: translateY(-1px);
-            }
-
-        .app-user-avatar-lg {
-            width: 44px;
-            height: 44px;
-            font-size: 1rem;
-            background: var(--app-primary);
-            border: none;
-            flex: none;
-        }
-
-        .app-user-dropdown {
-            position: absolute;
-            top: calc(100% + 12px);
-            right: 0;
-            min-width: 220px;
-            background: #fff;
-            border: 1px solid var(--app-border);
-            border-radius: 14px;
-            box-shadow: 0 12px 28px rgba(36,19,22,.16);
-            padding: .6rem;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-6px);
-            transition: opacity .15s ease, transform .15s ease, visibility .15s ease;
-            z-index: 1040;
-        }
-
-            .app-user-dropdown.show {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
-            }
-
-        .app-user-dropdown-header {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            padding: .3rem .5rem .6rem;
-        }
-
-        .app-user-dropdown-name {
-            font-weight: 600;
-            font-size: .88rem;
-            color: #241316;
-            word-break: break-word;
-        }
-
-        .app-user-dropdown-role {
-            font-size: .74rem;
-            color: var(--app-primary);
-            font-weight: 500;
-        }
-
-        .app-user-dropdown-divider {
-            height: 1px;
-            background: var(--app-border);
-            margin: 0 .2rem .5rem;
-        }
-
-        .app-user-dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: .55rem;
-            width: 100%;
-            padding: .55rem .6rem;
-            border: none;
-            background: none;
-            border-radius: 10px;
-            font-size: .87rem;
-            font-weight: 500;
-            color: #4a3a38;
-            text-align: left;
-            text-decoration: none;
-            transition: background-color .15s ease, color .15s ease;
-        }
-
-            .app-user-dropdown-item:hover {
-                background: var(--app-primary-light);
-                color: var(--app-primary-dark);
-                text-decoration: none;
-            }
-
-        .app-user-dropdown-item-danger:hover {
-            background: #fdf1f0;
-            color: #b3261e;
-        }
-
-        /* ---------- Layout shell ---------- */
-        .app-shell {
-            display: flex;
-            align-items: stretch;
-            min-height: calc(100vh - var(--app-navbar-height));
-        }
-
-        /* ---------- Sidebar ---------- */
-        .app-sidebar {
-            width: 248px;
-            flex: none;
-            position: sticky;
-            top: var(--app-navbar-height);
-            align-self: flex-start;
-            height: calc(100vh - var(--app-navbar-height));
-            overflow-y: auto;
-            background: var(--app-sidebar-bg);
-            border-right: 1px solid var(--app-border);
-            padding: 1.25rem 1rem;
-            transition: transform .25s ease, width .25s ease;
-        }
-
-        .app-sidebar-section {
-            display: flex;
-            align-items: center;
-            gap: .45rem;
-            text-transform: uppercase;
-            font-size: .68rem;
-            letter-spacing: .08em;
-            font-weight: 700;
-            color: #a68d8a;
-            padding: 0 .6rem;
-            margin-bottom: .9rem;
-        }
-
-        .app-sidebar-nav {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: .2rem;
-        }
-
-            .app-sidebar-nav .nav-item {
-                opacity: 0;
-                animation: sidebarItemIn .35s ease forwards;
-            }
-
-                .app-sidebar-nav .nav-item:nth-child(1) {
-                    animation-delay: .03s;
-                }
-
-                .app-sidebar-nav .nav-item:nth-child(2) {
-                    animation-delay: .08s;
-                }
-
-                .app-sidebar-nav .nav-item:nth-child(3) {
-                    animation-delay: .13s;
-                }
-
-                .app-sidebar-nav .nav-item:nth-child(4) {
-                    animation-delay: .18s;
-                }
-
-                .app-sidebar-nav .nav-item:nth-child(5) {
-                    animation-delay: .23s;
-                }
-
-        @@keyframes sidebarItemIn {
-            from {
-                opacity: 0;
-                transform: translateX(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .app-sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            padding: .5rem .6rem;
-            border-radius: 12px;
-            color: #4a3a38;
-            font-size: .88rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background-color .18s ease, color .18s ease, transform .12s ease;
-        }
-
-            .app-sidebar-link .icon-chip {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                flex: none;
-                width: 32px;
-                height: 32px;
-                border-radius: 9px;
-                background: rgba(125, 31, 39, .07);
-                color: var(--app-primary);
-                font-size: 1rem;
-                transition: background-color .18s ease, color .18s ease;
-            }
-
-            .app-sidebar-link .app-sidebar-chevron {
-                margin-left: auto;
-                color: #a68d8a;
-            }
-
-            .app-sidebar-link:hover {
-                background: var(--app-primary-light);
-                color: var(--app-primary-dark);
-                transform: translateX(2px);
-                text-decoration: none;
-            }
-
-                .app-sidebar-link:hover .icon-chip {
-                    background: #fff;
-                    color: var(--app-primary);
-                }
-
-            .app-sidebar-link.active {
-                background: var(--app-primary);
-                color: #fff;
-                font-weight: 600;
-            }
-
-                .app-sidebar-link.active .icon-chip {
-                    background: rgba(255,255,255,.16);
-                    color: #fff;
-                }
-
-        .app-sidebar-toggle {
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .app-sidebar-chevron {
-            font-size: .7rem !important;
-            transition: transform .2s ease;
-        }
-
-        .app-sidebar-toggle.collapsed .app-sidebar-chevron {
-            transform: rotate(-90deg);
-        }
-
-        .app-sidebar-submenu {
-            display: none;
-            flex-direction: column;
-            gap: .2rem;
-            margin: .3rem 0 .2rem .95rem;
-            padding-left: .85rem;
-            border-left: 2px solid var(--app-border);
-        }
-
-            .app-sidebar-submenu.open {
-                display: flex;
-            }
-
-            .app-sidebar-submenu .app-sidebar-link {
-                padding: .45rem .55rem;
-                font-size: .84rem;
-            }
-
-            .app-sidebar-submenu .icon-chip {
-                width: 28px;
-                height: 28px;
-                font-size: .92rem;
-            }
-
-        .app-sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: var(--app-navbar-height);
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(36,19,22,.35);
-            z-index: 1020;
-        }
-
-        /* Large desktops: a little extra breathing room */
-        @@media (min-width: 1400px) {
-            .app-sidebar {
-                width: 272px;
-                padding: 1.5rem 1.1rem;
-            }
-        }
-
-        /* Small laptops / tablets in landscape: keep the sidebar docked but tighten it */
-        @@media (min-width: 992px) and (max-width: 1199.98px) {
-            .app-sidebar {
-                width: 212px;
-                padding: 1rem .7rem;
-            }
-
-            .app-sidebar-link {
-                font-size: .84rem;
-                padding: .45rem .5rem;
-            }
-
-                .app-sidebar-link .icon-chip {
-                    width: 28px;
-                    height: 28px;
-                    font-size: .92rem;
-                }
-        }
-
-        /* Tablets in portrait and phones: off-canvas drawer */
-        @@media (max-width: 991.98px) {
-            .app-sidebar {
-                position: fixed;
-                top: var(--app-navbar-height);
-                left: 0;
-                bottom: 0;
-                width: min(78vw, 288px);
-                height: auto;
-                z-index: 1025;
-                transform: translateX(-100%);
-                box-shadow: 6px 0 24px rgba(36,19,22,.18);
-            }
-
-                .app-sidebar.open {
-                    transform: translateX(0);
-                }
-
-            .app-sidebar-overlay.show {
-                display: block;
-            }
-        }
-
-        /* Small phones: trim the drawer's own padding a touch */
-        @@media (max-width: 420px) {
-            .app-sidebar {
-                width: min(84vw, 260px);
-                padding: 1rem .85rem;
-            }
-        }
-
-        .app-content {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
-        @@media print {
-            .app-navbar,
-            .app-sidebar,
-            .app-sidebar-overlay,
-            .no-print {
-                display: none !important;
-            }
-
-            .app-shell {
-                display: block !important;
-                min-height: 0 !important;
-            }
-
-            .app-content {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            .app-content > hr,
-            .app-content > footer {
-                display: none !important;
-            }
-
-            body {
-                background: #fff !important;
-            }
-        }
-    </style>
+    <link href="~/Content/shared/layout.css" rel="stylesheet" />
 </head>
 <body>
     @if (User.Identity.IsAuthenticated)
@@ -506,8 +23,9 @@
                 && string.Equals(currentAction, a, System.StringComparison.OrdinalIgnoreCase)
                 ? " active" : "");
         bool isCarSectionActive = string.Equals(currentController, "Capa", System.StringComparison.OrdinalIgnoreCase);
+        bool isNncrSectionActive = string.Equals(currentController, "Nncr", System.StringComparison.OrdinalIgnoreCase);
         bool isComplaintSectionActive = string.Equals(currentController, "ComplaintReport", System.StringComparison.OrdinalIgnoreCase)
-            || string.Equals(currentController, "Ncr", System.StringComparison.OrdinalIgnoreCase);
+    || string.Equals(currentController, "Ncr", System.StringComparison.OrdinalIgnoreCase);
 
         var currentUserProfile = StoreManagement.Models.UserAccess.Current(Context);
         bool canDashboard = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Dashboard);
@@ -616,6 +134,26 @@
                                 </a>
                             </li>
                         </ul>
+
+                        <a class="app-sidebar-link app-sidebar-toggle@(isNncrSectionActive ? "" : " collapsed")" href="#" id="nncrSubmenuToggle" onclick="toggleNncrSubmenu(event)" aria-expanded="@(isNncrSectionActive ? "false" : "true")" aria-controls="nncrSubmenu">
+                            <span class="icon-chip"><i class="bi bi-folder2-open"></i></span>
+                            NNCR
+                            <i class="bi bi-chevron-down app-sidebar-chevron"></i>
+                        </a>
+                        <ul class="app-sidebar-nav app-sidebar-submenu@(isNncrSectionActive ? " open" : "")" id="nncrSubmenu">
+                            <li class="nav-item">
+                                <a class="@navClass("Nncr", "NncrList")" href="@Url.Action("NncrList", "Nncr")">
+                                    <span class="icon-chip"><i class="bi bi-clipboard-data"></i></span>
+                                    NNCR List
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Nncr", "Quality")" href="@Url.Action("Quality", "Nncr")">
+                                    <span class="icon-chip"><i class="bi bi-file-earmark-plus"></i></span>
+                                    NNCR Report Form
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
                 }
@@ -671,75 +209,8 @@
 
         <script>
             sessionStorage.setItem('Username', @Html.Raw(Json.Encode(User.Identity.Name)));
-
-            (function () {
-                var sidebar = document.getElementById('appSidebar');
-                var overlay = document.getElementById('sidebarOverlay');
-                var toggleBtn = document.getElementById('sidebarToggleBtn');
-
-                function openSidebar() {
-                    sidebar.classList.add('open');
-                    overlay.classList.add('show');
-                }
-                function closeSidebar() {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('show');
-                }
-
-                if (toggleBtn) {
-                    toggleBtn.addEventListener('click', function () {
-                        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-                    });
-                }
-                if (overlay) {
-                    overlay.addEventListener('click', closeSidebar);
-                }
-            })();
-
-            (function () {
-                var menu = document.getElementById('appUserMenu');
-                var btn = document.getElementById('appUserAvatarBtn');
-                var dropdown = document.getElementById('appUserDropdown');
-                if (!menu || !btn || !dropdown) return;
-
-                function closeMenu() {
-                    dropdown.classList.remove('show');
-                    btn.setAttribute('aria-expanded', 'false');
-                }
-                function toggleMenu() {
-                    var isOpen = dropdown.classList.toggle('show');
-                    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                }
-
-                btn.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    toggleMenu();
-                });
-                document.addEventListener('click', function (e) {
-                    if (!menu.contains(e.target)) closeMenu();
-                });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape') closeMenu();
-                });
-            })();
-
-            function toggleCarSubmenu(event) {
-                event.preventDefault();
-                var toggle = document.getElementById('carSubmenuToggle');
-                var submenu = document.getElementById('carSubmenu');
-                var isOpen = submenu.classList.toggle('open');
-                toggle.classList.toggle('collapsed', !isOpen);
-                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            }
-
-            function toggleComplaintSubmenu(event) {
-                event.preventDefault();
-                var toggle = document.getElementById('complaintSubmenuToggle');
-                var submenu = document.getElementById('complaintSubmenu');
-                var isOpen = submenu.classList.toggle('open');
-                toggle.classList.toggle('collapsed', !isOpen);
-                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            }        </script>
+        </script>
+        <script src="~/Scripts/shared/layout.js"></script>
     }
     @if (!User.Identity.IsAuthenticated)
     {
@@ -755,9 +226,7 @@
             @RenderBody()
         </div>
 
-        <script>
-            sessionStorage.removeItem('Username');
-        </script>
+        <script src="~/Scripts/shared/layout-guest.js"></script>
     }
 </body>
 </html>
