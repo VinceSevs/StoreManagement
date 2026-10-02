@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using StoreManagement.Models;
 
-namespace StoreManagement.Models
+namespace StoreManagement.Repositories
 {
     public class ComplaintReportRepository
     {

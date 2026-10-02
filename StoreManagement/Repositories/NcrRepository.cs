@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using StoreManagement.Models;
 
-namespace StoreManagement.Models
+namespace StoreManagement.Repositories
 {
     // Read-only view of the Non-Conformance Report (NCR) data that lives in Lead_Db
     // (same database used by LLIIOrderingSystem_V3, and the same tables as PCR —

@@ -1,0 +1,157 @@
+    .ncr-card {
+        border: 1px solid var(--lead-border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .ncr-section-header {
+        background: var(--lead-primary, #7d1f27);
+        color: #fff;
+        font-weight: 600;
+        font-size: .92rem;
+        padding: .65rem 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .ncr-field {
+        margin-bottom: .25rem;
+    }
+
+    .ncr-field-label {
+        display: block;
+        text-transform: uppercase;
+        font-size: .68rem;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--lead-text-muted, #8f7d7b);
+        margin-bottom: .2rem;
+    }
+
+    .ncr-field-value {
+        font-size: .92rem;
+        font-weight: 500;
+        color: var(--lead-text, #241316);
+    }
+
+    .ncr-status-panel {
+        background: #fbf6f5;
+    }
+
+    @media (min-width: 768px) {
+        .ncr-status-panel {
+            border-right: 1px solid var(--lead-border);
+        }
+    }
+
+    .attachment-file {
+        max-width: 100%;
+        max-height: 220px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform .2s ease;
+    }
+
+        .attachment-file:hover {
+            transform: scale(1.04);
+        }
+
+    .attachment-box {
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .attachment-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .35rem;
+        min-height: 160px;
+        background: #f3ecea;
+        border-radius: 8px;
+        color: var(--lead-text-muted, #8f7d7b);
+        font-size: .8rem;
+        padding: 1rem;
+    }
+
+        .attachment-placeholder i {
+            font-size: 1.9rem;
+            color: #c9b7b4;
+        }
+
+    textarea.ncr-findings-readonly {
+        background: #fbf6f5;
+        font-size: .88rem;
+        min-height: 160px;
+    }
+
+    textarea#CSFindings {
+        min-height: 160px;
+    }
+
+    .ncr-print-text {
+        display: none;
+    }
+
+    @media print {
+        @page {
+            margin: 0;
+        }
+
+        body {
+            padding: 12mm 10mm !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .ncr-card {
+            border: 1px solid #ccc !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        textarea.ncr-findings-readonly {
+            display: none !important;
+        }
+
+        .ncr-print-text {
+            display: block !important;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid var(--lead-border);
+            border-radius: 6px;
+            padding: .55rem .7rem;
+            background: #fbf6f5;
+            font-size: .85rem;
+            min-height: 50px;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        .ncr-status-panel {
+            border-right: none !important;
+            border-bottom: 1px solid var(--lead-border);
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .ncr-status-panel + div {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .attachment-box,
+        .attachment-placeholder {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+    }

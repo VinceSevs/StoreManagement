@@ -1,5 +1,6 @@
 using System.Web.Mvc;
 using StoreManagement.Models;
+using StoreManagement.Repositories;
 
 namespace StoreManagement.Controllers
 {

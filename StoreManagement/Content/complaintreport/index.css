@@ -1,0 +1,89 @@
+    .pcr-filter-card .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .pcr-filter-label {
+        display: block;
+        text-transform: uppercase;
+        font-size: .68rem;
+        letter-spacing: .05em;
+        font-weight: 700;
+        color: var(--lead-text-muted, #8f7d7b);
+        margin-bottom: .35rem;
+    }
+
+    .pcr-list-card {
+        padding: 1.5rem 1.75rem;
+        margin-top: 1.5rem;
+    }
+
+        .pcr-list-card table th,
+        .pcr-list-card table td {
+            padding: 0.85rem 1rem;
+        }
+
+    #pcrPagination {
+        gap: 4px;
+    }
+
+        #pcrPagination .page-item .page-link {
+            border: 1px solid var(--lead-border);
+            border-radius: 999px;
+            color: #4a3a38;
+            font-size: .8rem;
+            font-weight: 600;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 .55rem;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: none;
+        }
+
+            #pcrPagination .page-item .page-link:hover {
+                background: var(--lead-primary-light);
+                border-color: var(--lead-primary);
+                color: var(--lead-primary);
+                transform: translateY(-1px);
+            }
+
+        #pcrPagination .page-item.active .page-link {
+            background: var(--lead-primary);
+            border-color: var(--lead-primary);
+            color: #fff;
+        }
+
+        #pcrPagination .page-item.disabled .page-link {
+            background: #fbf6f5;
+            color: #c9b7b4;
+            border-color: var(--lead-border);
+        }
+
+    .pcr-sortable {
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        transition: color .15s ease;
+    }
+
+        .pcr-sortable:hover {
+            color: var(--lead-primary);
+        }
+
+        .pcr-sortable .sort-icon {
+            font-size: .7rem;
+            margin-left: .25rem;
+            opacity: .35;
+        }
+
+        .pcr-sortable.sort-asc,
+        .pcr-sortable.sort-desc {
+            color: var(--lead-primary);
+        }
+
+            .pcr-sortable.sort-asc .sort-icon,
+            .pcr-sortable.sort-desc .sort-icon {
+                opacity: 1;
+            }
