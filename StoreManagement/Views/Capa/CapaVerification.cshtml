@@ -251,15 +251,7 @@
     }
 
 </div>
-<div class="lightbox-overlay" id="lightboxOverlay" onclick="handleOverlayClick(event)">
-    <span class="lightbox-counter" id="lightboxCounter"></span>
-    <button type="button" class="lightbox-btn lightbox-prev" id="lightboxPrev" onclick="showLightboxPhoto(currentLightboxIndex - 1)" title="Previous">&#8249;</button>
-    <img id="lightboxImage" class="lightbox-img" src="" alt="Attachment preview">
-    <button type="button" class="lightbox-btn lightbox-next" id="lightboxNext" onclick="showLightboxPhoto(currentLightboxIndex + 1)" title="Next">&#8250;</button>
-    <a id="lightboxDownload" class="lightbox-btn lightbox-download" href="#" download title="Download">&#8681;</a>
-    <button type="button" class="lightbox-btn lightbox-close" onclick="closeLightbox()" title="Close">&#10005;</button>
-    <div class="lightbox-caption" id="lightboxCaption"></div>
-</div>
+@Html.Partial("~/Views/Shared/_PartialView/_AttachmentLightbox.cshtml")
 
 @{
     var photoList = new List<object>();

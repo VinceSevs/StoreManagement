@@ -1,0 +1,82 @@
+﻿    <div class="card mb-3 stage-card">
+        <div class="card-header bg-white fw-semibold">
+            <span>5. Product Disposition</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    @{ int itemNumber = 0; int photoIndex = 0; }
+                    @foreach (var capaItem in ViewBag.Capa.Items)
+                    {
+                        itemNumber++;
+                        int lineNumber = (int)capaItem.LineNumber;
+                        var itemPhotos = ViewBag.ItemAttachments.ContainsKey(lineNumber) ? ViewBag.ItemAttachments[lineNumber] : null;
+                        <div class="border rounded p-3 mb-2 pdf-item-block">
+                            <div class="fw-semibold text-uppercase small mb-2" style="color:var(--bs-primary)">Item @itemNumber</div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Item</label>
+                                    <input type="text" class="form-control readonly-field" value="@capaItem.ItemDescription" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Quantity for Disposal</label>
+                                    <input type="text" class="form-control readonly-field" value="@capaItem.Quantity" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Unit of Measure</label>
+                                    <input type="text" class="form-control readonly-field" value="@capaItem.UOMDisplay" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">Defect</label>
+                                    @{
+                                        var defectDisplay = string.IsNullOrWhiteSpace(capaItem.DefectName)
+                                            ? "Other (Kindly Check Remarks)"
+                                            : $"{capaItem.DefectName} ({capaItem.DefectCategoryName})";
+                                    }
+                                    <input type="text" class="form-control readonly-field"
+                                           value="@defectDisplay"
+                                           readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-uppercase text-secondary">UTD</label>
+                                    <input type="text" class="form-control readonly-field font-mono" value="@(capaItem.UsedToDate != null ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "")" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small text-uppercase text-secondary">Remarks</label>
+                                    <textarea class="form-control readonly-field" rows="2" readonly>@capaItem.Remarks</textarea>
+                                </div>
+                                @if (itemPhotos != null && itemPhotos.Count > 0)
+                                {
+                                    <div class="col-12 attached-photos-block">
+                                        <label class="form-label small text-uppercase text-secondary">Item @itemNumber Attached Photos</label>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var att in itemPhotos)
+                                            {
+                                                if (!string.IsNullOrEmpty(att.ContentType) && att.ContentType.StartsWith("image/"))
+                                                {
+                                                    <button type="button" class="attach-thumb-btn" onclick="openLightbox(@photoIndex)">
+                                                        <img src="@Url.Action("CapaAttachment", "Capa")?path=@Uri.EscapeDataString(att.FilePath)"
+                                                             style="width:140px;height:105px;object-fit:cover;border:1px solid #e2d3d0;border-radius:8px;" alt="Attachment">
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@Url.Action("CapaAttachment", "Capa")?path=@Uri.EscapeDataString(att.FilePath)" target="_blank"
+                                                       class="d-flex flex-column align-items-center justify-content-center text-decoration-none text-secondary"
+                                                       style="width:140px;height:105px;border:1px solid #e2d3d0;border-radius:8px;background:#f6efee;">
+                                                        <span style="font-size:1.6rem;line-height:1;">@(System.IO.Path.GetExtension(att.FilePath).TrimStart('.').ToUpperInvariant())</span>
+                                                        <small class="text-truncate px-2" style="max-width:90%;">@System.IO.Path.GetFileName(att.FilePath)</small>
+                                                    </a>
+                                                }
+                                                photoIndex++;
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>

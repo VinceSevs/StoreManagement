@@ -1,0 +1,85 @@
+﻿            <div class="capa-item-block" data-item-index="0" id="capaItemBlock0">
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white flex-wrap gap-1">
+                    <span><span class="step-badge me-2">1</span>Details of the Non-conformance</span>
+                    <small class="text-secondary fst-italic">To be completed by Requestor</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Item Description <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <div class="autocomplete-wrap item-search-wrap">
+                                <input type="text" class="form-control item-search" autocomplete="off"
+                                       placeholder="Start typing, e.g. &ldquo;mini apple&rdquo;&hellip;" required>
+                                <input type="hidden" class="item-field" data-field="item_id">
+                                <div class="list-group ac-dropdown item-ac-dropdown shadow-sm"></div>
+                            </div>
+                            <select class="form-select item-vendor-select d-none">
+                                <option value="" disabled selected>Select item&hellip;</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Item Code <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="text" class="form-control font-mono item-code-display" placeholder="Auto-fills from selection" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Quantity of Affected Items <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="number" min="0" class="form-control item-field" data-field="quantity" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Unit of Measure <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <select class="form-select item-field" data-field="uom_id" required>
+                                @foreach (var u in ViewBag.UOM)
+                                {
+                                    if (string.Equals((string)u.Text, "Case", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <option value="@u.UOMID" selected>@u.Text - @u.IsoCode</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@u.UOMID">@u.Text - @u.IsoCode</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Defect Description <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <select class="form-select item-field defect-select" data-field="defect_category_id" required>
+                                <option value="" disabled selected>Loading&hellip;</option>
+                            </select>
+                            <input type="text" class="form-control mt-2 d-none defect-other-input" placeholder="Specify the defect">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">Defect Category <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="text" class="form-control font-mono defect-category-display" placeholder="Auto-fills from selection" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-uppercase text-secondary">UTD <span class="optional-hint d-none text-secondary fst-normal text-lowercase">(optional)</span></label>
+                            <input type="date" class="form-control item-field" data-field="used_to_date" required>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label small text-uppercase text-secondary">Remarks</label>
+                        <textarea class="form-control item-field" data-field="remarks" rows="4" placeholder="Describe what happened, when and where it was discovered, and which product, batch, or shipment is affected&hellip;" required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white flex-wrap gap-1">
+                    <span><span class="step-badge me-2">2</span>Photo / Document Attachments</span>
+                    <small class="text-secondary fst-italic">Evidence photos, supporting documents, etc.</small>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                        <label class="btn btn-outline-primary btn-sm mb-0">
+                            + Add file(s)
+                            <input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple class="d-none item-attach-input">
+                        </label>
+                        <span class="small text-secondary fst-italic">Images, PDF, Word, or Excel &mdash; multiple files allowed. Stored only in this open page &mdash; nothing is uploaded anywhere.</span>
+                    </div>
+                    <div class="item-attach-empty text-secondary fst-italic small text-center py-3">No attachments added yet.</div>
+                    <div class="item-attach-grid row row-cols-2 row-cols-md-3 g-3"></div>
+                </div>
+            </div>
+            </div>
