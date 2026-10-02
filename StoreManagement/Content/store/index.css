@@ -1,0 +1,55 @@
+    .store-list-card {
+        padding: 1.5rem 1.75rem;
+        margin-top: 1.5rem;
+    }
+    .store-list-card table th,
+    .store-list-card table td { padding: 0.85rem 1rem; }
+    #searchSuggestions .list-group-item { padding: 0.6rem 1rem; }
+    #modalBox .modal-header,
+    #modalBox .modal-body,
+    #modalBox .modal-footer { padding: 1.25rem 1.5rem; }
+    #modalBox .modal-footer { gap: 0.5rem; }
+
+    /* ---------- Pagination ---------- */
+    #storePagination {
+        gap: 4px;
+    }
+
+        #storePagination .page-item .page-link {
+            border: 1px solid var(--lead-border);
+            border-radius: 999px;
+            color: #4a3a38;
+            font-size: .8rem;
+            font-weight: 600;
+            min-width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 .55rem;
+            transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: none;
+        }
+
+            #storePagination .page-item .page-link:hover {
+                background: var(--lead-primary-light);
+                border-color: var(--lead-primary);
+                color: var(--lead-primary);
+                transform: translateY(-1px);
+            }
+
+            #storePagination .page-item .page-link:focus {
+                box-shadow: 0 0 0 3px rgba(125,31,39,.15);
+            }
+
+        #storePagination .page-item.active .page-link {
+            background: var(--lead-primary);
+            border-color: var(--lead-primary);
+            color: #fff;
+        }
+
+        #storePagination .page-item.disabled .page-link {
+            background: #fbf6f5;
+            color: #c9b7b4;
+            border-color: var(--lead-border);
+        }
