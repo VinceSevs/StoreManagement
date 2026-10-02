@@ -1,0 +1,67 @@
+@model IEnumerable<StoreManagement.Models.Ncr>
+
+<div class="card shadow-sm ncr-list-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <span class="fw-semibold text-secondary small text-uppercase" style="letter-spacing:.04em"></span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="small text-secondary" id="ncrResultCount"></span>
+            <button type="button" id="ncrExportBtn" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 lead-table" id="ncrTable">
+            <thead>
+                <tr>
+                    <th class="ncr-sortable" data-col="0">Status <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="1">Create Date <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="2">NCR No. <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="3">Store Name <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="ncr-sortable" data-col="4">Filed By <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    int filterStatus = item.NcrStatus == 0 ? 20 : item.NcrStatus;
+                    <tr class="ncr-row" data-status="@filterStatus" data-date="@item.DateCreated.ToString("yyyy-MM-dd")">
+                        <td>
+                            @{
+                                string badgeClass = "bg-info";
+                                string badgeText = "TRANSMITTED";
+                                switch (item.NcrStatus)
+                                {
+                                    case 23: badgeClass = "bg-warning"; badgeText = "FOR FURTHER INVESTIGATION"; break;
+                                    case 24: badgeClass = "bg-primary"; badgeText = "CLOSED"; break;
+                                    case 29: badgeClass = "bg-secondary"; badgeText = "CANCELLED"; break;
+                                }
+                            }
+                            <span class="badge @badgeClass">@badgeText</span>
+                        </td>
+                        <td>@item.DateCreated.ToString("MMM dd yyyy")</td>
+                        <td class="font-mono fw-semibold" style="color:var(--lead-primary)">@item.NcrNumber</td>
+                        <td>@item.StoreName</td>
+                        <td>@item.FiledBy</td>
+                        <td class="text-end">
+                            <a href="@Url.Action("Details", "Ncr", new { docId = item.DocID })" class="btn btn-primary btn-sm">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 mt-2 border-top">
+        <span class="small text-secondary" id="ncrPageInfo"></span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <ul class="pagination pagination-sm mb-0" id="ncrPagination"></ul>
+            <div class="input-group input-group-sm" style="width:150px;">
+                <input type="number" min="1" class="form-control" id="ncrPageJumpInput" placeholder="Page #">
+                <button class="btn btn-outline-primary" type="button" id="ncrPageJumpBtn">Go</button>
+            </div>
+        </div>
+    </div>
+</div>

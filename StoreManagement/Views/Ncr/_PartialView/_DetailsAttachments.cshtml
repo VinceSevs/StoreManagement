@@ -1,0 +1,81 @@
+@model StoreManagement.Models.Ncr
+@using System.Linq
+@using System.Configuration
+
+@{
+    string attachmentsBaseUrl = ConfigurationManager.AppSettings["NCRAttachmentsBaseUrl"] ?? "";
+}
+
+<div class="card shadow-sm ncr-card mb-4">
+    <div class="ncr-section-header"><i class="bi bi-paperclip"></i> Attachments</div>
+    <div class="card-body">
+        @{
+            var attachments = new[] { Model.Attachment1, Model.Attachment2, Model.Attachment3, Model.Attachment4 };
+            var labels = new[] { "Attachment 1", "Attachment 2", "Attachment 3", "Attachment 4" };
+            bool hasAny = attachments.Any(a => !string.IsNullOrEmpty(a));
+            var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic", ".heif" };
+            var videoExtensions = new[] { ".mp4", ".webm", ".ogg" };
+        }
+        @if (hasAny && !string.IsNullOrEmpty(attachmentsBaseUrl))
+        {
+            <div class="row g-3">
+                @for (int i = 0; i < attachments.Length; i++)
+                {
+                    var file = attachments[i];
+                    if (string.IsNullOrEmpty(file)) { continue; }
+                    var filePath = attachmentsBaseUrl.TrimEnd('/') + "/" + file;
+                    var extension = System.IO.Path.GetExtension(file)?.ToLower() ?? "";
+                    var fileTypeLabel = extension.TrimStart('.').ToUpper();
+
+                    <div class="col-md-6 col-sm-6 text-center">
+                        <div class="attachment-box p-2 border rounded shadow-sm">
+                            <h6 class="small text-uppercase text-secondary fw-semibold">@labels[i]</h6>
+                            @if (imageExtensions.Contains(extension))
+                            {
+                                <img src="@filePath" class="attachment-file img-fluid" alt="@labels[i]"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="attachment-placeholder" style="display:none;">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                    <span>Preview not available@(extension == ".heic" || extension == ".heif" ? " (HEIC/HEIF isn't supported by most browsers)" : "")</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                            else if (extension == ".pdf")
+                            {
+                                <embed src="@filePath" type="application/pdf" class="attachment-file" style="width:100%;height:220px;" />
+                            }
+                            else if (videoExtensions.Contains(extension))
+                            {
+                                <video class="attachment-file" style="width:100%;height:220px;object-fit:cover;" controls
+                                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <source src="@filePath" type="video/@extension.Replace(".", "")" />
+                                </video>
+                                <div class="attachment-placeholder" style="display:none;">
+                                    <i class="bi bi-file-earmark-play"></i>
+                                    <span>Preview not available</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="attachment-placeholder">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>@(string.IsNullOrEmpty(fileTypeLabel) ? "File" : fileTypeLabel + " file")</span>
+                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary mt-1">Open File</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (hasAny)
+        {
+            <span class="text-muted">Attachments exist for this NCR, but the attachments file server URL has not been configured yet. Set "NCRAttachmentsBaseUrl" in Web.config.</span>
+        }
+        else
+        {
+            <span class="text-muted">No attachments</span>
+        }
+    </div>
+</div>
