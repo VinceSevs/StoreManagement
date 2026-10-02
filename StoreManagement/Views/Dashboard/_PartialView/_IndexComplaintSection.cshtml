@@ -1,0 +1,131 @@
+@model StoreManagement.Models.DashboardViewModel
+
+@{
+    string pcrVsNcrSummary = "";
+    int complaintTotalForSummary = Model.PcrTotal + Model.NcrTotal;
+    if (complaintTotalForSummary > 0)
+    {
+        int pcrPct = (int)System.Math.Round(Model.PcrTotal * 100.0 / complaintTotalForSummary);
+        pcrVsNcrSummary = "PCRs make up " + pcrPct + "% of all complaint records (" + Model.PcrTotal + " PCR vs " + Model.NcrTotal + " NCR).";
+    }
+}
+
+<!-- ================ COMPLAINT REPORT SECTION ================ -->
+<div class="dash-section" data-section="complaint" id="complaintSection">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <div class="dash-section-title mb-0">
+            <span class="icon-chip"><i class="bi bi-file-earmark-text"></i></span> Complaint Report
+        </div>
+        <div>
+            <label class="small fw-semibold text-secondary d-block mb-1" for="complaintScopeSelect">Scope</label>
+            <select id="complaintScopeSelect" class="form-select form-select-sm dash-scope-select">
+                <option value="all">All (PCR + NCR)</option>
+                <option value="pcr">PCR Only</option>
+                <option value="ncr">NCR Only</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="dash-mini-pill" title="View all PCR records">
+            <i class="bi bi-file-earmark-text"></i> PCR: @Model.PcrTotal
+        </a>
+        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="dash-mini-pill" title="View all NCR records">
+            <i class="bi bi-exclamation-diamond"></i> NCR: @Model.NcrTotal
+        </a>
+    </div>
+
+    <div class="dash-stat-row">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" id="complaintTotalLink" class="dash-stat-card" style="--accent:#7d1f27;" title="View records">
+            <div class="dash-stat-value" id="complaintTotalValue">@Model.ComplaintStats.Total</div>
+            <div class="dash-stat-label">Total</div>
+            <div class="dash-stat-delta" id="complaintTotalDelta"></div>
+        </a>
+        <div class="dash-stat-card" style="--accent:#c07a00;">
+            <div class="dash-stat-value" id="complaintOpenValue">@Model.ComplaintStats.Open</div>
+            <div class="dash-stat-label">Open / Ongoing</div>
+        </div>
+        <div class="dash-stat-card" style="--accent:#2f6b46;">
+            <div class="dash-stat-value" id="complaintClosedValue">@Model.ComplaintStats.Closed</div>
+            <div class="dash-stat-label">Closed</div>
+        </div>
+        <div class="dash-stat-card" style="--accent:#8f7d7b;">
+            <div class="dash-stat-value" id="complaintCancelledValue">@Model.ComplaintStats.Cancelled</div>
+            <div class="dash-stat-label">Cancelled / Invalid</div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="dash-card">
+                <h6>Status Breakdown</h6>
+                @if (Model.ComplaintStats.Total == 0)
+                {
+                    <div class="dash-empty">No PCR/NCR records yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary" id="complaintStatusSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-chart-wrap"><canvas id="complaintStatusChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
+                        <tbody>
+                            <tr><td>Open / Ongoing</td><td class="text-end" id="complaintStatusOpenCell">@Model.ComplaintStats.Open</td></tr>
+                            <tr><td>Closed</td><td class="text-end" id="complaintStatusClosedCell">@Model.ComplaintStats.Closed</td></tr>
+                            <tr><td>Cancelled / Invalid</td><td class="text-end" id="complaintStatusCancelledCell">@Model.ComplaintStats.Cancelled</td></tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="dash-card">
+                <h6 id="complaintTrendTitle">PCR + NCR Filed Over Time</h6>
+                @if (Model.ComplaintStats.Total == 0)
+                {
+                    <div class="dash-empty">No PCR/NCR records yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary" id="complaintTrendSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-chart-wrap"><canvas id="complaintTrendChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead id="complaintTrendHead"></thead>
+                        <tbody id="complaintTrendBody"></tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-12" id="pcrVsNcrCard">
+            <div class="dash-card">
+                <h6>PCR vs NCR by Status</h6>
+                @if (Model.PcrTotal == 0 && Model.NcrTotal == 0)
+                {
+                    <div class="dash-empty">No PCR/NCR records yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@pcrVsNcrSummary</span></div>
+                    <div class="dash-chart-wrap dash-chart-tall"><canvas id="pcrVsNcrChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Status</th><th class="text-end">PCR</th><th class="text-end">NCR</th></tr></thead>
+                        <tbody>
+                            <tr><td>Open / Ongoing</td><td class="text-end">@Model.PcrStats.Open</td><td class="text-end">@Model.NcrStats.Open</td></tr>
+                            <tr><td>Closed</td><td class="text-end">@Model.PcrStats.Closed</td><td class="text-end">@Model.NcrStats.Closed</td></tr>
+                            <tr><td>Cancelled / Invalid</td><td class="text-end">@Model.PcrStats.Cancelled</td><td class="text-end">@Model.NcrStats.Cancelled</td></tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-view-all">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="btn btn-outline-primary btn-sm">
+            View All PCR Records <i class="bi bi-arrow-right"></i>
+        </a>
+        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="btn btn-outline-primary btn-sm">
+            View All NCR Records <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>

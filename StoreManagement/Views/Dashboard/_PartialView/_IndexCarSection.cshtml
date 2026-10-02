@@ -1,0 +1,132 @@
+@model StoreManagement.Models.DashboardViewModel
+
+@{
+    string carStatusSummary = "";
+    if (Model.CarStats.Total > 0)
+    {
+        string dominantLabel; int dominantCount;
+        if (Model.CarStats.Open >= Model.CarStats.InVerification && Model.CarStats.Open >= Model.CarStats.Closed && Model.CarStats.Open >= Model.CarStats.Cancelled)
+        { dominantLabel = "awaiting response"; dominantCount = Model.CarStats.Open; }
+        else if (Model.CarStats.InVerification >= Model.CarStats.Closed && Model.CarStats.InVerification >= Model.CarStats.Cancelled)
+        { dominantLabel = "awaiting verification"; dominantCount = Model.CarStats.InVerification; }
+        else if (Model.CarStats.Closed >= Model.CarStats.Cancelled)
+        { dominantLabel = "closed"; dominantCount = Model.CarStats.Closed; }
+        else
+        { dominantLabel = "cancelled"; dominantCount = Model.CarStats.Cancelled; }
+
+        int pct = (int)System.Math.Round(dominantCount * 100.0 / Model.CarStats.Total);
+        carStatusSummary = "Most CAR reports (" + dominantCount + " of " + Model.CarStats.Total + ", " + pct + "%) are " + dominantLabel + ".";
+    }
+
+    string carClassificationSummary = "";
+    if (Model.CarClassificationLabels.Count > 0 && Model.CarStats.Total > 0)
+    {
+        int pct = (int)System.Math.Round(Model.CarClassificationCounts[0] * 100.0 / Model.CarStats.Total);
+        carClassificationSummary = "Most CAR reports are attributed to " + Model.CarClassificationLabels[0]
+            + " (" + Model.CarClassificationCounts[0] + " of " + Model.CarStats.Total + ", " + pct + "%).";
+    }
+}
+
+<!-- ===================== CAR SECTION ===================== -->
+<div class="dash-section" data-section="car" id="carSection">
+    <div class="dash-section-title">
+        <span class="icon-chip"><i class="bi bi-folder2-open"></i></span> CAR (Corrective Action Report)
+    </div>
+
+    <div class="dash-stat-row">
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#7d1f27;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Total</div>
+            <div class="dash-stat-label">Total</div>
+            <div class="dash-stat-delta" id="carTotalDelta"></div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#c07a00;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Open</div>
+            <div class="dash-stat-label">Awaiting Response</div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#2f6690;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.InVerification</div>
+            <div class="dash-stat-label">Awaiting Verification</div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#2f6b46;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Closed</div>
+            <div class="dash-stat-label">Closed</div>
+        </a>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#8f7d7b;" title="View all CAR reports">
+            <div class="dash-stat-value">@Model.CarStats.Cancelled</div>
+            <div class="dash-stat-label">Cancelled</div>
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="dash-card">
+                <h6>Status Breakdown</h6>
+                @if (Model.CarStats.Total == 0)
+                {
+                    <div class="dash-empty">No CAR reports yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@carStatusSummary</span></div>
+                    <div class="dash-chart-wrap"><canvas id="carStatusChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
+                        <tbody>
+                            <tr><td>Awaiting Response</td><td class="text-end">@Model.CarStats.Open</td></tr>
+                            <tr><td>Awaiting Verification</td><td class="text-end">@Model.CarStats.InVerification</td></tr>
+                            <tr><td>Closed</td><td class="text-end">@Model.CarStats.Closed</td></tr>
+                            <tr><td>Cancelled</td><td class="text-end">@Model.CarStats.Cancelled</td></tr>
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="dash-card">
+                <h6>Reports Filed Over Time</h6>
+                @if (Model.CarStats.Total == 0)
+                {
+                    <div class="dash-empty">No CAR reports yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary" id="carTrendSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-chart-wrap"><canvas id="carTrendChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead id="carTrendHead"></thead>
+                        <tbody id="carTrendBody"></tbody>
+                    </table>
+                }
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="dash-card">
+                <h6>Reports by Classification (who's responsible)</h6>
+                @if (Model.CarClassificationLabels.Count == 0)
+                {
+                    <div class="dash-empty">No CAR reports yet.</div>
+                }
+                else
+                {
+                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@carClassificationSummary</span></div>
+                    <div class="dash-chart-wrap dash-chart-tall"><canvas id="carClassificationChart"></canvas></div>
+                    <table class="table dash-data-table mb-0">
+                        <thead><tr><th>Classification</th><th class="text-end">Count</th></tr></thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.CarClassificationLabels.Count; i++)
+                            {
+                                <tr><td>@Model.CarClassificationLabels[i]</td><td class="text-end">@Model.CarClassificationCounts[i]</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-view-all">
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="btn btn-outline-primary btn-sm">
+            View All CAR Reports <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>
