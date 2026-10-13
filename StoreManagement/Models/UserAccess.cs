@@ -1,4 +1,5 @@
 using System.Web;
+using StoreManagement.Repositories;
 
 namespace StoreManagement.Models
 {
@@ -6,6 +7,7 @@ namespace StoreManagement.Models
     {
         Dashboard,
         Car,
+        Nncr,
         ComplaintReport,
         PdfReceipt,
         Store
@@ -29,9 +31,8 @@ namespace StoreManagement.Models
                 case AllAccessDepartment:
                     return true;
                 case QualityDepartment:
-                    return section == AppSection.Dashboard
-                        || section == AppSection.Car
-                        || section == AppSection.ComplaintReport;
+                    // Dashboard, PCR, NCR and NNCR are IT-only (AllAccessDepartment).
+                    return section == AppSection.Car;
                 case ProcurementDepartment:
                     return section == AppSection.PdfReceipt;
                 default:
@@ -39,9 +40,19 @@ namespace StoreManagement.Models
             }
         }
 
+        // tbl_UserAccount.role_id values allowed to close NNCRs (QA supervisors); they also get NNCR access.
+        public static readonly int[] NncrCloserRoles = { 49, 8 };
+
         public static bool CanAccess(Login user, AppSection section)
         {
-            return user != null && CanAccess(user.DepartmentId, section);
+            if (user == null) return false;
+            if (section == AppSection.Nncr && CanCloseNncr(user)) return true;
+            return CanAccess(user.DepartmentId, section);
+        }
+
+        public static bool CanCloseNncr(Login user)
+        {
+            return user != null && System.Array.IndexOf(NncrCloserRoles, user.RoleId) >= 0;
         }
 
         // Signed-in user's profile, loaded once per request.
@@ -60,6 +71,8 @@ namespace StoreManagement.Models
         public static string[] HomeRoute(Login user)
         {
             if (CanAccess(user, AppSection.Dashboard)) return new[] { "Index", "Dashboard" };
+            if (CanAccess(user, AppSection.Car)) return new[] { "CapaList", "Capa" };
+            if (CanAccess(user, AppSection.Nncr)) return new[] { "NncrList", "Nncr" };
             if (CanAccess(user, AppSection.PdfReceipt)) return new[] { "PdfReceipt", "Finance" };
             return null;
         }

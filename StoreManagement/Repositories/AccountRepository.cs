@@ -15,7 +15,7 @@ namespace StoreManagement.Repositories
             Login login = null;
 
             string query = @"
-                SELECT u.id, u.username, u.password, u.firstname, u.lastname, u.email, u.emp_id, r.RoleJobTitle, r.DepartmentID
+                SELECT u.id, u.username, u.password, u.firstname, u.lastname, u.email, u.emp_id, u.role_id, r.RoleJobTitle, r.DepartmentID
                 FROM tbl_UserAccount u
                 LEFT JOIN tbl_Role r ON u.role_id = r.RoleID
                 WHERE u.username = @username
@@ -39,6 +39,7 @@ namespace StoreManagement.Repositories
                             LastName = reader["lastname"] == System.DBNull.Value ? "" : reader["lastname"].ToString(),
                             Email = reader["email"] == System.DBNull.Value ? "" : reader["email"].ToString(),
                             EmpId = reader["emp_id"] == System.DBNull.Value ? "" : reader["emp_id"].ToString(),
+                            RoleId = reader["role_id"] == System.DBNull.Value ? 0 : System.Convert.ToInt32(reader["role_id"]),
                             RoleJobTitle = reader["RoleJobTitle"] == System.DBNull.Value ? "" : reader["RoleJobTitle"].ToString(),
                             DepartmentId = reader["DepartmentID"] == System.DBNull.Value ? (int?)null : System.Convert.ToInt32(reader["DepartmentID"])
                         };
