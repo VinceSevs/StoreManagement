@@ -13,12 +13,13 @@
         var currentUserProfile = StoreManagement.Models.UserAccess.Current(Context);
         bool canDashboard = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Dashboard);
         bool canCar = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Car);
+        bool canNncr = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Nncr);
         bool canComplaint = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.ComplaintReport);
         bool canPdfReceipt = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.PdfReceipt);
 }
 
             <aside class="app-sidebar" id="appSidebar">
-                @if (canDashboard || canCar || canComplaint)
+                @if (canDashboard || canCar || canNncr || canComplaint)
                 {
                 <div class="app-sidebar-section">
                     <i class="bi bi-patch-check-fill"></i> Quality Assurance
@@ -43,10 +44,12 @@
             </li>
         </ul>*@
 
-                @if (canCar)
+                @if (canCar || canNncr)
                 {
                 <ul class="app-sidebar-nav mt-2">
                     <li class="nav-item">
+                        @if (canCar)
+                        {
                         <a class="app-sidebar-link app-sidebar-toggle@(isCarSectionActive ? "" : " collapsed")" href="#" id="carSubmenuToggle" onclick="toggleCarSubmenu(event)" aria-expanded="@(isCarSectionActive ? "false" : "true")" aria-controls="carSubmenu">
                             <span class="icon-chip"><i class="bi bi-folder2-open"></i></span>
                             CAR
@@ -66,7 +69,10 @@
                                 </a>
                             </li>
                         </ul>
+                        }
 
+                        @if (canNncr)
+                        {
                         <a class="app-sidebar-link app-sidebar-toggle@(isNncrSectionActive ? "" : " collapsed")" href="#" id="nncrSubmenuToggle" onclick="toggleNncrSubmenu(event)" aria-expanded="@(isNncrSectionActive ? "false" : "true")" aria-controls="nncrSubmenu">
                             <span class="icon-chip"><i class="bi bi-folder2-open"></i></span>
                             NNCR
@@ -86,6 +92,7 @@
                                 </a>
                             </li>
                         </ul>
+                        }
                     </li>
                 </ul>
                 }
