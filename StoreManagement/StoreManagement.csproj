@@ -60,6 +60,9 @@
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json.Bson, Version=1.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Bson.1.0.2\lib\net45\Newtonsoft.Json.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
@@ -69,6 +72,9 @@
     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.6.0.0\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
@@ -76,12 +82,21 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.3.0\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.3.0\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -150,6 +165,8 @@
     <Compile Include="App_Data\CapaService.cs" />
     <Compile Include="App_Data\HelperService.cs" />
     <Compile Include="App_Data\InboundService.cs" />
+    <Compile Include="App_Data\NncrAttachmentService.cs" />
+    <Compile Include="App_Data\NncrNotificationService.cs" />
     <Compile Include="App_Data\ItemService.cs" />
     <Compile Include="App_Data\PublicService.cs" />
     <Compile Include="App_Data\TruckService.cs" />
@@ -160,32 +177,49 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CapaController.cs" />
+    <Compile Include="Controllers\ComplaintReportController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\FinanceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NcrController.cs" />
+    <Compile Include="Controllers\NncrController.cs" />
     <Compile Include="Controllers\PublicController.cs" />
+    <Compile Include="Controllers\SectionAccessAttribute.cs" />
     <Compile Include="Controllers\StoreController.cs" />
     <Compile Include="Controllers\SweetController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountRepository.cs" />
+    <Compile Include="Repositories\AccountRepository.cs" />
     <Compile Include="Models\Capa.cs" />
     <Compile Include="Models\CapaLog.cs" />
     <Compile Include="Models\CapaLookups.cs" />
     <Compile Include="Models\City.cs" />
+    <Compile Include="Repositories\ComplaintReportRepository.cs" />
+    <Compile Include="Models\DashboardViewModel.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\LogType.cs" />
     <Compile Include="Models\MySession.cs" />
+    <Compile Include="Models\Ncr.cs" />
+    <Compile Include="Models\Nncr.cs" />
+    <Compile Include="Repositories\NcrRepository.cs" />
+    <Compile Include="Repositories\NncrRepository.cs" />
+    <Compile Include="Models\Pcr.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\State.cs" />
     <Compile Include="Models\Store.cs" />
-    <Compile Include="Models\StoreRepository.cs" />
+    <Compile Include="Repositories\StoreRepository.cs" />
     <Compile Include="Models\StoreUpdateLog.cs" />
     <Compile Include="Models\Suggestion.cs" />
     <Compile Include="Models\UpdateLog.cs" />
-    <Compile Include="Models\UpdateLogRepository.cs" />
+    <Compile Include="Repositories\UpdateLogRepository.cs" />
+    <Compile Include="Models\UserAccess.cs" />
+    <Compile Include="Models\UserDisplayHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +242,55 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\Icon\favicon.ico" />
+    <Content Include="Content\lead-theme.css" />
+    <Content Include="Views\Nncr\_PartialView\_NncrDetails.cshtml" />
+    <Content Include="Content\nncr\nncr-details.css" />
+    <Content Include="Content\account\account.css" />
+    <Content Include="Content\account\login.css" />
+    <Content Include="Scripts\account\account.js" />
+    <Content Include="Scripts\account\login.js" />
+    <Content Include="Content\capa\capa-list.css" />
+    <Content Include="Content\capa\capa-response.css" />
+    <Content Include="Content\capa\capa-status.css" />
+    <Content Include="Content\capa\capa-verification.css" />
+    <Content Include="Content\capa\quality.css" />
+    <Content Include="Scripts\capa\capa-list.js" />
+    <Content Include="Scripts\capa\capa-response.js" />
+    <Content Include="Scripts\capa\capa-status-pallet-tags.js" />
+    <Content Include="Scripts\capa\capa-status-pdf.js" />
+    <Content Include="Scripts\capa\capa-status.js" />
+    <Content Include="Scripts\capa\capa-verification.js" />
+    <Content Include="Scripts\capa\quality.js" />
+    <Content Include="Content\complaintreport\details.css" />
+    <Content Include="Content\complaintreport\index.css" />
+    <Content Include="Scripts\complaintreport\details.js" />
+    <Content Include="Scripts\complaintreport\index.js" />
+    <Content Include="Content\dashboard\index.css" />
+    <Content Include="Scripts\dashboard\index.js" />
+    <Content Include="Content\finance\pdf-receipt.css" />
+    <Content Include="Scripts\finance\pdf-receipt.js" />
+    <Content Include="Content\ncr\details.css" />
+    <Content Include="Content\ncr\index.css" />
+    <Content Include="Scripts\ncr\details.js" />
+    <Content Include="Scripts\ncr\index.js" />
+    <Content Include="Content\images\lead-logo.png" />
+    <Content Include="Content\nncr\nncr-list.css" />
+    <Content Include="Content\nncr\nncr-response.css" />
+    <Content Include="Content\nncr\nncr-status.css" />
+    <Content Include="Content\nncr\quality.css" />
+    <Content Include="Scripts\nncr\nncr-list.js" />
+    <Content Include="Scripts\nncr\nncr-response.js" />
+    <Content Include="Scripts\nncr\nncr-status.js" />
+    <Content Include="Scripts\nncr\quality.js" />
+    <Content Include="Content\shared\error.css" />
+    <Content Include="Content\shared\layout.css" />
+    <Content Include="Content\shared\login-layout.css" />
+    <Content Include="Scripts\shared\layout-guest.js" />
+    <Content Include="Scripts\shared\layout.js" />
+    <Content Include="Content\store\index.css" />
+    <Content Include="Scripts\store\index.js" />
+    <Content Include="Scripts\sweet\alert.js" />
     <Content Include="Content\sweetalert\bootstrap-sweetalert.png" />
     <Content Include="Content\sweetalert\docs.css" />
     <Content Include="Content\sweetalert\sweet-alert.css" />
@@ -228,8 +311,10 @@
     <Content Include="Content\bootstrap\variables.less" />
     <Content Include="Content\bootstrap\mixins.less" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
-    <Content Include="Scripts\capa-form.js" />
-    <Content Include="Scripts\capa-tour.js" />
+    <Content Include="Scripts\capa\capa-form.js" />
+    <Content Include="Scripts\capa\capa-tour.js" />
+    <Content Include="Scripts\finance\pdf-to-excel.js" />
+    <Content Include="Scripts\finance\receipt-pdf.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.js" />
@@ -243,6 +328,22 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Capa\_PartialView\_CapaListTable.cshtml" />
+    <Content Include="Views\Capa\_PartialView\_CapaResponseSummary.cshtml" />
+    <Content Include="Views\Capa\_PartialView\_CapaStatusDispositionCard.cshtml" />
+    <Content Include="Views\Capa\_PartialView\_QualityFirstItem.cshtml" />
+    <Content Include="Views\Capa\_PartialView\_QualityItemTemplate.cshtml" />
+    <Content Include="Views\ComplaintReport\_PartialView\_DetailsAttachments.cshtml" />
+    <Content Include="Views\ComplaintReport\_PartialView\_IndexTable.cshtml" />
+    <Content Include="Views\Dashboard\_PartialView\_IndexCarSection.cshtml" />
+    <Content Include="Views\Dashboard\_PartialView\_IndexComplaintSection.cshtml" />
+    <Content Include="Views\Ncr\_PartialView\_DetailsAttachments.cshtml" />
+    <Content Include="Views\Ncr\_PartialView\_IndexTable.cshtml" />
+    <Content Include="Views\Nncr\_PartialView\_NncrListTable.cshtml" />
+    <Content Include="Views\Nncr\_PartialView\_NncrSupplierResponse.cshtml" />
+    <Content Include="Views\Shared\_PartialView\_AttachmentLightbox.cshtml" />
+    <Content Include="Views\Shared\_PartialView\_LayoutSidebar.cshtml" />
+    <Content Include="Views\Shared\_PartialView\_LayoutTopbar.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Store\Index.cshtml" />
@@ -267,6 +368,20 @@
     <Content Include="Views\Capa\Quality.cshtml" />
     <Content Include="Views\Sweet\Alert.cshtml" />
     <Content Include="Views\Capa\CapaVerification.cshtml" />
+    <Content Include="Views\ComplaintReport\Details.cshtml" />
+    <Content Include="Views\ComplaintReport\Index.cshtml" />
+    <Content Include="Views\Ncr\Details.cshtml" />
+    <Content Include="Views\Ncr\Index.cshtml" />
+    <Content Include="Views\Finance\PdfReceipt.cshtml" />
+    <Content Include="Views\Account\Account.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Shared\_LoginLayout.cshtml" />
+    <Content Include="Views\Shared\AccessDenied.cshtml" />
+    <Content Include="Views\Nncr\NncrResponse.cshtml" />
+    <Content Include="Views\Nncr\NncrResponseInvalid.cshtml" />
+    <Content Include="Views\Nncr\Quality.cshtml" />
+    <Content Include="Views\Nncr\NncrList.cshtml" />
+    <Content Include="Views\Nncr\NncrStatus.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
