@@ -1,0 +1,32 @@
+@model StoreManagement.Models.NncrReport
+@using StoreManagement.Models
+@* Read-only view of the supplier's submitted response (Responded / Closed NNCRs). *@
+@{
+    bool approved = Model.SupplierDecision == NncrDecisions.Approve;
+}
+<div class="row g-3">
+    <div class="col-sm-6">
+        <label class="form-label small text-uppercase text-secondary">Decision</label>
+        <div>
+            <span class="badge @(approved ? "bg-success" : "bg-danger") px-3 py-2">
+                <i class="bi @(approved ? "bi-check-circle" : "bi-x-circle")"></i> @(approved ? "Approved" : Model.SupplierDecision == NncrDecisions.Reject ? "Rejected" : "—")
+            </span>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label small text-uppercase text-secondary">Response Date</label>
+        <input type="text" class="form-control readonly-field font-mono" value="@(Model.AcknowledgeDate?.ToString("MMM dd, yyyy hh:mm tt"))" readonly>
+    </div>
+    <div class="col-12">
+        <label class="form-label small text-uppercase text-secondary">Supplier Remarks</label>
+        <div class="form-control readonly-field nncr-readonly-block">@Model.VendorRemarks</div>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label small text-uppercase text-secondary">Supplier</label>
+        <input type="text" class="form-control readonly-field" value="@Model.SupplierName" readonly>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label small text-uppercase text-secondary">Responded By (Email)</label>
+        <input type="text" class="form-control readonly-field font-mono" value="@Model.RespondedEmail" readonly>
+    </div>
+</div>

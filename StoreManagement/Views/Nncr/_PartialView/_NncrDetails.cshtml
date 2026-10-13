@@ -1,0 +1,232 @@
+@model StoreManagement.Models.NncrReport
+@using System.Linq
+@functions {
+    // One printed checklist option of the paper NNCR form.
+    public class NncrChecklistOption
+    {
+        public string Label { get; set; }
+        public string Hint { get; set; }
+        public string[] Keys { get; set; }
+        public bool HasDetail { get; set; }
+        public bool Checked { get; set; }
+        public List<string> Details { get; } = new List<string>();
+    }
+
+    // Splits a "; "-separated checklist ("Label" or "Label: detail") onto the fixed options.
+    // Entries that match no option are put under the last option ("Others").
+    public static List<NncrChecklistOption> BuildChecklist(string raw, List<NncrChecklistOption> options)
+    {
+        var entries = (raw ?? string.Empty)
+            .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim())
+            .Where(s => s.Length > 0);
+
+        foreach (var entry in entries)
+        {
+            int colon = entry.IndexOf(':');
+            string label = colon < 0 ? entry : entry.Substring(0, colon).Trim();
+            string detail = colon < 0 ? string.Empty : entry.Substring(colon + 1).Trim();
+            string key = label.ToLowerInvariant();
+
+            var match = options.FirstOrDefault(o => o.Keys.Any(k => key.Contains(k)));
+            if (match == null)
+            {
+                match = options.Last();
+                detail = entry;
+            }
+
+            match.Checked = true;
+            if (!string.IsNullOrWhiteSpace(detail)) match.Details.Add(detail);
+        }
+        return options;
+    }
+
+    public static string FormatDate(DateTime? value)
+    {
+        return value.HasValue && value.Value.Year > 1900 ? value.Value.ToString("MMM dd, yyyy") : string.Empty;
+    }
+}
+@{
+    var typeOptions = BuildChecklist(Model.NonconformanceType, new List<NncrChecklistOption>
+    {
+        new NncrChecklistOption { Label = "Quality Issues", Hint = "(thawing, foul odor, slimy texture, discoloration, dirty, etc.)", Keys = new[] { "quality" } },
+        new NncrChecklistOption { Label = "Damage items", Keys = new[] { "damage" } },
+        new NncrChecklistOption { Label = "Expired items", Keys = new[] { "expire" } },
+        new NncrChecklistOption { Label = "Presence of pest/molds", Keys = new[] { "pest", "mold" } },
+        new NncrChecklistOption { Label = "Others", Keys = new[] { "other" }, HasDetail = true }
+    });
+
+    var interceptionOptions = BuildChecklist(Model.NonconformanceInterception, new List<NncrChecklistOption>
+    {
+        new NncrChecklistOption { Label = "Receiving", Keys = new[] { "receiv" }, HasDetail = true },
+        new NncrChecklistOption { Label = "Storage", Keys = new[] { "storag" }, HasDetail = true },
+        new NncrChecklistOption { Label = "Dispatch", Keys = new[] { "dispatch" }, HasDetail = true },
+        new NncrChecklistOption { Label = "Others", Keys = new[] { "other" }, HasDetail = true }
+    });
+
+    string dueValue = FormatDate(Model.DueDate) + (string.IsNullOrEmpty(Model.DueText) ? "" : " (" + Model.DueText + ")");
+    string attachmentUrl = Url.Action("NncrAttachment", "Nncr");
+}
+
+<div class="card mb-3 nncr-section-card">
+    <div class="card-header bg-white fw-semibold nncr-section-header">
+        <span class="nncr-step-num">1</span>
+        <span>Report Information</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">NNCR No.</label>
+                <input type="text" class="form-control readonly-field font-mono" value="@Model.ReportNumber" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Status</label>
+                <input type="text" class="form-control readonly-field" value="@Model.StatusLabel" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Date of Incident</label>
+                <input type="text" class="form-control readonly-field font-mono" value="@FormatDate(Model.DateOfIncident)" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Date Filed</label>
+                <input type="text" class="form-control readonly-field font-mono" value="@FormatDate(Model.DateFiled)" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Response Due</label>
+                <input type="text" class="form-control readonly-field font-mono @(Model.IsOverdue ? "nncr-overdue-field" : "")" value="@dueValue" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Issued By</label>
+                <input type="text" class="form-control readonly-field" value="@Model.IssuedByName" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Issued To (Supplier)</label>
+                <input type="text" class="form-control readonly-field" value="@Model.SupplierName" readonly>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
+                <input type="text" class="form-control readonly-field" value="@Model.SiteWarehouseName" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3 nncr-section-card">
+    <div class="card-header bg-white fw-semibold nncr-section-header">
+        <span class="nncr-step-num">2</span>
+        <span>Non-conformance</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-label small text-uppercase text-secondary">Type of Non-conformance</div>
+                <ul class="nncr-checklist">
+                    @foreach (var option in typeOptions)
+                    {
+                        <li class="nncr-check @(option.Checked ? "is-checked" : "")">
+                            <span class="nncr-check-box" aria-hidden="true"></span>
+                            <span class="nncr-check-text">
+                                <span class="nncr-check-label">@(option.HasDetail ? option.Label + ":" : option.Label)</span>
+                                @if (!string.IsNullOrEmpty(option.Hint))
+                                {
+                                    <span class="nncr-check-hint">@option.Hint</span>
+                                }
+                                @if (option.HasDetail)
+                                {
+                                    <span class="nncr-check-detail @(option.Details.Count == 0 ? "is-blank" : "")">@(string.Join("; ", option.Details))</span>
+                                }
+                                @if (option.Checked)
+                                {
+                                    <span class="visually-hidden">(selected)</span>
+                                }
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <div class="form-label small text-uppercase text-secondary">Non-conformance Interception</div>
+                <ul class="nncr-checklist">
+                    @foreach (var option in interceptionOptions)
+                    {
+                        <li class="nncr-check @(option.Checked ? "is-checked" : "")">
+                            <span class="nncr-check-box" aria-hidden="true"></span>
+                            <span class="nncr-check-text">
+                                <span class="nncr-check-label">@option.Label:</span>
+                                <span class="nncr-check-detail @(option.Details.Count == 0 ? "is-blank" : "")">@(string.Join("; ", option.Details))</span>
+                                @if (option.Checked)
+                                {
+                                    <span class="visually-hidden">(selected)</span>
+                                }
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3 nncr-section-card">
+    <div class="card-header bg-white fw-semibold nncr-section-header">
+        <span class="nncr-step-num">3</span>
+        <span>Details of the Non-conformance</span>
+    </div>
+    <div class="card-body">
+        <div class="form-control readonly-field nncr-readonly-block">@Model.DetailsOfNonconformance</div>
+    </div>
+</div>
+
+<div class="card mb-3 nncr-section-card">
+    <div class="card-header bg-white fw-semibold nncr-section-header">
+        <span class="nncr-step-num">4</span>
+        <span>Action Taken by LLII-QA</span>
+    </div>
+    <div class="card-body">
+        <label class="form-label small text-uppercase text-secondary">QA Remarks</label>
+        @if (string.IsNullOrWhiteSpace(Model.QARemarks))
+        {
+            <div class="text-secondary fst-italic small">No QA remarks recorded.</div>
+        }
+        else
+        {
+            <div class="form-control readonly-field nncr-readonly-block">@Model.QARemarks</div>
+        }
+    </div>
+</div>
+
+<div class="card mb-3 nncr-section-card">
+    <div class="card-header bg-white fw-semibold nncr-section-header">
+        <span class="nncr-step-num">5</span>
+        <span>Attachments</span>
+    </div>
+    <div class="card-body">
+        @if (Model.Attachments == null || Model.Attachments.Count == 0)
+        {
+            <div class="text-secondary fst-italic small">No attachments.</div>
+        }
+        else
+        {
+            <ul class="list-unstyled mb-0 nncr-attachment-list">
+                @foreach (var file in Model.Attachments)
+                {
+                    string href = attachmentUrl + "?token=" + Url.Encode(Model.ResponseToken) + "&file=" + Url.Encode(file.FileName);
+                    <li class="nncr-attachment">
+                        @if (file.IsImage)
+                        {
+                            <a href="@href" target="_blank" rel="noopener" class="nncr-attachment-thumb">
+                                <img src="@href" alt="@file.FileName" loading="lazy">
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="nncr-attachment-icon" aria-hidden="true"><i class="bi bi-file-earmark"></i></span>
+                        }
+                        <a href="@href" target="_blank" rel="noopener" class="nncr-attachment-name">@file.FileName</a>
+                        <span class="small text-secondary text-nowrap">@(file.Size < 1024 * 1024 ? (file.Size / 1024.0).ToString("0.#") + " KB" : (file.Size / (1024.0 * 1024)).ToString("0.#") + " MB")</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

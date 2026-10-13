@@ -1,0 +1,31 @@
+/* NNCR Response page (supplier-facing). Shared theme, cards and checklists live in nncr-details.css. */
+#responseForm .form-control:focus,
+#responseForm .form-select:focus {
+    border-color: #b9757b;
+    box-shadow: 0 0 0 .2rem rgba(125, 31, 39, .15);
+}
+
+.nncr-deadline-note {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    background: #fff8e1;
+    border: 1px solid #f3dc8f;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: .85rem;
+    color: #5c4a12;
+}
+
+.nncr-thankyou-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #e6f1e8;
+    color: #3f6b46;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
