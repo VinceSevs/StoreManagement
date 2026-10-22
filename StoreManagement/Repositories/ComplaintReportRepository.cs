@@ -44,6 +44,8 @@ namespace StoreManagement.Repositories
             using (SqlCommand cmd = new SqlCommand("sp_SO_PCRList", conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
+                // sp_SO_PCRList is slow (row-multiplying joins, no indexes); the default 30 s times out.
+                cmd.CommandTimeout = 300;
                 conn.Open();
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {

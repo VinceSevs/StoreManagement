@@ -1,0 +1,499 @@
+/* =========================================
+   COMPLAINTS (Product Complaint Report + Non-Conformance Report)
+   Shared by Views/ComplaintReport and Views/Ncr. Builds on main.css;
+   only what main.css doesn't cover lives here.
+   ========================================= */
+
+
+/* =========================================
+   LIST: TOOLBAR FILTERS
+   ========================================= */
+
+/* Date range: a caption beside a date input, one box per date */
+.complaints-date {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 6px;
+}
+
+.complaints-date-label {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.complaints-date .form-control {
+    width: 140px;
+    max-width: none;
+    height: 40px;
+    border-color: #d9d9d9;
+    border-radius: 5px;
+    box-shadow: none;
+    color: #555555;
+    font-size: 13px;
+}
+
+    .complaints-date .form-control:focus {
+        border-color: var(--main-red);
+        box-shadow: 0 0 0 2px var(--main-red-bg-tint);
+    }
+
+.btn.complaints-clear-btn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #555555;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+    .btn.complaints-clear-btn:hover,
+    .btn.complaints-clear-btn:focus {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .btn.complaints-clear-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .btn.complaints-clear-btn i {
+        margin-right: 5px;
+    }
+
+.complaints-result-count {
+    flex: 0 0 auto;
+    color: #6b7280;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   LIST: TABLE
+   ========================================= */
+
+/* Sortable header: the whole cell is the click target (see index.js) */
+.complaints-table thead th[data-col] {
+    cursor: pointer;
+    user-select: none;
+}
+
+    .complaints-table thead th[data-col]:hover .th-label {
+        color: var(--main-red);
+    }
+
+.complaints-table .main-column-sort i {
+    font-size: 12px;
+}
+
+/* Action column holds a text button, not a single 32px icon */
+.complaints-table .main-actions-sticky {
+    width: auto;
+    white-space: nowrap;
+}
+
+.complaints-table.table tbody td.complaints-wrap {
+    min-width: 160px;
+    max-width: 320px;
+    white-space: normal;
+}
+
+
+/* =========================================
+   LIST: PAGINATION
+   ========================================= */
+
+.complaints-page-jump {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    color: #555555;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+    .complaints-page-jump .form-control {
+        width: 72px;
+        max-width: none;
+        height: 30px;
+        padding: 0 8px;
+        border-color: #d9d9d9;
+        border-radius: 4px;
+        box-shadow: none;
+        font-size: 12px;
+    }
+
+        .complaints-page-jump .form-control:focus {
+            border-color: var(--main-red);
+            box-shadow: 0 0 0 2px var(--main-red-bg-tint);
+        }
+
+.complaints-pagination-end {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    min-width: 0;
+}
+
+
+/* =========================================
+   DETAILS
+   ========================================= */
+
+.complaints-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+    .complaints-actions .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 38px;
+        padding: 0 14px;
+        font-size: 13px;
+    }
+
+/* White bordered section, same card as the list's toolbar / table */
+.complaints-card {
+    margin-bottom: 16px;
+    padding: 16px 20px 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+    .complaints-card > .main-view-card-header .main-badge {
+        flex: 0 0 auto;
+    }
+
+    .complaints-card .main-view-fields + .main-view-fields,
+    .complaints-card .main-view-fields + .complaints-items,
+    .complaints-card .complaints-items + .main-form-group {
+        margin-top: 16px;
+    }
+
+    .complaints-card .main-form-group:last-child {
+        margin-bottom: 0;
+    }
+
+/* Longer read-only text (Particulars, message) keeps its line breaks */
+.complaints-card .main-view-field dd.is-multiline {
+    white-space: pre-wrap;
+}
+
+/* Items table inside a card: long descriptions wrap */
+.complaints-items.main-list-table-wrapper {
+    box-shadow: none;
+}
+
+.complaints-items .main-list-table tbody td {
+    white-space: normal;
+}
+
+.complaints-items .main-list-table.table thead th {
+    white-space: nowrap;
+}
+
+/* Read-only findings: the form's grey well, taller than a single line */
+textarea.form-control.complaints-findings-readonly {
+    min-height: 140px;
+    background: #f7f8fa;
+    color: #222222;
+    cursor: default;
+}
+
+textarea.form-control.complaints-findings-input {
+    min-height: 110px;
+}
+
+.complaints-print-text {
+    display: none;
+}
+
+/* Remarks / findings panels: status on the left, findings on the right */
+.complaints-remarks {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 20px;
+}
+
+.complaints-remarks-side {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #f0f1f3;
+    border-radius: 6px;
+    background: #f7f8fa;
+}
+
+    .complaints-remarks-side > .main-badge + .main-view-field,
+    .complaints-remarks-side .main-form-group {
+        margin-top: 14px;
+    }
+
+    .complaints-remarks-side .main-form-group {
+        margin-bottom: 0;
+    }
+
+.complaints-remarks-main {
+    min-width: 0;
+}
+
+    .complaints-remarks-main .main-form-group {
+        margin-bottom: 0;
+    }
+
+        .complaints-remarks-main .main-form-group + .main-form-group {
+            margin-top: 16px;
+        }
+
+    .complaints-remarks-main .btn.main-form-save-btn {
+        margin-top: 12px;
+    }
+
+
+/* =========================================
+   DETAILS: ATTACHMENTS
+   ========================================= */
+
+.complaints-attachment {
+    height: 100%;
+    padding: 12px;
+    border: 1px solid #f0f1f3;
+    border-radius: 6px;
+    background: #f7f8fa;
+    text-align: center;
+}
+
+.complaints-attachment-label {
+    margin: 0 0 8px;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.complaints-attachment-file {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 5px;
+}
+
+.complaints-attachment-embed {
+    width: 100%;
+    height: 220px;
+    border: 0;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.complaints-attachment-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 160px;
+    padding: 16px;
+    border: 1px dashed #e1e3e6;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #6b7280;
+    font-size: 12.5px;
+}
+
+    .complaints-attachment-placeholder > i {
+        color: #c2c4c7;
+        font-size: 28px;
+    }
+
+    .complaints-attachment-placeholder .btn.main-outline-btn {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+.complaints-attachment-note {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 991px) {
+
+    .complaints-remarks {
+        grid-template-columns: 200px minmax(0, 1fr);
+    }
+
+    .complaints-pagination-end {
+        flex: 1 1 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .complaints-date {
+        flex: 1 1 calc(50% - 8px);
+    }
+
+        .complaints-date .form-control {
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
+        }
+
+    .btn.complaints-clear-btn {
+        flex: 1 1 100%;
+    }
+
+    .complaints-result-count {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+
+    .complaints-remarks {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .complaints-card {
+        padding: 14px 14px 16px;
+    }
+
+    .complaints-actions {
+        justify-content: stretch;
+    }
+
+        .complaints-actions .btn {
+            flex: 1 1 auto;
+        }
+}
+
+@media (max-width: 480px) {
+
+    .complaints-date {
+        flex: 1 1 100%;
+    }
+
+    .complaints-page-jump {
+        flex: 1 1 100%;
+        justify-content: flex-end;
+    }
+}
+
+
+/* =========================================
+   PRINT (Details > Print button)
+   ========================================= */
+
+@media print {
+
+    @page {
+        margin: 10mm;
+    }
+
+    body {
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .sidebar,
+    .sidebar-overlay,
+    .top-header,
+    .no-print,
+    .main-hero-back {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        background: #ffffff !important;
+    }
+
+    .page-content,
+    .main-list-page {
+        padding: 0 !important;
+    }
+
+    .main-hero {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        border: 1px solid #e1e1e1;
+        background: #ffffff;
+        break-inside: avoid;
+    }
+
+    .main-hero-bg,
+    .main-hero-gradient {
+        display: none !important;
+    }
+
+    .main-hero.is-record .main-hero-content {
+        width: 100%;
+        min-height: 0;
+        padding: 12px 16px;
+    }
+
+    .complaints-card {
+        box-shadow: none !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .complaints-card .main-view-field dd,
+    .complaints-remarks-side {
+        background: #f7f8fa !important;
+    }
+
+    textarea.complaints-findings-readonly {
+        display: none !important;
+    }
+
+    .complaints-print-text {
+        display: block !important;
+        min-height: 50px;
+        padding: 9px 12px;
+        border: 1px solid #e1e1e1;
+        border-radius: 5px;
+        background: #f7f8fa;
+        font-size: 12.5px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .table-responsive {
+        overflow: visible !important;
+    }
+
+    .complaints-remarks {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .complaints-attachment {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}

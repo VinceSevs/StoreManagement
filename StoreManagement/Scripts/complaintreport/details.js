@@ -2,9 +2,9 @@
 
     function insertPrintTextBlocks() {
         pcrPrintTextNodes = [];
-        document.querySelectorAll('textarea.pcr-findings-readonly').forEach(function (ta) {
+        document.querySelectorAll('textarea.complaints-findings-readonly').forEach(function (ta) {
             var div = document.createElement('div');
-            div.className = 'pcr-print-text';
+            div.className = 'complaints-print-text';
             div.textContent = ta.value;
             ta.insertAdjacentElement('afterend', div);
             pcrPrintTextNodes.push(div);

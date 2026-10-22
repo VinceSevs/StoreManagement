@@ -4,58 +4,161 @@
     ViewBag.Title = "Product Complaint Report";
 }*@
 
-<link href="~/Content/complaintreport/index.css" rel="stylesheet" />
+<link href="~/Content/complaints/complaints.css" rel="stylesheet" />
 
-<div class="lead-page-header">
-    <div class="lead-page-icon"><i class="bi bi-file-earmark-text"></i></div>
-    <div>
-        <div class="lead-eyebrow">Complaint Report</div>
-        <h1>Product Complaint Report</h1>
-    </div>
-</div>
+<div class="main-list-page">
 
-<div class="card shadow-sm pcr-filter-card mb-3">
-    <div class="card-body">
-        <div class="row g-3 align-items-end">
-            <div class="col-lg-4 col-md-6">
-                <label class="pcr-filter-label" for="pcrSearch">Search</label>
-                <input type="text" id="pcrSearch" class="form-control lead-search" placeholder="PCR No., store, item, vendor..." autocomplete="off" />
+    <!-- =========================================
+         PRODUCT COMPLAINT HERO BANNER
+         ========================================= -->
+
+    <div class="main-hero">
+
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="Product complaints" />
+
+        <div class="main-hero-gradient"></div>
+
+        <div class="main-hero-content">
+
+            <div class="main-hero-eyebrow">
+                COMPLAINTS
             </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="pcr-filter-label" for="pcrStatusFilter">Status</label>
-                <select id="pcrStatusFilter" class="form-select">
-                    <option value="">All Statuses</option>
-                    <option value="1">Transmitted</option>
-                    <option value="2">Closed</option>
-                    <option value="3">Re-opened</option>
-                    @*<option value="4">Valid</option>
-                    <option value="5">Invalid</option>
-                    <option value="6">For Further Investigation</option>
-                    <option value="7">Revalidated</option>
-                    <option value="8">Lead Responsibility</option>
-                    <option value="9">GADC Responsibility</option>
-                    <option value="10">AutoValid</option>
-                    <option value="11">Cancelled</option>*@
-                </select>
+
+            <h2 class="main-hero-heading">
+                Product Complaint Report
+            </h2>
+
+            <p class="main-hero-description">
+                Track complaints on delivered products and follow vendor, QA and GADC findings through resolution.
+            </p>
+
+            <div class="main-hero-features">
+
+                <div class="main-hero-feature">
+
+                    <div class="main-hero-feature-icon">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Product Issues</div>
+                        <div class="main-hero-feature-desc">Review defects and quality concerns</div>
+                    </div>
+
+                </div>
+
+                <div class="main-hero-feature">
+
+                    <div class="main-hero-feature-icon">
+                        <i class="fa fa-truck"></i>
+                    </div>
+
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Vendor Response</div>
+                        <div class="main-hero-feature-desc">Check vendor remarks and findings</div>
+                    </div>
+
+                </div>
+
+                <div class="main-hero-feature">
+
+                    <div class="main-hero-feature-icon">
+                        <i class="fa fa-check-circle"></i>
+                    </div>
+
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">QA Resolution</div>
+                        <div class="main-hero-feature-desc">Close complaints with QA findings</div>
+                    </div>
+
+                </div>
+
             </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="pcr-filter-label" for="pcrDateFrom">Date From</label>
-                <input type="date" id="pcrDateFrom" class="form-control" />
-            </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="pcr-filter-label" for="pcrDateTo">Date To</label>
-                <input type="date" id="pcrDateTo" class="form-control" />
-            </div>
-            <div class="col-lg-2 col-md-12">
-                <button type="button" id="pcrClearFilters" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-x-circle"></i> Clear Filters
-                </button>
-            </div>
+
         </div>
-    </div>
-</div>
 
-@Html.Partial("~/Views/ComplaintReport/_PartialView/_IndexTable.cshtml", Model)
+    </div>
+
+
+    <!-- =========================================
+         SEARCH / FILTER
+         ========================================= -->
+
+    <div class="main-list-toolbar">
+
+        <div class="main-list-search">
+
+            <div class="input-group">
+
+                <input type="text"
+                       id="pcrSearch"
+                       class="form-control"
+                       placeholder="Search PCR No., store, item, vendor..."
+                       autocomplete="off" />
+
+                <span class="input-group-btn">
+
+                    <button type="button"
+                            id="pcrSearchBtn"
+                            class="btn main-list-search-btn"
+                            title="Search">
+
+                        <i class="fa fa-search"></i>
+
+                        <span class="main-list-search-btn-text">Search</span>
+
+                    </button>
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="main-list-status">
+            <select id="pcrStatusFilter" class="form-control" aria-label="Status">
+                <option value="">All Statuses</option>
+                <option value="1">Transmitted</option>
+                <option value="2">Closed</option>
+                <option value="3">Re-opened</option>
+                @*<option value="4">Valid</option>
+                <option value="5">Invalid</option>
+                <option value="6">For Further Investigation</option>
+                <option value="7">Revalidated</option>
+                <option value="8">Lead Responsibility</option>
+                <option value="9">GADC Responsibility</option>
+                <option value="10">AutoValid</option>
+                <option value="11">Cancelled</option>*@
+            </select>
+        </div>
+
+        <div class="complaints-date">
+            <label class="complaints-date-label" for="pcrDateFrom">From</label>
+            <input type="date" id="pcrDateFrom" class="form-control" />
+        </div>
+
+        <div class="complaints-date">
+            <label class="complaints-date-label" for="pcrDateTo">To</label>
+            <input type="date" id="pcrDateTo" class="form-control" />
+        </div>
+
+        <button type="button" id="pcrClearFilters" class="btn complaints-clear-btn">
+            <i class="fa fa-times-circle-o"></i>Clear Filters
+        </button>
+
+        <span class="complaints-result-count" id="pcrResultCount"></span>
+
+        <button type="button" id="pcrExportBtn" class="btn main-list-add-btn" title="Export to Excel">
+            <i class="fa fa-file-excel-o"></i><span class="main-list-add-btn-text">Export to Excel</span>
+        </button>
+
+    </div>
+
+    @Html.Partial("~/Views/ComplaintReport/_PartialView/_IndexTable.cshtml", Model)
+
+</div>
 
 <script src="~/Scripts/jquery-3.7.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

@@ -12,13 +12,13 @@
 
 <!-- ================ COMPLAINT REPORT SECTION ================ -->
 <div class="dash-section" data-section="complaint" id="complaintSection">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-        <div class="dash-section-title mb-0">
-            <span class="icon-chip"><i class="bi bi-file-earmark-text"></i></span> Complaint Report
-        </div>
-        <div>
-            <label class="small fw-semibold text-secondary d-block mb-1" for="complaintScopeSelect">Scope</label>
-            <select id="complaintScopeSelect" class="form-select form-select-sm dash-scope-select">
+    <div class="dash-section-head">
+        <h3 class="dash-section-title">
+            <span class="dash-section-icon"><i class="fa fa-file-text-o"></i></span> Complaint Report
+        </h3>
+        <div class="dash-scope">
+            <label class="dash-toolbar-label" for="complaintScopeSelect">Scope</label>
+            <select id="complaintScopeSelect" class="form-select">
                 <option value="all">All (PCR + NCR)</option>
                 <option value="pcr">PCR Only</option>
                 <option value="ncr">NCR Only</option>
@@ -26,46 +26,58 @@
         </div>
     </div>
 
-    <div class="mb-3">
-        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="dash-mini-pill" title="View all PCR records">
-            <i class="bi bi-file-earmark-text"></i> PCR: @Model.PcrTotal
+    <div class="dash-pills">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="dash-pill" title="View all PCR records">
+            <i class="fa fa-file-text-o"></i> PCR: @Model.PcrTotal
         </a>
-        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="dash-mini-pill" title="View all NCR records">
-            <i class="bi bi-exclamation-diamond"></i> NCR: @Model.NcrTotal
+        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="dash-pill" title="View all NCR records">
+            <i class="fa fa-exclamation-triangle"></i> NCR: @Model.NcrTotal
         </a>
     </div>
 
-    <div class="dash-stat-row">
-        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" id="complaintTotalLink" class="dash-stat-card" style="--accent:#7d1f27;" title="View records">
-            <div class="dash-stat-value" id="complaintTotalValue">@Model.ComplaintStats.Total</div>
-            <div class="dash-stat-label">Total</div>
-            <div class="dash-stat-delta" id="complaintTotalDelta"></div>
+    <div class="dash-kpi-grid">
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" id="complaintTotalLink" class="dash-kpi" title="View records">
+            <span class="dash-kpi-icon"><i class="fa fa-file-text-o"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value" id="complaintTotalValue">@Model.ComplaintStats.Total</div>
+                <div class="dash-kpi-label">Total</div>
+                <div class="dash-kpi-delta" id="complaintTotalDelta"></div>
+            </div>
         </a>
-        <div class="dash-stat-card" style="--accent:#c07a00;">
-            <div class="dash-stat-value" id="complaintOpenValue">@Model.ComplaintStats.Open</div>
-            <div class="dash-stat-label">Open / Ongoing</div>
+        <div class="dash-kpi is-warning">
+            <span class="dash-kpi-icon"><i class="fa fa-clock-o"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value" id="complaintOpenValue">@Model.ComplaintStats.Open</div>
+                <div class="dash-kpi-label">Open / Ongoing</div>
+            </div>
         </div>
-        <div class="dash-stat-card" style="--accent:#2f6b46;">
-            <div class="dash-stat-value" id="complaintClosedValue">@Model.ComplaintStats.Closed</div>
-            <div class="dash-stat-label">Closed</div>
+        <div class="dash-kpi is-success">
+            <span class="dash-kpi-icon"><i class="fa fa-check-circle-o"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value" id="complaintClosedValue">@Model.ComplaintStats.Closed</div>
+                <div class="dash-kpi-label">Closed</div>
+            </div>
         </div>
-        <div class="dash-stat-card" style="--accent:#8f7d7b;">
-            <div class="dash-stat-value" id="complaintCancelledValue">@Model.ComplaintStats.Cancelled</div>
-            <div class="dash-stat-label">Cancelled / Invalid</div>
+        <div class="dash-kpi is-neutral">
+            <span class="dash-kpi-icon"><i class="fa fa-ban"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value" id="complaintCancelledValue">@Model.ComplaintStats.Cancelled</div>
+                <div class="dash-kpi-label">Cancelled / Invalid</div>
+            </div>
         </div>
     </div>
 
     <div class="row g-3">
         <div class="col-lg-4">
             <div class="dash-card">
-                <h6>Status Breakdown</h6>
+                <h4 class="dash-card-title">Status Breakdown</h4>
                 @if (Model.ComplaintStats.Total == 0)
                 {
                     <div class="dash-empty">No PCR/NCR records yet.</div>
                 }
                 else
                 {
-                    <div class="dash-summary" id="complaintStatusSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-summary" id="complaintStatusSummary"><i class="fa fa-lightbulb-o"></i><span></span></div>
                     <div class="dash-chart-wrap"><canvas id="complaintStatusChart"></canvas></div>
                     <table class="table dash-data-table mb-0">
                         <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
@@ -80,32 +92,34 @@
         </div>
         <div class="col-lg-8">
             <div class="dash-card">
-                <h6 id="complaintTrendTitle">PCR + NCR Filed Over Time</h6>
+                <h4 class="dash-card-title" id="complaintTrendTitle">PCR + NCR Filed Over Time</h4>
                 @if (Model.ComplaintStats.Total == 0)
                 {
                     <div class="dash-empty">No PCR/NCR records yet.</div>
                 }
                 else
                 {
-                    <div class="dash-summary" id="complaintTrendSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-summary" id="complaintTrendSummary"><i class="fa fa-lightbulb-o"></i><span></span></div>
                     <div class="dash-chart-wrap"><canvas id="complaintTrendChart"></canvas></div>
-                    <table class="table dash-data-table mb-0">
-                        <thead id="complaintTrendHead"></thead>
-                        <tbody id="complaintTrendBody"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table dash-data-table mb-0">
+                            <thead id="complaintTrendHead"></thead>
+                            <tbody id="complaintTrendBody"></tbody>
+                        </table>
+                    </div>
                 }
             </div>
         </div>
         <div class="col-12" id="pcrVsNcrCard">
             <div class="dash-card">
-                <h6>PCR vs NCR by Status</h6>
+                <h4 class="dash-card-title">PCR vs NCR by Status</h4>
                 @if (Model.PcrTotal == 0 && Model.NcrTotal == 0)
                 {
                     <div class="dash-empty">No PCR/NCR records yet.</div>
                 }
                 else
                 {
-                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@pcrVsNcrSummary</span></div>
+                    <div class="dash-summary"><i class="fa fa-lightbulb-o"></i><span>@pcrVsNcrSummary</span></div>
                     <div class="dash-chart-wrap dash-chart-tall"><canvas id="pcrVsNcrChart"></canvas></div>
                     <table class="table dash-data-table mb-0">
                         <thead><tr><th>Status</th><th class="text-end">PCR</th><th class="text-end">NCR</th></tr></thead>
@@ -121,11 +135,11 @@
     </div>
 
     <div class="dash-view-all">
-        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="btn btn-outline-primary btn-sm">
-            View All PCR Records <i class="bi bi-arrow-right"></i>
+        <a href="@Url.Action("Index", "ComplaintReport")" target="_blank" class="btn dash-view-all-btn">
+            View All PCR Records <i class="fa fa-arrow-right"></i>
         </a>
-        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="btn btn-outline-primary btn-sm">
-            View All NCR Records <i class="bi bi-arrow-right"></i>
+        <a href="@Url.Action("Index", "Ncr")" target="_blank" class="btn dash-view-all-btn">
+            View All NCR Records <i class="fa fa-arrow-right"></i>
         </a>
     </div>
 </div>

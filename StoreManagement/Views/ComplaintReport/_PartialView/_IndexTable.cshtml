@@ -1,30 +1,67 @@
 @model IEnumerable<StoreManagement.Models.Pcr>
 
-<div class="card shadow-sm pcr-list-card mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <span class="fw-semibold text-secondary small text-uppercase" style="letter-spacing:.04em"></span>
-        <div class="d-flex align-items-center gap-2">
-            <span class="small text-secondary" id="pcrResultCount"></span>
-            <button type="button" id="pcrExportBtn" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-file-earmark-excel"></i> Export to Excel
-            </button>
-        </div>
-    </div>
+<div class="main-list-table-wrapper">
 
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 lead-table" id="pcrTable">
+
+        <table class="table main-list-table complaints-table" id="pcrTable">
             <thead>
                 <tr>
-                    <th class="pcr-sortable" data-col="0">Status <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="1">Create Date <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="2">PCR No. <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="3">Store Name <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="4">Item <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="5">Complaint Issue <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="6">Vendor <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="7">Vendor Remarks <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="pcr-sortable" data-col="8">QA Remarks <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                    <th class="text-end">Action</th>
+                    <th class="pcr-sortable" data-col="0">
+                        <div class="th-content">
+                            <span class="th-label">STATUS</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Status"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="1">
+                        <div class="th-content">
+                            <span class="th-label">CREATE DATE</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Create Date"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="2">
+                        <div class="th-content">
+                            <span class="th-label">PCR NO.</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by PCR No."><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="3">
+                        <div class="th-content">
+                            <span class="th-label">STORE NAME</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Store Name"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="4">
+                        <div class="th-content">
+                            <span class="th-label">ITEM</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Item"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="5">
+                        <div class="th-content">
+                            <span class="th-label">COMPLAINT ISSUE</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Complaint Issue"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="6">
+                        <div class="th-content">
+                            <span class="th-label">VENDOR</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Vendor"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="7">
+                        <div class="th-content">
+                            <span class="th-label">VENDOR REMARKS</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Vendor Remarks"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="pcr-sortable" data-col="8">
+                        <div class="th-content">
+                            <span class="th-label">QA REMARKS</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by QA Remarks"><i class="fa fa-sort sort-icon" aria-hidden="true"></i></button>
+                        </div>
+                    </th>
+                    <th class="main-actions-sticky">ACTION</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,49 +71,84 @@
                     <tr class="pcr-row" data-status="@filterStatus" data-date="@item.DateCreated.ToString("yyyy-MM-dd")">
                         <td>
                             @{
-                                string badgeClass = "bg-info";
+                                string badgeClass = "is-info";
                                 string badgeText = "TRANSMITTED";
                                 switch (item.PcrStatus)
                                 {
-                                    case 2: badgeClass = "bg-primary"; badgeText = "CLOSED"; break;
-                                    case 3: badgeClass = "bg-info"; badgeText = "RE-OPENED"; break;
-                                        //case 4: badgeClass = "bg-primary"; badgeText = "VALID"; break;
-                                        //case 5: badgeClass = "bg-danger"; badgeText = "INVALID"; break;
-                                        //case 6: badgeClass = "bg-danger"; badgeText = "FOR FURTHER INVESTIGATION"; break;
-                                        //case 7: badgeClass = "bg-danger"; badgeText = "REVALIDATED"; break;
-                                        //case 8: badgeClass = "bg-danger"; badgeText = "LEAD RESPONSIBILITY"; break;
-                                        //case 9: badgeClass = "bg-danger"; badgeText = "GADC RESPONSIBILITY"; break;
-                                        //case 10: badgeClass = "bg-danger"; badgeText = "AUTOVALID"; break;
-                                        //case 11: badgeClass = "bg-secondary"; badgeText = "CANCELLED"; break;
+                                    case 2: badgeClass = "is-success"; badgeText = "CLOSED"; break;
+                                    case 3: badgeClass = "is-warning"; badgeText = "RE-OPENED"; break;
+                                        //case 4: badgeClass = "is-success"; badgeText = "VALID"; break;
+                                        //case 5: badgeClass = "is-brand"; badgeText = "INVALID"; break;
+                                        //case 6: badgeClass = "is-warning"; badgeText = "FOR FURTHER INVESTIGATION"; break;
+                                        //case 7: badgeClass = "is-info"; badgeText = "REVALIDATED"; break;
+                                        //case 8: badgeClass = "is-success"; badgeText = "LEAD RESPONSIBILITY"; break;
+                                        //case 9: badgeClass = "is-success"; badgeText = "GADC RESPONSIBILITY"; break;
+                                        //case 10: badgeClass = "is-success"; badgeText = "AUTOVALID"; break;
+                                        //case 11: badgeClass = ""; badgeText = "CANCELLED"; break;
                                 }
                             }
-                            <span class="badge @badgeClass">@badgeText</span>
+                            <span class="main-badge @badgeClass">@badgeText</span>
                         </td>
                         <td>@item.DateCreated.ToString("MMM dd yyyy")</td>
-                        <td class="font-mono fw-semibold" style="color:var(--lead-primary)">@item.PcrNumber</td>
+                        <td><span class="main-chip">@item.PcrNumber</span></td>
                         <td>@item.StoreName</td>
                         <td>@item.ItemID</td>
-                        <td>@item.ComplaintIssueDesc</td>
+                        <td class="complaints-wrap">@item.ComplaintIssueDesc</td>
                         <td>@item.VendorName</td>
-                        <td>@item.SupplierRemarksDesc</td>
-                        <td>@item.QARemarksDesc</td>
-                        <td class="text-end">
+                        <td class="complaints-wrap">@item.SupplierRemarksDesc</td>
+                        <td class="complaints-wrap">@item.QARemarksDesc</td>
+                        <td class="main-actions-sticky">
                             <a href="@Url.Action("Details", "ComplaintReport", new { docId = item.DocID })" class="btn btn-primary btn-sm">View</a>
                         </td>
                     </tr>
                 }
+                <tr class="main-empty-row" id="pcrEmptyRow" hidden>
+                    <td colspan="10">
+                        <div class="main-empty-state">
+                            <div class="main-empty-state-icon"><i class="fa fa-search"></i></div>
+                            <div class="main-empty-state-title">No complaint reports found</div>
+                            <div class="main-empty-state-text">Try a different search or clear the filters.</div>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
+
     </div>
 
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 mt-2 border-top">
-        <span class="small text-secondary" id="pcrPageInfo"></span>
-        <div class="d-flex align-items-center flex-wrap gap-2">
-            <ul class="pagination pagination-sm mb-0" id="pcrPagination"></ul>
-            <div class="input-group input-group-sm" style="width:150px;">
-                <input type="number" min="1" class="form-control" id="pcrPageJumpInput" placeholder="Page #">
-                <button class="btn btn-outline-primary" type="button" id="pcrPageJumpBtn">Go</button>
-            </div>
-        </div>
+</div>
+
+<div class="main-list-pagination">
+
+    <div class="main-pagination-size">
+        <span>Show</span>
+
+        <select id="pcrPageSize" class="form-control" aria-label="Rows per page">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+
+        <span class="main-pagination-entries">entries</span>
     </div>
+
+    <div class="main-pagination-summary" id="pcrPageInfo">
+        Showing 0 entries
+    </div>
+
+    <div class="complaints-pagination-end">
+
+        <div class="main-pagination-controls" id="pcrPagination">
+            <!-- Rendered by index.js -->
+        </div>
+
+        <div class="complaints-page-jump">
+            <span>Go to</span>
+            <input type="number" min="1" class="form-control" id="pcrPageJumpInput" placeholder="Page #" aria-label="Page number">
+            <button class="btn main-pagination-btn" type="button" id="pcrPageJumpBtn">Go</button>
+        </div>
+
+    </div>
+
 </div>
