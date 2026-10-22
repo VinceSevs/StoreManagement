@@ -83,11 +83,11 @@ function printPalletTags() {
 	html2pdf().set(opt).from(container).save().then(() => {
 		container.remove();
 		btn.disabled = false;
-		btn.innerHTML = '<i class="bi bi-tags"></i> Print Pallet Tags';
+		btn.innerHTML = '<i class="fa fa-tags"></i> Print Pallet Tags';
 	}).catch((err) => {
 		container.remove();
 		btn.disabled = false;
-		btn.innerHTML = '<i class="bi bi-tags"></i> Print Pallet Tags';
+		btn.innerHTML = '<i class="fa fa-tags"></i> Print Pallet Tags';
 		console.error('Pallet tag PDF generation failed:', err);
 		alert('Could not generate PDF: ' + (err && err.message ? err.message : err));
 	});

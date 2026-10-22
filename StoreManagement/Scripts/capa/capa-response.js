@@ -1,20 +1,6 @@
 const RESPONSE_TOKEN = window.CAPA_RESPONSE_DATA.responseToken;
 const SUBMIT_ENDPOINT = window.CAPA_RESPONSE_DATA.submitEndpoint;
-const CLOSE_IF_OVERDUE_ENDPOINT = window.CAPA_RESPONSE_DATA.closeIfOverdueEndpoint;
 const ATTACHMENT_PHOTOS = window.CAPA_RESPONSE_DATA.attachmentPhotos;
-
-function markResponseClosed() {
-	const badge = document.getElementById('capaResponseStatusBadge');
-	if (badge) {
-		badge.textContent = 'Closed';
-		badge.className = 'badge bg-dark px-3 py-2';
-	}
-	const submitBtn = document.getElementById('submitBtn');
-	if (submitBtn) {
-		submitBtn.disabled = true;
-		submitBtn.textContent = 'Closed — Past Due';
-	}
-}
 
 let responseAttachments = [];
 let responseAttachIdSeq = 0;
@@ -100,16 +86,16 @@ function renderResponseAttachments() {
 	if (!grid) return;
 	grid.innerHTML = responseAttachments.map(a => `
 		<div class="col">
-			<div class="card response-attach-thumb h-100">
+			<div class="capa-attach-thumb">
 				<button type="button" class="btn-close" aria-label="Remove" onclick="removeResponseAttachment(${a.id})"></button>
 				${a.isImage
-					? `<img src="${a.dataUrl}" class="card-img-top" alt="Attachment">`
-					: `<div class="card-img-top d-flex flex-column align-items-center justify-content-center bg-light" style="aspect-ratio:4/3;">
-						   <span style="font-size:2rem;line-height:1;">${responseFileIconFor(a.fileName)}</span>
-						   <small class="text-secondary text-truncate px-2" style="max-width:90%;">${responseEscapeHtml(a.fileName)}</small>
+					? `<img src="${a.dataUrl}" alt="Attachment">`
+					: `<div class="capa-attach-file">
+						   <span class="capa-attach-ext">${responseFileIconFor(a.fileName)}</span>
+						   <small>${responseEscapeHtml(a.fileName)}</small>
 					   </div>`}
-				<div class="card-body p-2">
-					<input type="text" class="form-control form-control-sm" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" oninput="updateResponseCaption(${a.id}, this.value)">
+				<div class="capa-attach-caption">
+					<input type="text" class="form-control" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" oninput="updateResponseCaption(${a.id}, this.value)">
 				</div>
 			</div>
 		</div>
@@ -138,7 +124,7 @@ async function submitResponse() {
 			icon: 'warning',
 			title: 'Missing required fields',
 			html: '<ul style="text-align:left;margin:0;padding-left:1.2rem">' + missing.map(m => `<li>${m}</li>`).join('') + '</ul>',
-			confirmButtonColor: '#7d1f27'
+			confirmButtonColor: '#c60404'
 		});
 		return;
 	}
@@ -173,7 +159,7 @@ async function submitResponse() {
 				icon: 'success',
 				title: 'Response submitted',
 				text: 'Thank you — QA has been notified and will verify your response.',
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			}).then(() => {
 				location.reload();
 			});
@@ -182,18 +168,18 @@ async function submitResponse() {
 				icon: 'info',
 				title: 'Already submitted',
 				text: (result && result.message) || 'This CAPA has already been responded to.',
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			}).then(() => location.reload());
 		} else {
 			Swal.fire({
 				icon: 'error',
 				title: 'Could not submit',
 				text: (result && result.message) || `HTTP ${response.status}`,
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			});
 		}
 	} catch (err) {
-		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#7d1f27' });
+		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#c60404' });
 	} finally {
 		btn.disabled = false;
 		btn.textContent = 'Submit Response';

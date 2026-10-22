@@ -5,6 +5,42 @@ using Newtonsoft.Json;
 namespace IsseERP.Models
 
 {
+    // The LLII / Others classification box takes one or more email addresses.
+    // They are stored comma-separated with no spaces ("a@x.com,b@x.com"), which is the
+    // format .NET's MailMessage.To.Add(...) accepts directly.
+    public static class CapaEmailList
+    {
+        private static readonly System.Text.RegularExpressions.Regex EmailPattern =
+            new System.Text.RegularExpressions.Regex(@"^[^\s@;,<>]+@[^\s@;,<>]+\.[^\s@;,<>]+$");
+
+        // Splits on comma or semicolon, trims, drops blanks and case-insensitive duplicates.
+        // Returns the cleaned list joined with ","; anything that isn't a valid address goes to invalid.
+        public static string Normalize(string raw, out List<string> invalid)
+        {
+            invalid = new List<string>();
+            var valid = new List<string>();
+            if (string.IsNullOrWhiteSpace(raw)) return "";
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var part in raw.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string email = part.Trim();
+                if (email.Length == 0) continue;
+                if (!EmailPattern.IsMatch(email)) invalid.Add(email);
+                else if (seen.Add(email)) valid.Add(email);
+            }
+            return string.Join(",", valid);
+        }
+    }
+
+    public static class CapaStatuses
+    {
+        public const string AwaitingResponse = "Awaiting Response";
+        public const string AwaitingVerification = "Awaiting Verification";
+        public const string Closed = "Closed";
+        public const string Cancelled = "Cancelled";
+    }
+
     // Property names here match the SQL columns 1:1 on purpose, so the
     // repository can map straight across without any translation step.
     public class CapaReportModel
@@ -21,13 +57,50 @@ namespace IsseERP.Models
         public int SiteWarehouse { get; set; }
         public string SiteWarehouseName { get; set; } // display only, resolved via JOIN
         public string RefNo { get; set; }
+        // CARs have no due date. These columns stay on the model only because
+        // the shared tbl_QualityIncidentHdr (and NNCR, which reuses
+        // CorrectionDueDate) still has them; the CAR screens never set or show them.
         public DateTime? CorrectionDueDate { get; set; }
         public DateTime? ReportDueDate { get; set; }
 
-        // Workflow stage: Filed -> AwaitingResponse -> AwaitingVerification
-        // -> AwaitingEffectivenessCheck -> Closed (loops back to
-        // AwaitingResponse if the effectiveness check fails)
+        // Stored workflow stage: "Awaiting Response" -> "Awaiting Verification"
+        // -> "Closed" (back to "Awaiting Response" if the effectiveness check
+        // fails), or "Cancelled". See CapaStatuses.
         public string Status { get; set; }
+
+        // List/dashboard bucket: "response" | "verify" | "closed" | "cancelled".
+        // Uses the stored Status; rows from before status was stored (blank or
+        // "Filed") fall back to working it out from the filled-in fields.
+        [JsonIgnore]
+        public string StatusKey
+        {
+            get
+            {
+                if (string.Equals(Status, CapaStatuses.Cancelled, StringComparison.OrdinalIgnoreCase)) return "cancelled";
+                if (string.Equals(Status, CapaStatuses.Closed, StringComparison.OrdinalIgnoreCase)) return "closed";
+                if (string.Equals(Status, CapaStatuses.AwaitingVerification, StringComparison.OrdinalIgnoreCase)) return "verify";
+                if (string.Equals(Status, CapaStatuses.AwaitingResponse, StringComparison.OrdinalIgnoreCase)) return "response";
+
+                if (string.IsNullOrWhiteSpace(ImmediateAction)) return "response";
+                if (string.IsNullOrWhiteSpace(IaVerifiedBy) || string.IsNullOrWhiteSpace(CapaVerifiedBy)) return "verify";
+                return "closed";
+            }
+        }
+
+        [JsonIgnore]
+        public string StatusText
+        {
+            get
+            {
+                switch (StatusKey)
+                {
+                    case "cancelled": return CapaStatuses.Cancelled;
+                    case "verify": return CapaStatuses.AwaitingVerification;
+                    case "response": return CapaStatuses.AwaitingResponse;
+                    default: return CapaStatuses.Closed;
+                }
+            }
+        }
 
         // How many times this CAR has been sent back to Awaiting Response
         // after failing an effectiveness check. 0 the first time through.

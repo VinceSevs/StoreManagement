@@ -125,7 +125,7 @@ async function submitVerification() {
 			icon: 'warning',
 			title: 'Missing required fields',
 			html: '<ul style="text-align:left;margin:0;padding-left:1.2rem">' + missing.map(m => `<li>${m}</li>`).join('') + '</ul>',
-			confirmButtonColor: '#7d1f27'
+			confirmButtonColor: '#c60404'
 		});
 		return;
 	}
@@ -173,7 +173,7 @@ async function submitVerification() {
 				icon: 'success',
 				title: 'Verification saved',
 				text: isEffective ? 'This CAPA is now closed.' : 'Not effective - this CAPA has been sent back to Awaiting Response for a new corrective action.',
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			}).then(() => {
 				location.reload();
 			});
@@ -182,11 +182,11 @@ async function submitVerification() {
 				icon: 'error',
 				title: 'Could not save verification',
 				text: (result && result.message) || `HTTP ${response.status}`,
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			});
 		}
 	} catch (err) {
-		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#7d1f27' });
+		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#c60404' });
 	} finally {
 		btn.disabled = false;
 		btn.textContent = 'Submit Verification';

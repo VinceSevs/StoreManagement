@@ -9,6 +9,7 @@ function downloadCapaStatusPdf() {
 
 	const clone = source.cloneNode(true);
 	clone.removeAttribute('id');
+	clone.classList.add('is-pdf');
 
 	clone.querySelectorAll('.readonly-field').forEach(el => {
 		el.style.backgroundColor = '#fff';
@@ -20,9 +21,9 @@ function downloadCapaStatusPdf() {
 	if (photosBlocks.length > 0) {
 		const photosPage = document.createElement('div');
 		photosPage.id = 'pdfAttachmentsPage';
-		photosPage.className = 'card mb-3 stage-card';
-		photosPage.innerHTML = '<div class="card-header bg-white fw-semibold">Attached Photos</div><div class="card-body"></div>';
-		const photosBody = photosPage.querySelector('.card-body');
+		photosPage.className = 'capa-card stage-card';
+		photosPage.innerHTML = '<div class="main-view-card-header"><h4>Attached Photos</h4></div><div class="capa-photos-body"></div>';
+		const photosBody = photosPage.querySelector('.capa-photos-body');
 
 		photosBlocks.forEach(photosBlock => {
 			photosBlock.remove();
@@ -65,7 +66,7 @@ function downloadCapaStatusPdf() {
 	html2pdf().set(opt).from(clone).save().then(() => {
 		clone.remove();
 		btn.disabled = false;
-		btn.innerHTML = '<i class="bi bi-download"></i> Download PDF';
+		btn.innerHTML = '<i class="fa fa-download"></i> Download PDF';
 
 		fetch(window.CAPA_STATUS_PDF_DATA.logCapaActionUrl, {
 			method: 'POST',
@@ -75,7 +76,7 @@ function downloadCapaStatusPdf() {
 	}).catch((err) => {
 		clone.remove();
 		btn.disabled = false;
-		btn.innerHTML = '<i class="bi bi-download"></i> Download PDF';
+		btn.innerHTML = '<i class="fa fa-download"></i> Download PDF';
 		console.error('PDF generation failed:', err);
 		alert('Could not generate PDF: ' + (err && err.message ? err.message : err));
 	});

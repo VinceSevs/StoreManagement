@@ -116,6 +116,7 @@ namespace IsseERP.Services
                 LEFT JOIN tbl_Warehouse w ON h.SiteWarehouse = w.WarehouseID
                 LEFT JOIN tbl_UserAccount uv ON h.VerifiedBy = uv.id
                 LEFT JOIN tbl_UserAccount ua ON h.ApprovedBy = ua.id
+                WHERE h.ReportNumber LIKE 'CAR-%'
                 ORDER BY h.EventID DESC";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -307,7 +308,8 @@ namespace IsseERP.Services
                     RootCause = @RootCause,
                     CapaActions = @CapaActions,
                     CapaPerson = @CapaPerson,
-                    CapaTargetDate = @CapaTargetDate
+                    CapaTargetDate = @CapaTargetDate,
+                    Status = CASE WHEN Status IN ('Closed', 'Cancelled') THEN Status ELSE 'Awaiting Verification' END
                 WHERE ResponseToken = @ResponseToken
             ";
 
@@ -334,6 +336,7 @@ namespace IsseERP.Services
                 UPDATE dbo.tbl_QualityIncidentHdr
                 SET Status = 'Cancelled'
                 WHERE ResponseToken = @ResponseToken
+                  AND ReportNumber LIKE 'CAR-%'
                   AND (ImmediateAction IS NULL OR ImmediateAction = '')
                   AND (Status IS NULL OR Status NOT IN ('Closed', 'Cancelled'))
             ";
@@ -457,7 +460,7 @@ namespace IsseERP.Services
         {
             const string query = @"
                 UPDATE dbo.tbl_QualityIncidentHdr
-                SET Status = '',
+                SET Status = 'Awaiting Response',
                     loopNumber = loopNumber + 1,
                     ImmediateAction = '',
                     IaPerson = '',
@@ -507,40 +510,22 @@ namespace IsseERP.Services
             return reset;
         }
 
-        public async Task<bool> CloseIfOverdue(string token)
+        // The external api/capa/insert decides the initial Status; make sure a
+        // freshly filed CAR starts as Awaiting Response.
+        public async Task MarkAwaitingResponse(string reportNumber)
         {
             const string query = @"
                 UPDATE dbo.tbl_QualityIncidentHdr
-                SET Status = 'Closed'
-                WHERE ResponseToken = @ResponseToken
-                  AND CAST(CorrectionDueDate AS DATE) < CAST(SYSDATETIME() AS DATE)
-                  AND (ImmediateAction IS NULL OR ImmediateAction = '')
-                  AND (Status IS NULL OR Status NOT IN ('Closed', 'Cancelled'))
+                SET Status = 'Awaiting Response'
+                WHERE ReportNumber = @ReportNumber
+                  AND ReportNumber LIKE 'CAR-%'
+                  AND (Status IS NULL OR Status IN ('', 'Filed'))
             ";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                cmd.Parameters.AddWithValue("@ResponseToken", token);
-                await conn.OpenAsync();
-                int rows = await cmd.ExecuteNonQueryAsync();
-                return rows > 0;
-            }
-        }
-
-        public async Task CloseAllOverdue()
-        {
-            const string query = @"
-                UPDATE dbo.tbl_QualityIncidentHdr
-                SET Status = 'Closed'
-                WHERE CAST(CorrectionDueDate AS DATE) < CAST(SYSDATETIME() AS DATE)
-                  AND (ImmediateAction IS NULL OR ImmediateAction = '')
-                  AND (Status IS NULL OR Status NOT IN ('Closed', 'Cancelled'))
-            ";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            {
+                cmd.Parameters.AddWithValue("@ReportNumber", reportNumber);
                 await conn.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
             }

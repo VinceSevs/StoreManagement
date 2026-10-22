@@ -1,27 +1,10 @@
-/* ---------- Default date + due-date auto-calc ---------- */
+/* ---------- Default date ---------- */
 function toIsoDate(date) {
 	return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
 }
 
-function skipWeekend(date) {
-	const day = date.getDay(); // 0 = Sunday, 6 = Saturday
-	if (day === 6) date.setDate(date.getDate() + 2);      // Saturday -> Monday
-	else if (day === 0) date.setDate(date.getDate() + 1); // Sunday -> Monday
-	return date;
-}
-
 function setDefaultDate() {
-	const today = new Date();
-	document.getElementById('docDateInput').value = toIsoDate(today);
-
-	const correctionDue = new Date(today);
-	correctionDue.setDate(correctionDue.getDate() + 1);
-	skipWeekend(correctionDue);
-	document.getElementById('correctionDueInput').value = toIsoDate(correctionDue);
-
-	const capaDue = new Date(today);
-	capaDue.setDate(capaDue.getDate() + 7);
-	document.getElementById('capaDueInput').value = toIsoDate(capaDue);
+	document.getElementById('docDateInput').value = toIsoDate(new Date());
 }
 setDefaultDate();
 
@@ -122,6 +105,30 @@ function handleCarClassificationChange() {
 	else otherInput.classList.remove('d-none'); // LLII / Others
 }
 
+/* ---------- LLII / Others: one or more emails, comma or semicolon separated ---------- */
+const EMAIL_PATTERN = /^[^\s@;,<>]+@[^\s@;,<>]+\.[^\s@;,<>]+$/;
+
+// Same rules as the server (CapaEmailList.Normalize): trim, drop blanks and duplicates.
+function parseEmailList(raw) {
+	const valid = [];
+	const invalid = [];
+	const seen = new Set();
+	(raw || '').split(/[;,]/).forEach(part => {
+		const email = part.trim();
+		if (!email) return;
+		if (!EMAIL_PATTERN.test(email)) invalid.push(email);
+		else if (!seen.has(email.toLowerCase())) { seen.add(email.toLowerCase()); valid.push(email); }
+	});
+	return { valid, invalid, normalized: valid.join(',') };
+}
+
+function getInvalidClassificationEmails() {
+	const selected = document.querySelector('input[name="car_classification_type"]:checked');
+	if (!selected || (selected.value !== 'LLII' && selected.value !== 'Others')) return [];
+	const otherInput = document.getElementById('carOtherText');
+	return parseEmailList(otherInput ? otherInput.value : '').invalid;
+}
+
 function getCarClassificationPayload() {
 	const selected = document.querySelector('input[name="car_classification_type"]:checked');
 	if (!selected) {
@@ -151,7 +158,7 @@ function getCarClassificationPayload() {
 		CarClassificationRefId: null,
 		CarClassificationRefName: null,
 		CarClassificationRefEmail: null,
-		CarClassificationOtherText: otherInput ? otherInput.value : null
+		CarClassificationOtherText: otherInput ? parseEmailList(otherInput.value).normalized : null
 	};
 }
 
@@ -270,8 +277,6 @@ function buildCapaPayload() {
 		IssuedToDepartment: Number(val('issued_to')) || 0,
 		SiteWarehouse: Number(val('site_warehouse')) || 0,
 		RefNo: val('ref_no'),
-		CorrectionDueDate: val('correction_due') || null,
-		ReportDueDate: val('capa_due') || null,
 
 		NonconformanceType: (document.querySelector('input[name="nonconformance_type"]:checked') || {}).value || null,
 		ExternalAuditSubType: (document.querySelector('input[name="external_audit_subtype"]:checked') || {}).value || null,
@@ -307,8 +312,6 @@ function getRequiredFieldChecks() {
 			label: 'Ref. No. (QAR / PNCR)'
 		},
 		{ test: () => !!val('site_warehouse'), label: 'Site Warehouse' },
-		{ test: () => !!val('correction_due'), label: 'Correction / Immediate Action Due Date' },
-		{ test: () => !!val('capa_due'), label: 'Corrective / Preventive Action Due Date' },
 		{ test: () => !!document.querySelector('input[name="nonconformance_type"]:checked'), label: 'Type of Non-conformance' },
 		{
 			test: () => {
@@ -377,7 +380,19 @@ async function submitCapaForm() {
 			icon: 'warning',
 			title: 'Missing required fields',
 			html: '<ul style="text-align:left;margin:0;padding-left:1.2rem">' + missing.map(m => `<li>${m}</li>`).join('') + '</ul>',
-			confirmButtonColor: '#7d1f27'
+			confirmButtonColor: '#c60404'
+		});
+		return;
+	}
+
+	const invalidEmails = getInvalidClassificationEmails();
+	if (invalidEmails.length > 0) {
+		Swal.fire({
+			icon: 'warning',
+			title: 'Invalid email address',
+			html: 'Please fix these, or separate several addresses with a comma or semicolon:<ul style="text-align:left;margin:0.5rem 0 0;padding-left:1.2rem">'
+				+ invalidEmails.map(e => `<li>${e.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))}</li>`).join('') + '</ul>',
+			confirmButtonColor: '#c60404'
 		});
 		return;
 	}
@@ -438,7 +453,7 @@ async function submitCapaForm() {
 				icon: 'error',
 				title: 'Could not save the report',
 				text: (result && result.message) || `HTTP ${response.status}`,
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			});
 		}
 	} catch (err) {
@@ -446,7 +461,7 @@ async function submitCapaForm() {
 			icon: 'error',
 			title: 'Network error',
 			text: err.message,
-			confirmButtonColor: '#7d1f27'
+			confirmButtonColor: '#c60404'
 		});
 	} finally {
 		btn.disabled = false;

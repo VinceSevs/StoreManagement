@@ -1,57 +1,57 @@
-﻿@model List<IsseERP.Models.CapaReportModel>
+@model List<IsseERP.Models.CapaReportModel>
 @using System.Linq
 @{
     Func<IsseERP.Models.CapaReportModel, string> computeStatusKey = (Func<IsseERP.Models.CapaReportModel, string>)ViewData["CapaList_ComputeStatusKey"];
 }
         <div class="table-responsive">
-            <table class="table capa-table" id="capaTable">
+            <table class="table main-list-table capa-table" id="capaTable">
                 <thead>
                     <tr>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleDateIssuedSort()">
-                            Date Issued <i class="bi bi-arrow-down-up sort-icon" id="dateIssuedSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleDateIssuedSort()">
+                            DATE ISSUED <i class="fa fa-sort sort-icon" id="dateIssuedSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleCarNoSort()">
-                            Car No. <i class="bi bi-arrow-down-up sort-icon" id="carNoSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleCarNoSort()">
+                            CAR NO. <i class="fa fa-sort sort-icon" id="carNoSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleStockMovementSort()">
-                            Stock Movement <i class="bi bi-arrow-down-up sort-icon" id="stockMovementSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleStockMovementSort()">
+                            STOCK MOVEMENT <i class="fa fa-sort sort-icon" id="stockMovementSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleItemCodeSort()">
-                            Item Code <i class="bi bi-arrow-down-up sort-icon" id="itemCodeSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleItemCodeSort()">
+                            ITEM CODE <i class="fa fa-sort sort-icon" id="itemCodeSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleDescriptionSort()">
-                            Description <i class="bi bi-arrow-down-up sort-icon" id="descriptionSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleDescriptionSort()">
+                            DESCRIPTION <i class="fa fa-sort sort-icon" id="descriptionSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleUTDSort()">
-                            UTD <i class="bi bi-arrow-down-up sort-icon" id="utdSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleUTDSort()">
+                            UTD <i class="fa fa-sort sort-icon" id="utdSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleUOMSort()">
-                            UOM <i class="bi bi-arrow-down-up sort-icon" id="uomSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleUOMSort()">
+                            UOM <i class="fa fa-sort sort-icon" id="uomSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleQuantitySort()">
-                            Quantity <i class="bi bi-arrow-down-up sort-icon" id="quantitySortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleQuantitySort()">
+                            QUANTITY <i class="fa fa-sort sort-icon" id="quantitySortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleNatureOfDefectSort()">
-                            Nature of Defect <i class="bi bi-arrow-down-up sort-icon" id="natureOfDefectSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleNatureOfDefectSort()">
+                            NATURE OF DEFECT <i class="fa fa-sort sort-icon" id="natureOfDefectSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleCarClassificationSort()">
-                            Car Classification <i class="bi bi-arrow-down-up sort-icon" id="carClassificationSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleCarClassificationSort()">
+                            CAR CLASSIFICATION <i class="fa fa-sort sort-icon" id="carClassificationSortIcon"></i>
                         </th>
-                        <th style="cursor:pointer;user-select:none;" onclick="toggleStatusSort()">
-                            Status <i class="bi bi-arrow-down-up sort-icon" id="statusSortIcon" style="font-size:.7rem;"></i>
+                        <th class="is-sortable" onclick="toggleStatusSort()">
+                            STATUS <i class="fa fa-sort sort-icon" id="statusSortIcon"></i>
                         </th>
-                        <th></th>
+                        <th class="main-actions-sticky">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model == null || Model.Count == 0)
             {
-                        <tr>
+                        <tr class="main-empty-row">
                             <td colspan="12">
-                                <div class="empty-state">
-                                    <div class="empty-icon">&#128203;</div>
-                                    <div class="fw-semibold">No CAR reports yet</div>
-                                    <div class="small">Filed reports will show up here.</div>
+                                <div class="main-empty-state">
+                                    <div class="main-empty-state-icon"><i class="fa fa-clipboard"></i></div>
+                                    <div class="main-empty-state-title">No CAR reports yet</div>
+                                    <div class="main-empty-state-text">Filed reports will show up here.</div>
                                 </div>
                             </td>
                         </tr>
@@ -61,28 +61,19 @@
                         foreach (var capa in Model)
                         {
                             string statusKey = computeStatusKey(capa);
-        string statusText, dotColor, pillColor, pillBg;
+        string statusText, badgeTone;
 
                             switch (statusKey)
                             {
                                 case "response":
-                                    statusText = "Awaiting Response"; dotColor = "var(--status-response)"; pillColor = "var(--status-response)"; pillBg = "var(--status-response-bg)"; break;
+                                    statusText = "Awaiting Response"; badgeTone = "is-warning"; break;
                                 case "verify":
-                                    statusText = "Awaiting Verification"; dotColor = "var(--status-verify)"; pillColor = "var(--status-verify)"; pillBg = "var(--status-verify-bg)"; break;
+                                    statusText = "Awaiting Verification"; badgeTone = "is-info"; break;
                                 case "cancelled":
-                                    statusText = "Cancelled"; dotColor = "var(--status-cancelled)"; pillColor = "var(--status-cancelled)"; pillBg = "var(--status-cancelled-bg)"; break;
+                                    statusText = "Cancelled"; badgeTone = "is-brand"; break;
                                 default:
-                                    statusText = "Closed"; dotColor = "var(--status-closed)"; pillColor = "var(--status-closed)"; pillBg = "var(--status-closed-bg)"; break;
+                                    statusText = "Closed"; badgeTone = "is-success"; break;
                             }
-
-    string initials = "?";
-    if (!string.IsNullOrWhiteSpace(capa.IssuedBy))
-    {
-        var parts = capa.IssuedBy.Trim().Split(' ');
-        initials = parts.Length > 1
-            ? ("" + parts[0][0] + parts[parts.Length - 1][0]).ToUpper()
-            : capa.IssuedBy.Trim().Substring(0, Math.Min(2, capa.IssuedBy.Trim().Length)).ToUpper();
-    }
 
     string allItemsText = capa.Items != null
         ? string.Join(" ", capa.Items.Select(i => $"{i.ItemDescription} {i.DefectName} {i.DefectCategoryName}"))
@@ -94,65 +85,65 @@
     var firstItem = carItems.Count > 0 ? carItems[0] : null;
     bool hasMultipleItems = carItems.Count > 1;
 
-                <tr class="@(hasMultipleItems ? "has-items-expand" : "")" data-status="@statusKey" data-classification="@capa.CarClassificationType" data-created="@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("yyyy-MM-dd") : "")" data-due="@(capa.ReportDueDate.HasValue ? capa.ReportDueDate.Value.ToString("yyyy-MM-dd") : "")" data-search="@searchText" data-report-number="@capa.ReportNumber" style="border-left-color:@dotColor" onclick="toggleItemDetails(this, event)">
-                    <td class="font-mono fw-semibold">@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("MMM dd, yyyy") : "")</td>
-                    <td class="font-mono text-secondary">
-                        @if (hasMultipleItems)
-                        {
-                            <i class="bi bi-chevron-right expand-icon" style="font-size:.7rem;"></i>
-                        }
-                        @capa.ReportNumber
-                        @if (hasMultipleItems)
-                        {
-                            <span class="badge bg-secondary fw-normal" title="This CAR has @carItems.Count items — click the row to see them all">+@(carItems.Count - 1) more item@(carItems.Count > 2 ? "s" : "")</span>
-                        }
-                        @if (capa.LoopNumber > 0)
-                        {
-                            <span class="badge bg-warning text-dark" title="Sent back to Awaiting Response @capa.LoopNumber time(s) after failing an effectiveness check">&#x21bb; @capa.LoopNumber</span>
-                        }
-                    </td>
-                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(capa.IaVerifiedBy) ? "—" : (capa.StockEventID == 2 ? "AUDIT" : capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT"))</td>
-                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.ItemCode) ? "—" : firstItem?.ItemCode)</td>
-                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.ItemDescription) ? "—" : firstItem?.ItemDescription)</td>
-                    <td class="font-mono text-secondary">@(firstItem?.UsedToDate != null && firstItem.UsedToDate.Value.Year > 1900 ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "—")</td>
-                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.UOMDisplay) ? "—" : firstItem?.UOMDisplay)</td>
-                    <td class="font-mono text-secondary">@((firstItem?.Quantity ?? 0) == 0 ? "—" : firstItem?.Quantity.ToString())</td>
-                    <td class="font-mono text-secondary">@(string.IsNullOrWhiteSpace(firstItem?.DefectName) ? "—" : firstItem?.DefectName)</td>
-                    <td class="font-mono text-secondary">@capa.CarClassificationType</td>
-                    <td>
-                        <span class="status-pill" style="color:@pillColor;background:@pillBg">
-                            <span class="dot" style="background:@dotColor"></span>@statusText
+                <tr class="@(hasMultipleItems ? "has-items-expand" : "")" data-status="@statusKey" data-classification="@capa.CarClassificationType" data-created="@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("yyyy-MM-dd") : "")" data-search="@searchText" data-report-number="@capa.ReportNumber" onclick="toggleItemDetails(this, event)">
+                    <td class="main-tabular fw-semibold">@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("MMM dd, yyyy") : "")</td>
+                    <td class="main-tabular">
+                        <span class="capa-car-no">
+                            @if (hasMultipleItems)
+                            {
+                                <i class="fa fa-chevron-right expand-icon"></i>
+                            }
+                            <span class="main-chip">@capa.ReportNumber</span>
+                            @if (hasMultipleItems)
+                            {
+                                <span class="main-badge" title="This CAR has @carItems.Count items — click the row to see them all">+@(carItems.Count - 1) more item@(carItems.Count > 2 ? "s" : "")</span>
+                            }
+                            @if (capa.LoopNumber > 0)
+                            {
+                                <span class="main-badge is-warning" title="Sent back to Awaiting Response @capa.LoopNumber time(s) after failing an effectiveness check"><i class="fa fa-repeat"></i> @capa.LoopNumber</span>
+                            }
                         </span>
                     </td>
-                    <td class="text-end">
-                        <a href="@Url.Action("CapaStatus", "Capa")?token=@capa.ResponseToken" class="view-link" target="_blank">View &rarr;</a>
+                    <td>@(string.IsNullOrWhiteSpace(capa.IaVerifiedBy) ? "-" : (capa.StockEventID == 2 ? "AUDIT" : capa.StockEventID == 1 ? "OUT RIGHT" : "SA OUT"))</td>
+                    <td class="main-tabular">@(string.IsNullOrWhiteSpace(firstItem?.ItemCode) ? "-" : firstItem?.ItemCode)</td>
+                    <td>@(string.IsNullOrWhiteSpace(firstItem?.ItemDescription) ? "-" : firstItem?.ItemDescription)</td>
+                    <td class="main-tabular">@(firstItem?.UsedToDate != null && firstItem.UsedToDate.Value.Year > 1900 ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "-")</td>
+                    <td>@(string.IsNullOrWhiteSpace(firstItem?.UOMDisplay) ? "-" : firstItem?.UOMDisplay)</td>
+                    <td class="main-tabular">@((firstItem?.Quantity ?? 0) == 0 ? "-" : firstItem?.Quantity.ToString())</td>
+                    <td>@(string.IsNullOrWhiteSpace(firstItem?.DefectName) ? "-" : firstItem?.DefectName)</td>
+                    <td>@capa.CarClassificationType</td>
+                    <td>
+                        <span class="main-badge @badgeTone"><i class="fa fa-circle"></i>@statusText</span>
+                    </td>
+                    <td class="main-actions-sticky">
+                        <a href="@Url.Action("CapaStatus", "Capa")?token=@capa.ResponseToken" class="btn btn-primary btn-sm" target="_blank" title="View CAR" aria-label="View CAR @capa.ReportNumber">View</a>
                     </td>
                 </tr>
                         if (hasMultipleItems)
                         {
                 <tr class="item-detail-row d-none">
-                    <td colspan="12" class="p-0">
-                        <table class="table table-sm mb-0" style="background:#faf6f5;">
+                    <td colspan="12">
+                        <table class="table capa-subtable">
                             <thead>
                                 <tr>
-                                    <th class="small text-secondary text-uppercase">Item Code</th>
-                                    <th class="small text-secondary text-uppercase">Description</th>
-                                    <th class="small text-secondary text-uppercase">UTD</th>
-                                    <th class="small text-secondary text-uppercase">UOM</th>
-                                    <th class="small text-secondary text-uppercase">Quantity</th>
-                                    <th class="small text-secondary text-uppercase">Nature of Defect</th>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>UTD</th>
+                                    <th>UOM</th>
+                                    <th>Quantity</th>
+                                    <th>Nature of Defect</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var carItem in carItems)
                                 {
                                     <tr>
-                                        <td class="font-mono text-secondary">@carItem.ItemCode</td>
-                                        <td class="font-mono text-secondary">@carItem.ItemDescription</td>
-                                        <td class="font-mono text-secondary">@(carItem.UsedToDate.HasValue ? carItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
-                                        <td class="font-mono text-secondary">@carItem.UOMDisplay</td>
-                                        <td class="font-mono text-secondary">@carItem.Quantity</td>
-                                        <td class="font-mono text-secondary">@carItem.DefectName</td>
+                                        <td class="main-tabular">@carItem.ItemCode</td>
+                                        <td>@carItem.ItemDescription</td>
+                                        <td class="main-tabular">@(carItem.UsedToDate.HasValue ? carItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
+                                        <td>@carItem.UOMDisplay</td>
+                                        <td class="main-tabular">@carItem.Quantity</td>
+                                        <td>@carItem.DefectName</td>
                                     </tr>
                                 }
                             </tbody>

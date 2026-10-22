@@ -20,9 +20,6 @@ function buildFormTourSteps() {
 	addStep('#siteWarehouseSelect', '🏭', 'Site Warehouse', "The warehouse where this was found. Picking one auto-fills the code next to it.");
 	addStep('#warehouseCodeInput', '🔢', 'Warehouse Code', "Fills in automatically — no need to type this yourself.");
 
-	addStep('#correctionDueInput', '⏰', 'Correction Due', "Defaults to the next business day — if that falls on a weekend, it automatically rolls forward to the following Monday.", 'top');
-	addStep('#capaDueInput', '📆', 'CAPA Due', "Defaults to one week out — the deadline for the full corrective action.", 'top');
-
 	addStep('#nonconformanceTypeSection', '⚠️', 'Type of Issue', "Pick exactly one category that best describes what happened.", 'top');
 	addStep('#externalAuditSubWrap', '🕵️', 'Audit Type', "Since this is an External Quality Audit, also pick Government or 3rd Party.", 'top');
 	addStep('#carClassificationSection', '👥', "Who's Responsible", "Pick who should respond to this CAPA — LLII, Supplier, Trucker, DC Site, or Others.", 'top');
@@ -41,7 +38,7 @@ function buildFormTourSteps() {
 	addStep('[data-field="hauler"]', '🚛', 'Hauler', "The accredited hauler who took it away, if applicable.", 'top');
 	addStep('[data-field="remarks"]', '📝', 'Remarks', "Describe what happened — what, when, where, and which product/batch/shipment is affected. Be specific.", 'top');
 
-	const attachCard = document.querySelector('#capaItemBlock0 .item-attach-input')?.closest('.card');
+	const attachCard = document.querySelector('#capaItemBlock0 .item-attach-input')?.closest('.capa-card');
 	addStep(attachCard || document.querySelector('#capaItemBlock0 .item-attach-empty'), '📸', 'Photos', "Attach photos of the issue here — multiple files are fine. Nothing uploads until you submit.", 'top');
 
 	addStep('#submitBtn', '✅', 'Submit', "Saves the report and generates its CAPA number.", 'left');

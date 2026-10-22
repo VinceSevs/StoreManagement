@@ -37,7 +37,6 @@ namespace IsseERP.Controllers
         }
         public async Task<ActionResult> CapaList()
         {
-            await _capaService.CloseAllOverdue();
             var reports = await _capaService.GetAllCapaReports();
             return View(reports);
         }
@@ -187,9 +186,26 @@ namespace IsseERP.Controllers
                     return Json(new { success = false, message = "Invalid data payload structure." });
                 }
 
+                // LLII / Others take a free-text list of emails: validate and store them normalised.
+                if (model.CarClassificationType == "LLII" || model.CarClassificationType == "Others")
+                {
+                    string emails = CapaEmailList.Normalize(model.CarClassificationOtherText, out var invalidEmails);
+                    if (invalidEmails.Count > 0)
+                    {
+                        Response.StatusCode = 400;
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Invalid email address: " + string.Join(", ", invalidEmails)
+                        });
+                    }
+                    model.CarClassificationOtherText = emails;
+                }
+
                 // 1. GENERATE REPORT NUMBER ON THE SERVER
                 string reportNumber = await _capaService.GetNextCapaNo();
                 model.ReportNumber = reportNumber;
+                model.Status = CapaStatuses.AwaitingResponse;
 
                 if (model.Items == null || model.Items.Count == 0)
                 {
@@ -208,6 +224,8 @@ namespace IsseERP.Controllers
                         message = "Could not save the report. Please try again."
                     });
                 }
+
+                await _capaService.MarkAwaitingResponse(reportNumber);
 
                 // 3. Save attachments using the server-generated report number
                 string attachmentsRoot = Server.MapPath("~/App_Data/CapaAttachments");
@@ -282,24 +300,6 @@ namespace IsseERP.Controllers
             ViewBag.Attachments = allAttachments;
             ViewBag.ResponseToken = token;
             return View();
-        }
-
-        [Authorize]
-        [HttpPost]
-        public async Task<JsonResult> CloseIfOverdue(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                Response.StatusCode = 400;
-                return Json(new { success = false });
-            }
-
-            bool closed = await _capaService.CloseIfOverdue(token);
-            return Json(new 
-            { 
-                success = true, 
-                closed = closed 
-            });
         }
 
         [Authorize]

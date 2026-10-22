@@ -29,8 +29,8 @@
 
 		document.querySelectorAll('.sort-icon').forEach(function (icon) {
 			icon.className = icon.id === iconId
-				? 'bi sort-icon ' + (sortState.direction === 'asc' ? 'bi-sort-up' : 'bi-sort-down')
-				: 'bi bi-arrow-down-up sort-icon';
+				? 'fa sort-icon is-active ' + (sortState.direction === 'asc' ? 'fa-sort-asc' : 'fa-sort-desc')
+				: 'fa fa-sort sort-icon';
 		});
 
 		applyFilters();
@@ -50,8 +50,8 @@
 
 		const icon = rowEl.querySelector('.expand-icon');
 		if (icon) {
-			icon.classList.toggle('bi-chevron-right');
-			icon.classList.toggle('bi-chevron-down');
+			icon.classList.toggle('fa-chevron-right');
+			icon.classList.toggle('fa-chevron-down');
 		}
 	}
 
@@ -99,8 +99,8 @@
 			row.classList.add('d-none');
 		});
 		document.querySelectorAll('#capaTable tbody .expand-icon').forEach(function (icon) {
-			icon.classList.remove('bi-chevron-down');
-			icon.classList.add('bi-chevron-right');
+			icon.classList.remove('fa-chevron-down');
+			icon.classList.add('fa-chevron-right');
 		});
 
 		const allRows = Array.from(document.querySelectorAll('#capaTable tbody tr[data-search]'));
@@ -143,20 +143,21 @@
 
 		function addPageItem(label, page, opts) {
 			opts = opts || {};
-			const li = document.createElement('li');
-			li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
 			const btn = document.createElement('button');
 			btn.type = 'button';
-			btn.className = 'page-link';
+			btn.className = 'btn main-pagination-btn' +
+				(opts.nav ? ' main-pagination-nav-btn' : '') +
+				(opts.active ? ' main-pagination-btn-active' : '');
 			btn.textContent = label;
+			btn.disabled = !!opts.disabled;
+			if (opts.active) btn.setAttribute('aria-current', 'page');
 			if (!opts.disabled && !opts.active) {
 				btn.addEventListener('click', function () {
 					currentPage = page;
 					renderPage();
 				});
 			}
-			li.appendChild(btn);
-			pager.appendChild(li);
+			pager.appendChild(btn);
 		}
 
 		if (totalPages <= 1) return;
@@ -169,11 +170,11 @@
 			windowStart = Math.max(1, windowEnd - MAX_VISIBLE + 1);
 		}
 
-		addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1 });
+		addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1, nav: true });
 		for (let p = windowStart; p <= windowEnd; p++) {
 			addPageItem(String(p), p, { active: p === currentPage });
 		}
-		addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages });
+		addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages, nav: true });
 	}
 
 	function jumpToPage() {
@@ -194,6 +195,11 @@
 
 	document.getElementById('capaSearch').addEventListener('input', function () {
 		currentSearchQuery = this.value.trim().toLowerCase();
+		applyFilters();
+	});
+
+	document.getElementById('capaSearchBtn').addEventListener('click', function () {
+		currentSearchQuery = document.getElementById('capaSearch').value.trim().toLowerCase();
 		applyFilters();
 	});
 
@@ -259,10 +265,10 @@
 		}).catch(() => {});
 	}
 
-	document.querySelectorAll('.stat-card').forEach(function (card) {
+	document.querySelectorAll('.capa-stat').forEach(function (card) {
 		card.addEventListener('click', function () {
-			document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-			this.classList.add('active');
+			document.querySelectorAll('.capa-stat').forEach(c => c.classList.remove('is-active'));
+			this.classList.add('is-active');
 			currentStatusFilter = this.dataset.status;
 			applyFilters();
 		});

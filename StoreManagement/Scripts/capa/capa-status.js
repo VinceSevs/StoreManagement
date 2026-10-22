@@ -9,7 +9,7 @@ async function cancelCar() {
 		showCancelButton: true,
 		confirmButtonText: 'Yes, cancel it',
 		cancelButtonText: 'No, keep it',
-		confirmButtonColor: '#7d1f27'
+		confirmButtonColor: '#c60404'
 	});
 	if (!confirmResult.isConfirmed) return;
 
@@ -29,20 +29,20 @@ async function cancelCar() {
 			Swal.fire({
 				icon: 'success',
 				title: 'CAR cancelled',
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			}).then(() => location.reload());
 		} else {
 			Swal.fire({
 				icon: 'error',
 				title: 'Could not cancel',
 				text: (result && result.message) || `HTTP ${response.status}`,
-				confirmButtonColor: '#7d1f27'
+				confirmButtonColor: '#c60404'
 			});
 			btn.disabled = false;
 			btn.textContent = 'Cancel CAR';
 		}
 	} catch (err) {
-		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#7d1f27' });
+		Swal.fire({ icon: 'error', title: 'Network error', text: err.message, confirmButtonColor: '#c60404' });
 		btn.disabled = false;
 		btn.textContent = 'Cancel CAR';
 	}

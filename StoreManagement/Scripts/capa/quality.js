@@ -73,16 +73,16 @@
             empty.style.display = attachments.length ? 'none' : 'block';
             grid.innerHTML = attachments.map(a => `
                 <div class="col">
-                    <div class="card attach-thumb h-100">
+                    <div class="capa-attach-thumb">
                         <button type="button" class="btn-close" aria-label="Remove" data-remove-id="${a.id}"></button>
                         ${a.isImage
-                            ? `<img src="${a.dataUrl}" class="card-img-top" alt="Attachment">`
-                            : `<div class="card-img-top d-flex flex-column align-items-center justify-content-center bg-light" style="aspect-ratio:4/3;">
-                                   <span style="font-size:2rem;line-height:1;">${fileIconFor(a.fileName)}</span>
-                                   <small class="text-secondary text-truncate px-2" style="max-width:90%;">${escapeHtml(a.fileName)}</small>
+                            ? `<img src="${a.dataUrl}" alt="Attachment">`
+                            : `<div class="capa-attach-file">
+                                   <span class="capa-attach-ext">${fileIconFor(a.fileName)}</span>
+                                   <small>${escapeHtml(a.fileName)}</small>
                                </div>`}
-                        <div class="card-body p-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" data-caption-id="${a.id}">
+                        <div class="capa-attach-caption">
+                            <input type="text" class="form-control" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" data-caption-id="${a.id}">
                         </div>
                     </div>
                 </div>
