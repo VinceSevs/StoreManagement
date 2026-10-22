@@ -5,168 +5,214 @@
 @{
     ViewBag.Title = "NCR Details";
 
-    string statusBadgeClass = "bg-info"; string statusBadgeText = "TRANSMITTED";
+    string statusBadgeClass = "is-info"; string statusBadgeText = "TRANSMITTED";
     switch (Model.NcrStatus)
     {
-        case 23: statusBadgeClass = "bg-warning"; statusBadgeText = "FOR FURTHER INVESTIGATION"; break;
-        case 24: statusBadgeClass = "bg-primary"; statusBadgeText = "CLOSED"; break;
-        case 29: statusBadgeClass = "bg-secondary"; statusBadgeText = "CANCELLED"; break;
+        case 23: statusBadgeClass = "is-warning"; statusBadgeText = "FOR FURTHER INVESTIGATION"; break;
+        case 24: statusBadgeClass = "is-success"; statusBadgeText = "CLOSED"; break;
+        case 29: statusBadgeClass = ""; statusBadgeText = "CANCELLED"; break;
+    }
+
+    string csBadgeClass = "is-info"; string csBadgeText = "TRANSMITTED";
+    switch (Model.CSRemarks)
+    {
+        case 21: csBadgeClass = "is-success"; csBadgeText = "VALID"; break;
+        case 22: csBadgeClass = "is-warning"; csBadgeText = "INVALID"; break;
+        case 23: csBadgeClass = "is-info"; csBadgeText = "FOR FURTHER INVESTIGATION"; break;
     }
 }
 
-<link href="~/Content/ncr/details.css" rel="stylesheet" />
+<link href="~/Content/complaints/complaints.css" rel="stylesheet" />
 
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
-    <a href="@Url.Action("Index", "Ncr")" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left"></i> Back to List
-    </a>
-    <div class="d-flex align-items-center gap-2">
-        <button type="button" class="btn btn-outline-primary btn-sm" onclick="printNcrDetails()">
-            <i class="bi bi-printer"></i> Print
+<div class="main-list-page">
+
+    <!-- =========================================
+         NCR RECORD HERO BANNER
+         ========================================= -->
+
+    <div class="main-hero is-record">
+
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="Non-conformance report" />
+
+        <div class="main-hero-gradient"></div>
+
+        <div class="main-hero-content">
+
+            <nav class="main-hero-eyebrow main-hero-breadcrumb" aria-label="Breadcrumb">
+                <a href="@Url.Action("Index", "Ncr")"
+                   class="main-hero-back"
+                   title="Back to Non-Conformance Report"
+                   aria-label="Back to Non-Conformance Report">
+                    <i class="fa fa-arrow-left"></i>
+                </a>
+                <span>Complaints</span>
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                <a href="@Url.Action("Index", "Ncr")">Non-Conformance Report</a>
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                <span>@Model.NcrNumber</span>
+            </nav>
+
+            <div class="main-hero-title-row">
+                <h2 class="main-hero-heading">NCR No: @Model.NcrNumber</h2>
+                <span class="main-badge @statusBadgeClass">@statusBadgeText</span>
+            </div>
+
+            <p class="main-hero-description">
+                Report details with Customer Care remarks and findings.
+            </p>
+
+            <div class="main-hero-features">
+
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Store</div>
+                        <div class="main-hero-feature-desc">@Model.StoreNumber - @Model.StoreName</div>
+                    </div>
+                </div>
+
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-user-o" aria-hidden="true"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Filed By</div>
+                        <div class="main-hero-feature-desc">@Model.FiledBy</div>
+                    </div>
+                </div>
+
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-calendar-o" aria-hidden="true"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Created</div>
+                        <div class="main-hero-feature-desc">@Model.DateCreated.ToString("MM/dd/yyyy hh:mm tt")</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="complaints-actions no-print">
+        <a href="@Url.Action("Index", "Ncr")" class="btn main-form-cancel-btn">
+            <i class="fa fa-arrow-left me-2"></i>Back to List
+        </a>
+        <button type="button" class="btn main-outline-btn" onclick="printNcrDetails()">
+            <i class="fa fa-print"></i>Print
         </button>
-        <span class="badge @statusBadgeClass px-3 py-2">@statusBadgeText</span>
     </div>
-</div>
 
-<div class="d-none d-print-block mb-3">
-    <span class="badge @statusBadgeClass px-3 py-2">@statusBadgeText</span>
-</div>
-
-<div class="lead-page-header">
-    <div class="lead-page-icon"><i class="bi bi-exclamation-diamond"></i></div>
-    <div>
-        <div class="lead-eyebrow">Complaint Report / Non-Conformance Report</div>
-        <h1>NCR No: @Model.NcrNumber</h1>
-    </div>
-</div>
-
-<div class="card shadow-sm ncr-card mb-4">
-    <div class="ncr-section-header"><i class="bi bi-info-circle"></i> Main Details</div>
-    <div class="card-body">
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Create Date/Time</span>
-                    <span class="ncr-field-value">@Model.DateCreated.ToString("MM/dd/yyyy hh:mm tt")</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Store</span>
-                    <span class="ncr-field-value">@Model.StoreNumber - @Model.StoreName</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Manager-In-Charge</span>
-                    <span class="ncr-field-value">@Model.ManagerInCharge</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Filed By</span>
-                    <span class="ncr-field-value">@Model.FiledBy</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Store Contact</span>
-                    <span class="ncr-field-value">@Model.StoreContact</span>
-                </div>
-            </div>
-            <div class="col-md-5">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Store Email</span>
-                    <span class="ncr-field-value">@Model.StoreEmail</span>
-                </div>
-            </div>
+    <section class="complaints-card">
+        <div class="main-view-card-header">
+            <h4><span class="main-view-card-icon"><i class="fa fa-info-circle"></i></span>Main Details</h4>
         </div>
-    </div>
-</div>
-
-<div class="card shadow-sm ncr-card mb-4">
-    <div class="ncr-section-header"><i class="bi bi-card-text"></i> Complaint</div>
-    <div class="card-body">
-        <div class="row g-4 mb-3">
-            <div class="col-md-4">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Complaint Issue</span>
-                    <span class="ncr-field-value">@Model.ComplaintIssueDesc</span>
-                </div>
+        <dl class="row gx-3 main-view-fields">
+            <div class="col-12 col-md-6 col-lg-3 main-view-field">
+                <dt>Create Date/Time</dt>
+                <dd>@Model.DateCreated.ToString("MM/dd/yyyy hh:mm tt")</dd>
             </div>
-            <div class="col-md-8">
-                <div class="ncr-field">
-                    <span class="ncr-field-label">Subject</span>
-                    <span class="ncr-field-value">@Model.Subject</span>
-                </div>
+            <div class="col-12 col-md-6 col-lg-3 main-view-field">
+                <dt>Store</dt>
+                <dd>@Model.StoreNumber - @Model.StoreName</dd>
             </div>
+            <div class="col-12 col-md-6 col-lg-3 main-view-field">
+                <dt>Manager-In-Charge</dt>
+                <dd>@Model.ManagerInCharge</dd>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3 main-view-field">
+                <dt>Filed By</dt>
+                <dd>@Model.FiledBy</dd>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3 main-view-field">
+                <dt>Store Contact</dt>
+                <dd>@Model.StoreContact</dd>
+            </div>
+            <div class="col-12 col-md-6 col-lg-5 main-view-field">
+                <dt>Store Email</dt>
+                <dd>@Model.StoreEmail</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="complaints-card">
+        <div class="main-view-card-header">
+            <h4><span class="main-view-card-icon"><i class="fa fa-file-text-o"></i></span>Complaint</h4>
         </div>
+        <dl class="row gx-3 main-view-fields">
+            <div class="col-12 col-md-4 main-view-field">
+                <dt>Complaint Issue</dt>
+                <dd>@Model.ComplaintIssueDesc</dd>
+            </div>
+            <div class="col-12 col-md-8 main-view-field">
+                <dt>Subject</dt>
+                <dd>@Model.Subject</dd>
+            </div>
+        </dl>
 
-        <div class="ncr-field">
-            <span class="ncr-field-label">Message</span>
-            <textarea class="form-control ncr-findings-readonly" rows="6" disabled>@Model.Remarks</textarea>
+        <div class="main-form-group">
+            <span class="main-form-label">Message</span>
+            <textarea class="form-control complaints-findings-readonly" rows="6" disabled>@Model.Remarks</textarea>
         </div>
-    </div>
-</div>
+    </section>
 
-@Html.Partial("~/Views/Ncr/_PartialView/_DetailsAttachments.cshtml", Model)
+    @Html.Partial("~/Views/Ncr/_PartialView/_DetailsAttachments.cshtml", Model)
 
-<div class="card shadow-sm ncr-card mb-4">
-    <div class="ncr-section-header"><i class="bi bi-headset"></i> LLII Customer Care Remarks / Findings</div>
-    <div class="row g-0">
-        <div class="col-md-3 p-3 ncr-status-panel">
-            @{
-                string csBadgeClass = "bg-info"; string csBadgeText = "TRANSMITTED";
-                switch (Model.CSRemarks)
+    <section class="complaints-card">
+        <div class="main-view-card-header">
+            <h4><span class="main-view-card-icon"><i class="fa fa-headphones"></i></span>LLII Customer Care Remarks / Findings</h4>
+        </div>
+        <div class="complaints-remarks">
+            <div class="complaints-remarks-side">
+                <span class="main-badge @csBadgeClass">@csBadgeText</span>
+                <div class="main-view-field">
+                    <dl class="mb-0">
+                        <dt>Response Date</dt>
+                        <dd>@(Model.CSResDate.HasValue ? Model.CSResDate.Value.ToString("MM/dd/yyyy hh:mm tt") : "-")</dd>
+                    </dl>
+                </div>
+
+                @if (Model.NcrStatus != 24)
                 {
-                    case 21: csBadgeClass = "bg-success"; csBadgeText = "VALID"; break;
-                    case 22: csBadgeClass = "bg-warning"; csBadgeText = "INVALID"; break;
-                    case 23: csBadgeClass = "bg-primary"; csBadgeText = "FOR FURTHER INVESTIGATION"; break;
+                    <div class="main-form-group no-print">
+                        <label for="CSRemarks">New Remarks</label>
+                        <select class="form-control" id="CSRemarks">
+                            <option value="21">Valid</option>
+                            <option value="22">Invalid</option>
+                            <option value="23">For Further Investigation</option>
+                        </select>
+                    </div>
                 }
-            }
-            <span class="badge @csBadgeClass">@csBadgeText</span>
-            <div class="ncr-field mt-3">
-                <span class="ncr-field-label">Response Date</span>
-                <span class="ncr-field-value">@(Model.CSResDate.HasValue ? Model.CSResDate.Value.ToString("MM/dd/yyyy hh:mm tt") : "-")</span>
             </div>
-
-            @if (Model.NcrStatus != 24)
-            {
-                <div class="mt-3 no-print">
-                    <span class="ncr-field-label">New Remarks</span>
-                    <select class="form-select form-select-sm" id="CSRemarks">
-                        <option value="21">Valid</option>
-                        <option value="22">Invalid</option>
-                        <option value="23">For Further Investigation</option>
-                    </select>
+            <div class="complaints-remarks-main">
+                <div class="main-form-group">
+                    <span class="main-form-label">Latest Findings</span>
+                    <textarea class="form-control complaints-findings-readonly" rows="6" disabled>@Model.CSFindings</textarea>
                 </div>
-            }
-        </div>
-        <div class="col-md-9 p-3">
-            <div class="ncr-field">
-                <span class="ncr-field-label">Latest Findings</span>
-                <textarea class="form-control ncr-findings-readonly" rows="6" disabled>@Model.CSFindings</textarea>
+
+                @if (Model.NcrStatus != 24)
+                {
+                    <div class="main-form-group no-print">
+                        <label for="CSFindings">Add Findings</label>
+                        <textarea class="form-control complaints-findings-input" id="CSFindings" rows="4" placeholder="Add your findings..."></textarea>
+                    </div>
+                    <input type="hidden" id="DocID" value="@Model.DocID" />
+                    <button id="saveCSFindings" class="btn main-form-save-btn no-print">
+                        <i class="fa fa-paper-plane"></i>Update Findings
+                    </button>
+                }
+                else
+                {
+                    <div class="main-inline-alert is-warning mt-3">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <span>This NCR has been finalized. You cannot edit the Customer Care Remarks/Findings.</span>
+                    </div>
+                }
             </div>
-
-            @if (Model.NcrStatus != 24)
-            {
-                <div class="ncr-field mt-3 no-print">
-                    <span class="ncr-field-label">Add Findings</span>
-                    <textarea class="form-control" id="CSFindings" rows="4" placeholder="Add your findings..."></textarea>
-                </div>
-                <input type="hidden" id="DocID" value="@Model.DocID" />
-                <button id="saveCSFindings" class="btn btn-primary btn-sm mt-2 no-print">
-                    <i class="bi bi-send-check"></i> Update Findings
-                </button>
-            }
-            else
-            {
-                <div class="alert alert-warning mt-3 mb-0 py-2 small">
-                    This NCR has been finalized. You cannot edit the Customer Care Remarks/Findings.
-                </div>
-            }
         </div>
-    </div>
+    </section>
+
 </div>
 
 <script src="~/Scripts/jquery-3.7.0.min.js"></script>

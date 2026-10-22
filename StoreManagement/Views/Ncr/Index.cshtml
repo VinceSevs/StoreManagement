@@ -4,51 +4,154 @@
     ViewBag.Title = "Non-Conformance Report";
 }*@
 
-<link href="~/Content/ncr/index.css" rel="stylesheet" />
+<link href="~/Content/complaints/complaints.css" rel="stylesheet" />
 
-<div class="lead-page-header">
-    <div class="lead-page-icon"><i class="bi bi-exclamation-diamond"></i></div>
-    <div>
-        <div class="lead-eyebrow">Complaint Report</div>
-        <h1>Non-Conformance Report</h1>
-    </div>
-</div>
+<div class="main-list-page">
 
-<div class="card shadow-sm ncr-filter-card mb-3">
-    <div class="card-body">
-        <div class="row g-3 align-items-end">
-            <div class="col-lg-4 col-md-6">
-                <label class="ncr-filter-label" for="ncrSearch">Search</label>
-                <input type="text" id="ncrSearch" class="form-control lead-search" placeholder="NCR No., store, filed by..." autocomplete="off" />
+    <!-- =========================================
+         NON-CONFORMANCE HERO BANNER
+         ========================================= -->
+
+    <div class="main-hero">
+
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="Non-conformance reports" />
+
+        <div class="main-hero-gradient"></div>
+
+        <div class="main-hero-content">
+
+            <div class="main-hero-eyebrow">
+                COMPLAINTS
             </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="ncr-filter-label" for="ncrStatusFilter">Status</label>
-                <select id="ncrStatusFilter" class="form-select">
-                    <option value="">All Statuses</option>
-                    <option value="20">Transmitted</option>
-                    <option value="23">For Further Investigation</option>
-                    <option value="24">Closed</option>
-                    <option value="29">Cancelled</option>
-                </select>
+
+            <h2 class="main-hero-heading">
+                Non-Conformance Report
+            </h2>
+
+            <p class="main-hero-description">
+                Review non-conformance reports filed by stores and record Customer Care findings through closure.
+            </p>
+
+            <div class="main-hero-features">
+
+                <div class="main-hero-feature">
+
+                    <div class="main-hero-feature-icon">
+                        <i class="fa fa-file-text-o"></i>
+                    </div>
+
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Store Reports</div>
+                        <div class="main-hero-feature-desc">Non-conformance filed by stores</div>
+                    </div>
+
+                </div>
+
+                <div class="main-hero-feature">
+
+                    <div class="main-hero-feature-icon">
+                        <i class="fa fa-headphones"></i>
+                    </div>
+
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Customer Care</div>
+                        <div class="main-hero-feature-desc">Respond with remarks and findings</div>
+                    </div>
+
+                </div>
+
+                <div class="main-hero-feature">
+
+                    <div class="main-hero-feature-icon">
+                        <i class="fa fa-line-chart"></i>
+                    </div>
+
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Status Tracking</div>
+                        <div class="main-hero-feature-desc">Follow each report to closure</div>
+                    </div>
+
+                </div>
+
             </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="ncr-filter-label" for="ncrDateFrom">Date From</label>
-                <input type="date" id="ncrDateFrom" class="form-control" />
-            </div>
-            <div class="col-lg-2 col-md-6">
-                <label class="ncr-filter-label" for="ncrDateTo">Date To</label>
-                <input type="date" id="ncrDateTo" class="form-control" />
-            </div>
-            <div class="col-lg-2 col-md-12">
-                <button type="button" id="ncrClearFilters" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-x-circle"></i> Clear Filters
-                </button>
-            </div>
+
         </div>
-    </div>
-</div>
 
-@Html.Partial("~/Views/Ncr/_PartialView/_IndexTable.cshtml", Model)
+    </div>
+
+
+    <!-- =========================================
+         SEARCH / FILTER
+         ========================================= -->
+
+    <div class="main-list-toolbar">
+
+        <div class="main-list-search">
+
+            <div class="input-group">
+
+                <input type="text"
+                       id="ncrSearch"
+                       class="form-control"
+                       placeholder="Search NCR No., store, filed by..."
+                       autocomplete="off" />
+
+                <span class="input-group-btn">
+
+                    <button type="button"
+                            id="ncrSearchBtn"
+                            class="btn main-list-search-btn"
+                            title="Search">
+
+                        <i class="fa fa-search"></i>
+
+                        <span class="main-list-search-btn-text">Search</span>
+
+                    </button>
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="main-list-status">
+            <select id="ncrStatusFilter" class="form-control" aria-label="Status">
+                <option value="">All Statuses</option>
+                <option value="20">Transmitted</option>
+                <option value="23">For Further Investigation</option>
+                <option value="24">Closed</option>
+                <option value="29">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="complaints-date">
+            <label class="complaints-date-label" for="ncrDateFrom">From</label>
+            <input type="date" id="ncrDateFrom" class="form-control" />
+        </div>
+
+        <div class="complaints-date">
+            <label class="complaints-date-label" for="ncrDateTo">To</label>
+            <input type="date" id="ncrDateTo" class="form-control" />
+        </div>
+
+        <button type="button" id="ncrClearFilters" class="btn complaints-clear-btn">
+            <i class="fa fa-times-circle-o"></i>Clear Filters
+        </button>
+
+        <span class="complaints-result-count" id="ncrResultCount"></span>
+
+        <button type="button" id="ncrExportBtn" class="btn main-list-add-btn" title="Export to Excel">
+            <i class="fa fa-file-excel-o"></i><span class="main-list-add-btn-text">Export to Excel</span>
+        </button>
+
+    </div>
+
+    @Html.Partial("~/Views/Ncr/_PartialView/_IndexTable.cshtml", Model)
+
+</div>
 
 <script src="~/Scripts/jquery-3.7.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

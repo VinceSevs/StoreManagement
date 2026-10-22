@@ -14,10 +14,13 @@
         var statusSelect = document.getElementById('ncrStatusFilter');
         var dateFromInput = document.getElementById('ncrDateFrom');
         var dateToInput = document.getElementById('ncrDateTo');
+        var pageSizeSelect = document.getElementById('ncrPageSize');
+        var emptyRow = document.getElementById('ncrEmptyRow');
 
         function reorderDom(rows) {
             var tbody = document.querySelector('#ncrTable tbody');
             rows.forEach(function (row) { tbody.appendChild(row); });
+            if (emptyRow) tbody.appendChild(emptyRow);
         }
 
         function getSortValue(row, colIndex) {
@@ -37,8 +40,11 @@
         function updateSortIndicators() {
             document.querySelectorAll('.ncr-sortable').forEach(function (th) {
                 th.classList.remove('sort-asc', 'sort-desc');
+                th.setAttribute('aria-sort', 'none');
+                var btn = th.querySelector('.main-column-sort');
+                if (btn) btn.classList.remove('is-active');
                 var icon = th.querySelector('.sort-icon');
-                if (icon) icon.className = 'bi bi-arrow-down-up sort-icon';
+                if (icon) icon.className = 'fa fa-sort sort-icon';
             });
 
             if (sortState.column === null) return;
@@ -47,9 +53,12 @@
             if (!activeTh) return;
 
             activeTh.classList.add(sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            activeTh.setAttribute('aria-sort', sortState.direction === 'asc' ? 'ascending' : 'descending');
+            var activeBtn = activeTh.querySelector('.main-column-sort');
+            if (activeBtn) activeBtn.classList.add('is-active');
             var activeIcon = activeTh.querySelector('.sort-icon');
             if (activeIcon) {
-                activeIcon.className = 'bi ' + (sortState.direction === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill') + ' sort-icon';
+                activeIcon.className = 'fa ' + (sortState.direction === 'asc' ? 'fa-sort-asc' : 'fa-sort-desc') + ' sort-icon';
             }
         }
 
@@ -123,11 +132,13 @@
                 row.style.display = visibleSet.has(row) ? '' : 'none';
             });
 
+            if (emptyRow) emptyRow.hidden = totalRows !== 0;
+
             var infoEl = document.getElementById('ncrPageInfo');
             if (infoEl) {
                 infoEl.textContent = totalRows === 0
                     ? 'No NCRs found'
-                    : (startIndex + 1) + ' to ' + Math.min(endIndex, totalRows) + ' of ' + totalRows + ' shown';
+                    : 'Showing ' + (startIndex + 1) + ' to ' + Math.min(endIndex, totalRows) + ' of ' + totalRows + ' entries';
             }
 
             var countEl = document.getElementById('ncrResultCount');
@@ -145,57 +156,52 @@
             if (!pager) return;
             pager.innerHTML = '';
 
-            function addPageItem(label, page, opts) {
+            function addButton(label, page, opts) {
                 opts = opts || {};
-                var li = document.createElement('li');
-                li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
-
-                if (opts.ellipsis) {
-                    li.innerHTML = '<span class="page-link" style="border:none;background:transparent;box-shadow:none;">&hellip;</span>';
-                    pager.appendChild(li);
-                    return;
-                }
-
                 var btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'page-link';
+                btn.className = 'btn main-pagination-btn' +
+                    (opts.nav ? ' main-pagination-nav-btn' : '') +
+                    (opts.active ? ' main-pagination-btn-active' : '');
                 btn.textContent = label;
+                btn.disabled = !!opts.disabled;
+                if (opts.active) btn.setAttribute('aria-current', 'page');
                 if (!opts.disabled && !opts.active) {
                     btn.addEventListener('click', function () {
                         currentPage = page;
                         renderPage();
                     });
                 }
-                li.appendChild(btn);
-                pager.appendChild(li);
+                pager.appendChild(btn);
+            }
+
+            function addEllipsis() {
+                var span = document.createElement('span');
+                span.className = 'main-pagination-ellipsis';
+                span.textContent = '...';
+                pager.appendChild(span);
             }
 
             if (totalPages <= 1) return;
 
-            addPageItem('Previous', currentPage - 1, { disabled: currentPage === 1 });
+            addButton('Previous', currentPage - 1, { nav: true, disabled: currentPage === 1 });
 
-            addPageItem('1', 1, { active: currentPage === 1 });
+            addButton('1', 1, { active: currentPage === 1 });
 
             var windowStart = Math.max(2, currentPage - 1);
             var windowEnd = Math.min(totalPages - 1, currentPage + 1);
 
-            if (windowStart > 2) {
-                addPageItem(null, null, { ellipsis: true });
-            }
+            if (windowStart > 2) addEllipsis();
 
             for (var p = windowStart; p <= windowEnd; p++) {
-                addPageItem(String(p), p, { active: p === currentPage });
+                addButton(String(p), p, { active: p === currentPage });
             }
 
-            if (windowEnd < totalPages - 1) {
-                addPageItem(null, null, { ellipsis: true });
-            }
+            if (windowEnd < totalPages - 1) addEllipsis();
 
-            if (totalPages > 1) {
-                addPageItem(String(totalPages), totalPages, { active: currentPage === totalPages });
-            }
+            addButton(String(totalPages), totalPages, { active: currentPage === totalPages });
 
-            addPageItem('Next', currentPage + 1, { disabled: currentPage === totalPages });
+            addButton('Next', currentPage + 1, { nav: true, disabled: currentPage === totalPages });
         }
 
         function exportToExcel() {
@@ -210,7 +216,7 @@
             visibleRows.forEach(function (row) {
                 var cells = row.querySelectorAll('td');
                 var rowData = [];
-                for (var i = 0; i < cells.length - 1; i++) { // skip the trailing Action column
+                for (var i = 0; i < cells.length - 1; i++) {
                     rowData.push(cells[i].textContent.trim());
                 }
                 data.push(rowData);
@@ -247,6 +253,11 @@
         searchInput.addEventListener('input', function () {
             clearTimeout(searchTimer);
             searchTimer = setTimeout(applyFilters, 200);
+        });
+        document.getElementById('ncrSearchBtn').addEventListener('click', applyFilters);
+        pageSizeSelect.addEventListener('change', function () {
+            PAGE_SIZE = parseInt(pageSizeSelect.value, 10) || 10;
+            applyFilters();
         });
         statusSelect.addEventListener('change', applyFilters);
         dateFromInput.addEventListener('change', applyFilters);

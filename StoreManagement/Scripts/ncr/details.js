@@ -2,9 +2,9 @@
 
     function insertNcrPrintTextBlocks() {
         ncrPrintTextNodes = [];
-        document.querySelectorAll('textarea.ncr-findings-readonly').forEach(function (ta) {
+        document.querySelectorAll('textarea.complaints-findings-readonly').forEach(function (ta) {
             var div = document.createElement('div');
-            div.className = 'ncr-print-text';
+            div.className = 'complaints-print-text';
             div.textContent = ta.value;
             ta.insertAdjacentElement('afterend', div);
             ncrPrintTextNodes.push(div);
