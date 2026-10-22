@@ -68,165 +68,171 @@
     string attachmentUrl = Url.Action("NncrAttachment", "Nncr");
 }
 
-<div class="card mb-3 nncr-section-card">
-    <div class="card-header bg-white fw-semibold nncr-section-header">
-        <span class="nncr-step-num">1</span>
-        <span>Report Information</span>
+@{
+    string statusTone = Model.StatusKey == "awaiting" ? "is-info"
+        : Model.StatusKey == "overdue" ? "is-brand"
+        : Model.StatusKey == "approved" ? "is-success"
+        : Model.StatusKey == "rejected" ? "is-warning" : "";
+}
+
+<div class="nncr-card">
+    <div class="main-view-card-header">
+        <h4><span class="nncr-step-num">1</span>Report Information</h4>
     </div>
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">NNCR No.</label>
-                <input type="text" class="form-control readonly-field font-mono" value="@Model.ReportNumber" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Status</label>
-                <input type="text" class="form-control readonly-field" value="@Model.StatusLabel" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Date of Incident</label>
-                <input type="text" class="form-control readonly-field font-mono" value="@FormatDate(Model.DateOfIncident)" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Date Filed</label>
-                <input type="text" class="form-control readonly-field font-mono" value="@FormatDate(Model.DateFiled)" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Response Due</label>
-                <input type="text" class="form-control readonly-field font-mono @(Model.IsOverdue ? "nncr-overdue-field" : "")" value="@dueValue" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Issued By</label>
-                <input type="text" class="form-control readonly-field" value="@Model.IssuedByName" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Issued To (Supplier)</label>
-                <input type="text" class="form-control readonly-field" value="@Model.SupplierName" readonly>
-            </div>
-            <div class="col-sm-6">
-                <label class="form-label small text-uppercase text-secondary">Site Warehouse</label>
-                <input type="text" class="form-control readonly-field" value="@Model.SiteWarehouseName" readonly>
-            </div>
+    <dl class="row main-view-fields">
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>NNCR No.</dt>
+            <dd class="nncr-mono">@Model.ReportNumber</dd>
         </div>
-    </div>
-</div>
-
-<div class="card mb-3 nncr-section-card">
-    <div class="card-header bg-white fw-semibold nncr-section-header">
-        <span class="nncr-step-num">2</span>
-        <span>Non-conformance</span>
-    </div>
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="form-label small text-uppercase text-secondary">Type of Non-conformance</div>
-                <ul class="nncr-checklist">
-                    @foreach (var option in typeOptions)
-                    {
-                        <li class="nncr-check @(option.Checked ? "is-checked" : "")">
-                            <span class="nncr-check-box" aria-hidden="true"></span>
-                            <span class="nncr-check-text">
-                                <span class="nncr-check-label">@(option.HasDetail ? option.Label + ":" : option.Label)</span>
-                                @if (!string.IsNullOrEmpty(option.Hint))
-                                {
-                                    <span class="nncr-check-hint">@option.Hint</span>
-                                }
-                                @if (option.HasDetail)
-                                {
-                                    <span class="nncr-check-detail @(option.Details.Count == 0 ? "is-blank" : "")">@(string.Join("; ", option.Details))</span>
-                                }
-                                @if (option.Checked)
-                                {
-                                    <span class="visually-hidden">(selected)</span>
-                                }
-                            </span>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <div class="col-md-6">
-                <div class="form-label small text-uppercase text-secondary">Non-conformance Interception</div>
-                <ul class="nncr-checklist">
-                    @foreach (var option in interceptionOptions)
-                    {
-                        <li class="nncr-check @(option.Checked ? "is-checked" : "")">
-                            <span class="nncr-check-box" aria-hidden="true"></span>
-                            <span class="nncr-check-text">
-                                <span class="nncr-check-label">@option.Label:</span>
-                                <span class="nncr-check-detail @(option.Details.Count == 0 ? "is-blank" : "")">@(string.Join("; ", option.Details))</span>
-                                @if (option.Checked)
-                                {
-                                    <span class="visually-hidden">(selected)</span>
-                                }
-                            </span>
-                        </li>
-                    }
-                </ul>
-            </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Status</dt>
+            <dd><span class="main-badge @statusTone"><i class="fa fa-circle"></i>@Model.StatusLabel</span></dd>
         </div>
-    </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Date of Incident</dt>
+            <dd class="nncr-mono">@FormatDate(Model.DateOfIncident)</dd>
+        </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Date Filed</dt>
+            <dd class="nncr-mono">@FormatDate(Model.DateFiled)</dd>
+        </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Response Due</dt>
+            <dd class="nncr-mono @(Model.IsOverdue ? "nncr-overdue-value" : "")">@dueValue</dd>
+        </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Issued By</dt>
+            <dd>@Model.IssuedByName</dd>
+        </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Issued To (Supplier)</dt>
+            <dd>@Model.SupplierName</dd>
+        </div>
+        <div class="col-12 col-sm-6 main-view-field">
+            <dt>Site Warehouse</dt>
+            <dd>@Model.SiteWarehouseName</dd>
+        </div>
+    </dl>
 </div>
 
-<div class="card mb-3 nncr-section-card">
-    <div class="card-header bg-white fw-semibold nncr-section-header">
-        <span class="nncr-step-num">3</span>
-        <span>Details of the Non-conformance</span>
+<div class="nncr-card">
+    <div class="main-view-card-header">
+        <h4><span class="nncr-step-num">2</span>Non-conformance</h4>
     </div>
-    <div class="card-body">
-        <div class="form-control readonly-field nncr-readonly-block">@Model.DetailsOfNonconformance</div>
-    </div>
-</div>
-
-<div class="card mb-3 nncr-section-card">
-    <div class="card-header bg-white fw-semibold nncr-section-header">
-        <span class="nncr-step-num">4</span>
-        <span>Action Taken by LLII-QA</span>
-    </div>
-    <div class="card-body">
-        <label class="form-label small text-uppercase text-secondary">QA Remarks</label>
-        @if (string.IsNullOrWhiteSpace(Model.QARemarks))
-        {
-            <div class="text-secondary fst-italic small">No QA remarks recorded.</div>
-        }
-        else
-        {
-            <div class="form-control readonly-field nncr-readonly-block">@Model.QARemarks</div>
-        }
-    </div>
-</div>
-
-<div class="card mb-3 nncr-section-card">
-    <div class="card-header bg-white fw-semibold nncr-section-header">
-        <span class="nncr-step-num">5</span>
-        <span>Attachments</span>
-    </div>
-    <div class="card-body">
-        @if (Model.Attachments == null || Model.Attachments.Count == 0)
-        {
-            <div class="text-secondary fst-italic small">No attachments.</div>
-        }
-        else
-        {
-            <ul class="list-unstyled mb-0 nncr-attachment-list">
-                @foreach (var file in Model.Attachments)
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <div class="nncr-checklist-title">Type of Non-conformance</div>
+            <ul class="nncr-checklist">
+                @foreach (var option in typeOptions)
                 {
-                    string href = attachmentUrl + "?token=" + Url.Encode(Model.ResponseToken) + "&file=" + Url.Encode(file.FileName);
-                    <li class="nncr-attachment">
-                        @if (file.IsImage)
-                        {
-                            <a href="@href" target="_blank" rel="noopener" class="nncr-attachment-thumb">
-                                <img src="@href" alt="@file.FileName" loading="lazy">
-                            </a>
-                        }
-                        else
-                        {
-                            <span class="nncr-attachment-icon" aria-hidden="true"><i class="bi bi-file-earmark"></i></span>
-                        }
-                        <a href="@href" target="_blank" rel="noopener" class="nncr-attachment-name">@file.FileName</a>
-                        <span class="small text-secondary text-nowrap">@(file.Size < 1024 * 1024 ? (file.Size / 1024.0).ToString("0.#") + " KB" : (file.Size / (1024.0 * 1024)).ToString("0.#") + " MB")</span>
+                    <li class="nncr-check @(option.Checked ? "is-checked" : "")">
+                        <span class="nncr-check-box" aria-hidden="true"></span>
+                        <span class="nncr-check-text">
+                            <span class="nncr-check-label">@(option.HasDetail ? option.Label + ":" : option.Label)</span>
+                            @if (!string.IsNullOrEmpty(option.Hint))
+                            {
+                                <span class="nncr-check-hint">@option.Hint</span>
+                            }
+                            @if (option.HasDetail)
+                            {
+                                <span class="nncr-check-detail @(option.Details.Count == 0 ? "is-blank" : "")">@(string.Join("; ", option.Details))</span>
+                            }
+                            @if (option.Checked)
+                            {
+                                <span class="visually-hidden">(selected)</span>
+                            }
+                        </span>
                     </li>
                 }
             </ul>
-        }
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="nncr-checklist-title">Non-conformance Interception</div>
+            <ul class="nncr-checklist">
+                @foreach (var option in interceptionOptions)
+                {
+                    <li class="nncr-check @(option.Checked ? "is-checked" : "")">
+                        <span class="nncr-check-box" aria-hidden="true"></span>
+                        <span class="nncr-check-text">
+                            <span class="nncr-check-label">@option.Label:</span>
+                            <span class="nncr-check-detail @(option.Details.Count == 0 ? "is-blank" : "")">@(string.Join("; ", option.Details))</span>
+                            @if (option.Checked)
+                            {
+                                <span class="visually-hidden">(selected)</span>
+                            }
+                        </span>
+                    </li>
+                }
+            </ul>
+        </div>
     </div>
+</div>
+
+<div class="nncr-card">
+    <div class="main-view-card-header">
+        <h4><span class="nncr-step-num">3</span>Details of the Non-conformance</h4>
+    </div>
+    <dl class="row main-view-fields">
+        <div class="col-12 main-view-field">
+            <dt>Details</dt>
+            <dd class="nncr-readonly-block">@Model.DetailsOfNonconformance</dd>
+        </div>
+    </dl>
+</div>
+
+<div class="nncr-card">
+    <div class="main-view-card-header">
+        <h4><span class="nncr-step-num">4</span>Action Taken by LLII-QA</h4>
+    </div>
+    @if (string.IsNullOrWhiteSpace(Model.QARemarks))
+    {
+        <div class="main-empty is-boxed">No QA remarks recorded.</div>
+    }
+    else
+    {
+        <dl class="row main-view-fields">
+            <div class="col-12 main-view-field">
+                <dt>QA Remarks</dt>
+                <dd class="nncr-readonly-block">@Model.QARemarks</dd>
+            </div>
+        </dl>
+    }
+</div>
+
+<div class="nncr-card">
+    <div class="main-view-card-header">
+        <h4><span class="nncr-step-num">5</span>Attachments</h4>
+    </div>
+    @if (Model.Attachments == null || Model.Attachments.Count == 0)
+    {
+        <div class="main-empty is-boxed">No attachments.</div>
+    }
+    else
+    {
+        var photos = new List<object>();
+        int photoIndex = 0;
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var file in Model.Attachments)
+            {
+                string href = attachmentUrl + "?token=" + Url.Encode(Model.ResponseToken) + "&file=" + Url.Encode(file.FileName);
+                if (file.IsImage)
+                {
+                    photos.Add(new { url = href, caption = "", fileName = file.FileName });
+                    <button type="button" class="attach-thumb-btn" onclick="openLightbox(@photoIndex)" title="@file.FileName">
+                        <img src="@href" class="capa-thumb" alt="@file.FileName" loading="lazy">
+                    </button>
+                    photoIndex++;
+                }
+                else
+                {
+                    <a href="@href" target="_blank" rel="noopener" class="capa-thumb-file" title="@file.FileName">
+                        <span>@(System.IO.Path.GetExtension(file.FileName).TrimStart('.').ToUpperInvariant())</span>
+                        <small>@file.FileName</small>
+                    </a>
+                }
+            }
+        </div>
+        <script>window.ATTACHMENT_PHOTOS = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(photos));</script>
+
+    }
 </div>

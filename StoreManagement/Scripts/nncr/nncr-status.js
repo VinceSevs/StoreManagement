@@ -5,7 +5,7 @@
 	'use strict';
 
 	var CONFIG = window.NNCR_STATUS_DATA || {};
-	var BRAND_COLOR = '#7d1f27';
+	var BRAND_COLOR = '#c60404';
 
 	function escapeHtml(str) {
 		return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
@@ -52,8 +52,8 @@
 			showConfirmButton: !!CONFIG.canSendEmail && !!email.To,
 			showDenyButton: true,
 			showCancelButton: true,
-			confirmButtonText: '<i class="bi bi-send"></i> Send email',
-			denyButtonText: '<i class="bi bi-box-arrow-up-right"></i> Open response form',
+			confirmButtonText: '<i class="fa fa-paper-plane-o"></i> Send email',
+			denyButtonText: '<i class="fa fa-external-link"></i> Open response form',
 			cancelButtonText: 'Close',
 			confirmButtonColor: BRAND_COLOR,
 			denyButtonColor: '#6c757d',
@@ -104,7 +104,7 @@
 	// ---------- Download PDF (html2pdf, like CAPA status) ----------
 	function setPdfButton(btn, busy) {
 		btn.disabled = busy;
-		btn.innerHTML = busy ? 'Generating...' : '<i class="bi bi-download"></i> Download PDF';
+		btn.innerHTML = busy ? 'Generating...' : '<i class="fa fa-download"></i> Download PDF';
 	}
 
 	function downloadPdf() {
@@ -117,9 +117,9 @@
 		var clone = source.cloneNode(true);
 		clone.removeAttribute('id');
 		clone.querySelectorAll('[data-pdf-exclude], .no-print').forEach(function (el) { el.remove(); });
-		clone.querySelectorAll('.readonly-field').forEach(function (el) {
+		clone.querySelectorAll('.main-view-field dd').forEach(function (el) {
 			el.style.backgroundColor = '#fff';
-			el.style.border = '1px solid #000';
+			el.style.border = '1px solid #999';
 		});
 		document.body.appendChild(clone);
 
@@ -130,7 +130,7 @@
 			image: { type: 'jpeg', quality: 0.98 },
 			html2canvas: { scale: 2, useCORS: true },
 			jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-			pagebreak: { mode: ['avoid-all', 'css'], avoid: ['.nncr-section-card'] }
+			pagebreak: { mode: ['avoid-all', 'css'], avoid: ['.nncr-card'] }
 		};
 
 		html2pdf().set(opt).from(clone).save().then(function () {

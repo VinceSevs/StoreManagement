@@ -4,20 +4,20 @@
 	'use strict';
 
 	var CONFIG = window.NNCR_RESPONSE_DATA || {};
-	var BRAND_COLOR = '#7d1f27';
+	var BRAND_COLOR = '#c60404';
 
 	function setBadge(text, cls) {
 		var badge = document.getElementById('nncrStatusBadge');
 		if (!badge) return;
-		badge.textContent = text;
-		badge.className = 'badge nncr-status-badge ' + cls + ' px-3 py-2';
+		badge.innerHTML = text; // static markup from this script, no user text
+		badge.className = 'main-badge ' + cls;
 	}
 
 	function setStatus(text, cls) {
 		var el = document.getElementById('submitStatus');
 		if (!el) return;
 		el.textContent = text || '';
-		el.className = 'me-auto small fw-semibold' + (cls ? ' ' + cls : '');
+		el.className = 'nncr-submit-status' + (cls ? ' ' + cls : '');
 	}
 
 	function showThankYou(remarks, decisionText, dateText) {
@@ -94,7 +94,7 @@
 			var result = await response.json().catch(function () { return null; });
 
 			if (response.ok && result && result.success) {
-				setBadge('Responded', 'is-responded');
+				setBadge('<i class="fa fa-circle"></i>' + (decision === 'Approve' ? 'Approved' : 'Rejected'), decision === 'Approve' ? 'is-success' : 'is-warning');
 				showThankYou(remarks, decisionText, dateEl ? dateEl.value : '');
 				Swal.fire({
 					icon: 'success',

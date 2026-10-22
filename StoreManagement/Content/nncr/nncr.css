@@ -1,0 +1,1174 @@
+/* NNCR module (Views/Nncr/*): only what main.css does not cover.
+   List page, hero, toolbar, table, badges and buttons come from main.css. */
+
+
+/* =========================================
+   TONES (shared by the stat cards)
+   ========================================= */
+
+.nncr-stat {
+    --nncr-tone: #6b7280;
+    --nncr-tone-bg: #f0f1f3;
+}
+
+    .nncr-stat.is-brand {
+        --nncr-tone: var(--main-red);
+        --nncr-tone-bg: var(--main-red-bg-tint);
+    }
+
+    .nncr-stat.is-info {
+        --nncr-tone: #1d4ed8;
+        --nncr-tone-bg: rgba(37, 99, 235, 0.12);
+    }
+
+    .nncr-stat.is-warning {
+        --nncr-tone: #b45309;
+        --nncr-tone-bg: rgba(217, 119, 6, 0.14);
+    }
+
+    .nncr-stat.is-success {
+        --nncr-tone: #15803d;
+        --nncr-tone-bg: rgba(22, 163, 74, 0.13);
+    }
+
+
+/* =========================================
+   LIST PAGE: STATUS SUMMARY
+   ========================================= */
+
+.nncr-stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.nncr-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+    .nncr-stat:hover {
+        border-color: var(--main-red);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+
+    .nncr-stat:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .nncr-stat.is-active {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-soft);
+        box-shadow: 0 0 0 1px var(--main-red);
+    }
+
+.nncr-stat-icon {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--nncr-tone-bg);
+    color: var(--nncr-tone);
+    font-size: 15px;
+}
+
+.nncr-stat-body {
+    min-width: 0;
+}
+
+.nncr-stat-value {
+    color: #17191D;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.nncr-stat-label {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+
+/* =========================================
+   LIST PAGE: TOOLBAR EXTRAS
+   ========================================= */
+
+.main-list-status.nncr-supplier-filter {
+    flex: 0 0 220px;
+    width: 220px;
+}
+
+.nncr-toolbar-dates {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 6px;
+}
+
+    .nncr-toolbar-dates label,
+    .nncr-toolbar-dates span {
+        margin: 0;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .nncr-toolbar-dates .form-control {
+        width: 140px;
+        height: 40px;
+        border-color: #d9d9d9;
+        border-radius: 5px;
+        box-shadow: none;
+        color: #555555;
+        font-size: 13px;
+    }
+
+        .nncr-toolbar-dates .form-control:focus {
+            border-color: var(--main-red);
+            box-shadow: 0 0 0 3px var(--main-red-ring);
+        }
+
+.btn.main-outline-btn.nncr-export-btn {
+    height: 40px;
+    padding: 0 14px;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   LIST PAGE: TABLE
+   ========================================= */
+
+.nncr-table thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.nncr-table .th-content .sort-icon {
+    font-size: 11px;
+}
+
+.main-list-table.nncr-table tbody tr.nncr-row {
+    cursor: pointer;
+}
+
+/* Rows are shown and hidden by paging and filters, so the stripe is set by script */
+.main-list-table.nncr-table tbody tr.nncr-row:nth-child(even) {
+    --row-bg: #ffffff;
+    background: #ffffff;
+}
+
+.main-list-table.nncr-table tbody tr.nncr-row.is-even,
+.main-list-table.nncr-table tbody tr.nncr-row.is-even:nth-child(even) {
+    --row-bg: #fbfbfc;
+    background: #fbfbfc;
+}
+
+.main-list-table.nncr-table tbody tr.nncr-row.is-overdue,
+.main-list-table.nncr-table tbody tr.nncr-row.is-overdue:nth-child(even),
+.main-list-table.nncr-table tbody tr.nncr-row.is-overdue.is-even {
+    --row-bg: #fff6f6;
+    background: #fff6f6;
+}
+
+.main-list-table.nncr-table tbody tr.nncr-row:hover {
+    --row-bg: #fcf5f5;
+    background: #fcf5f5;
+}
+
+.nncr-cell-text {
+    display: -webkit-box;
+    max-width: 220px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+}
+
+.nncr-date-cell {
+    font-variant-numeric: tabular-nums;
+}
+
+.nncr-due-line {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.nncr-due-icon {
+    color: #b45309;
+    font-size: 12px;
+}
+
+.is-overdue .nncr-due-icon {
+    color: var(--main-red);
+}
+
+.nncr-due-text {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 11.5px;
+}
+
+    .nncr-due-text.is-due-soon {
+        color: #b45309;
+        font-weight: 600;
+    }
+
+    .nncr-due-text.is-overdue {
+        color: var(--main-red);
+        font-weight: 600;
+    }
+
+a.main-chip.nncr-no-link {
+    text-decoration: none;
+}
+
+    a.main-chip.nncr-no-link:hover,
+    a.main-chip.nncr-no-link:focus {
+        border-color: var(--main-red);
+        color: var(--main-red-hover);
+    }
+
+.btn.nncr-row-action {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #555555;
+    font-size: 13px;
+}
+
+    .btn.nncr-row-action:hover,
+    .btn.nncr-row-action:focus {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .btn.nncr-row-action:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+
+/* =========================================
+   DETAIL / FORM PAGES (Status, Response, Quality)
+   ========================================= */
+
+.nncr-doc {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.nncr-doc-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 16px 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.nncr-doc-logo {
+    flex: 0 0 auto;
+    height: 48px;
+    width: auto;
+}
+
+.nncr-doc-meta {
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.nncr-doc-eyebrow {
+    color: var(--main-red);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.nncr-doc-title {
+    margin: 2px 0 0;
+    color: #17191D;
+    font-size: 18px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.nncr-doc-sub {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 12.5px;
+}
+
+.nncr-mono,
+.font-mono {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+.nncr-card {
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+    .nncr-card > .main-view-card-header {
+        margin-bottom: 14px;
+    }
+
+    .nncr-card .main-view-card-header .main-badge {
+        flex: 0 0 auto;
+    }
+
+.nncr-card-note {
+    flex: 0 0 auto;
+    color: #6b7280;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.nncr-step-num {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--main-red);
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+    .nncr-step-num.is-muted {
+        background: #9ca3af;
+    }
+
+.nncr-muted {
+    color: #6b7280;
+    font-size: 12.5px;
+}
+
+.nncr-readonly-block {
+    min-height: 3.5rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.main-view-field dd.nncr-overdue-value {
+    border-color: var(--main-red-ring);
+    background: var(--main-red-bg-soft);
+    color: var(--main-red);
+    font-weight: 600;
+}
+
+/* Action bar above a detail page (list / email / PDF / close) */
+.nncr-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    max-width: 860px;
+    margin: 0 auto 16px;
+    padding: 10px 16px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+    .nncr-actions .nncr-actions-lead {
+        margin-right: auto;
+    }
+
+    .nncr-actions .btn.main-outline-btn,
+    .nncr-actions .btn.main-form-cancel-btn,
+    .nncr-actions .btn.main-form-save-btn {
+        height: 36px;
+        min-width: 0;
+        padding: 0 14px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 13px;
+    }
+
+        .nncr-actions .btn.main-outline-btn i,
+        .nncr-actions .btn.main-form-cancel-btn i,
+        .nncr-actions .btn.main-form-save-btn i {
+            margin-right: 6px;
+        }
+
+.nncr-submit-status {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+    .nncr-submit-status.text-success {
+        color: #15803d !important;
+    }
+
+
+/* ---- Progress strip: Filed > Supplier response (Approved / Rejected) > Closed ---- */
+
+.nncr-progress {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nncr-progress-step {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 4px;
+    text-align: center;
+}
+
+    .nncr-progress-step + .nncr-progress-step::before {
+        content: "";
+        position: absolute;
+        top: 15px;
+        right: 50%;
+        width: 100%;
+        height: 3px;
+        background: #e1e1e1;
+        z-index: 0;
+    }
+
+    .nncr-progress-step.is-done + .nncr-progress-step::before {
+        background: var(--main-red);
+    }
+
+.nncr-progress-dot {
+    position: relative;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e1e1e1;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.nncr-progress-step.is-done .nncr-progress-dot {
+    border-color: var(--main-red);
+    background: var(--main-red);
+    color: #ffffff;
+}
+
+.nncr-progress-step.is-current .nncr-progress-dot {
+    border-color: var(--main-red);
+    color: var(--main-red);
+    box-shadow: 0 0 0 4px var(--main-red-bg-strong);
+}
+
+.nncr-progress-title {
+    margin-top: 6px;
+    color: #17191D;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.nncr-progress-step:not(.is-done):not(.is-current) .nncr-progress-title {
+    color: #6b7280;
+}
+
+.nncr-progress-meta {
+    color: #6b7280;
+    font-size: 12px;
+    word-break: break-word;
+}
+
+    .nncr-progress-meta .is-overdue {
+        color: var(--main-red);
+        font-weight: 600;
+    }
+
+
+/* ---- Paper-form checklists (Type of non-conformance / Interception) ---- */
+
+.nncr-checklist-title {
+    margin-bottom: 6px;
+    color: #6b7280;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.nncr-checklist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nncr-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 4px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+    .nncr-check.is-checked {
+        border-color: #f0f1f3;
+        background: #f7f8fa;
+        color: #17191D;
+    }
+
+.nncr-check-box {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #9ca3af;
+    border-radius: 4px;
+    background: #ffffff;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.nncr-check.is-checked .nncr-check-box {
+    border-color: var(--main-red);
+    background: var(--main-red);
+    color: #ffffff;
+}
+
+    .nncr-check.is-checked .nncr-check-box::after {
+        content: "\2713";
+        font-weight: 700;
+    }
+
+.nncr-check-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.nncr-check-label {
+    font-weight: 500;
+}
+
+.nncr-check.is-checked .nncr-check-label {
+    font-weight: 600;
+}
+
+.nncr-check-hint {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.nncr-check-detail {
+    display: inline-block;
+    min-width: 90px;
+    max-width: 100%;
+    margin-left: 4px;
+    padding: 0 4px;
+    border-bottom: 1px solid #9ca3af;
+    word-break: break-word;
+}
+
+    .nncr-check-detail.is-blank {
+        min-height: 1.2em;
+        vertical-align: bottom;
+    }
+
+
+/* ---- Attachments ---- */
+
+.nncr-attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nncr-attachment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.nncr-attachment-thumb img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+}
+
+.nncr-attachment-icon {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+    font-size: 22px;
+}
+
+.nncr-attachment-name {
+    color: var(--main-red);
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+    .nncr-attachment-name:hover {
+        color: var(--main-red-hover);
+        text-decoration: underline;
+    }
+
+.nncr-attachment-size {
+    color: #6b7280;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   QUALITY FORM (filing)
+   ========================================= */
+
+.nncr-head-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+    .nncr-head-fields > .main-form-group {
+        flex: 1 1 170px;
+        min-width: 170px;
+        margin-bottom: 0;
+    }
+
+.nncr-form .main-form-group .form-control[readonly] {
+    background: #f5f5f5;
+}
+
+.nncr-form .main-form-group .form-control.is-mono {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+.nncr-form .main-form-group .form-text {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.nncr-hint {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.nncr-box {
+    height: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #fbfbfc;
+}
+
+.nncr-box-title {
+    margin-bottom: 10px;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+    .nncr-box-title small {
+        color: #6b7280;
+        font-size: 11.5px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+    }
+
+.nncr-box .form-check-label {
+    color: #333333;
+    font-size: 13px;
+}
+
+.nncr-box .form-check-input:checked {
+    border-color: var(--main-red);
+    background-color: var(--main-red);
+}
+
+.nncr-box .form-check-input:focus {
+    border-color: var(--main-red);
+    box-shadow: 0 0 0 3px var(--main-red-ring);
+}
+
+.nncr-box .nncr-detail-input {
+    height: 34px;
+    border-color: #d9d9d9;
+    border-radius: 5px;
+    box-shadow: none;
+    font-size: 13px;
+}
+
+    .nncr-box .nncr-detail-input:focus {
+        border-color: var(--main-red);
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.nncr-form .nncr-card {
+    box-shadow: none;
+}
+
+.nncr-locked {
+    background: #fafafa;
+}
+
+    .nncr-locked textarea.form-control {
+        background: #f3f4f6;
+        cursor: not-allowed;
+    }
+
+.nncr-info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 9px 12px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #fbfbfc;
+    color: #555555;
+    font-size: 12.5px;
+}
+
+    .nncr-info-note i {
+        margin-top: 2px;
+        color: var(--main-red);
+    }
+
+/* Supplier search dropdown (Issued To) */
+.nncr-autocomplete {
+    position: relative;
+}
+
+.nncr-ac-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    max-height: 230px;
+    margin-top: 4px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+    .nncr-ac-dropdown.open {
+        display: block;
+    }
+
+.nncr-ac-item {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    background: #ffffff;
+    color: #222222;
+    font-size: 13px;
+    text-align: left;
+}
+
+    .nncr-ac-item:hover,
+    .nncr-ac-item.active {
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .nncr-ac-item mark {
+        padding: 0;
+        background: var(--main-red-bg-tint);
+        color: inherit;
+        font-weight: 700;
+    }
+
+.nncr-ac-note {
+    padding: 9px 12px;
+    color: #6b7280;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.nncr-file-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nncr-file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 13px;
+}
+
+    .nncr-file-item:last-child {
+        border-bottom: 0;
+    }
+
+    .nncr-file-item i {
+        color: #6b7280;
+    }
+
+.nncr-file-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nncr-file-size {
+    color: #6b7280;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+    .nncr-file-size.is-error {
+        color: var(--main-red);
+        font-weight: 600;
+    }
+
+.nncr-file-remove {
+    margin-left: auto;
+    padding: 2px 6px;
+    border: 0;
+    background: none;
+    color: var(--main-red);
+}
+
+    .nncr-file-remove:hover {
+        color: var(--main-red-hover);
+    }
+
+
+/* =========================================
+   RESPONSE PAGE (supplier-facing)
+   ========================================= */
+
+.nncr-response-form .main-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.nncr-response-form .main-form-group .form-control.is-invalid {
+    border-color: var(--main-red);
+    background-image: none;
+}
+
+    .nncr-response-form .main-form-group .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.nncr-response-form .invalid-feedback {
+    color: var(--main-red);
+    font-size: 12px;
+}
+
+.nncr-submit-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.nncr-thankyou-icon {
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(22, 163, 74, 0.13);
+    color: #15803d;
+    font-size: 26px;
+}
+
+.nncr-thankyou {
+    text-align: center;
+}
+
+    .nncr-thankyou h2 {
+        margin: 0 0 6px;
+        color: #17191D;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .nncr-thankyou .nncr-thankyou-body {
+        text-align: left;
+    }
+
+.nncr-invalid {
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 32px 24px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    text-align: center;
+}
+
+    .nncr-invalid .main-empty-state-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .nncr-invalid h1 {
+        margin: 0 0 8px;
+        color: #17191D;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .nncr-invalid p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 991px) {
+
+    .nncr-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .main-list-status.nncr-supplier-filter {
+        flex: 1 1 180px;
+        width: auto;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .nncr-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .main-list-status.nncr-supplier-filter {
+        flex: 1 1 100%;
+    }
+
+    .nncr-toolbar-dates {
+        flex: 1 1 100%;
+        order: 2;
+    }
+
+        .nncr-toolbar-dates .form-control {
+            flex: 1 1 0;
+            width: auto;
+            min-width: 0;
+        }
+
+    .btn.main-outline-btn.nncr-export-btn {
+        order: 2;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .nncr-card,
+    .nncr-doc-header {
+        padding: 14px;
+    }
+
+    .nncr-doc-logo {
+        height: 38px;
+    }
+
+    .nncr-progress-title {
+        font-size: 12px;
+    }
+
+    .nncr-progress-meta {
+        font-size: 11px;
+    }
+
+    .nncr-actions .btn {
+        flex: 1 1 auto;
+    }
+
+    .nncr-submit-bar .btn {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .nncr-stat {
+        transition: none;
+    }
+
+        .nncr-stat:hover {
+            transform: none;
+        }
+}
+
+
+/* =========================================
+   PRINT (Quality form: window.print)
+   ========================================= */
+
+@media print {
+
+    .sidebar,
+    .sidebar-overlay,
+    .top-header,
+    .main-hero,
+    .nncr-actions,
+    .d-print-none,
+    .no-print {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .page-content,
+    .main-list-page {
+        padding: 0 !important;
+    }
+
+    .nncr-card,
+    .nncr-doc-header {
+        box-shadow: none !important;
+    }
+}
+
+/* ---------- Activity log (status page) ---------- */
+.nncr-log-wrap {
+    margin-top: 16px;
+}
+
+.nncr-log-time {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 12px;
+    font-family: Consolas, "Courier New", monospace;
+}
+
+.nncr-log-wrap .main-history-list {
+    max-height: 420px;
+}
+
+.nncr-log-wrap .main-history-row .main-badge {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.nncr-log-wrap .main-history-icon.is-error {
+    background: var(--lead-danger-bg, #fbe7e6);
+    color: var(--lead-danger, #b42318);
+}
+
+@media (max-width: 480px) {
+    .nncr-log-wrap .main-history-row {
+        flex-wrap: wrap;
+    }
+
+    .nncr-log-wrap .main-history-row .main-badge {
+        margin-left: 38px;
+    }
+}
+
+.nncr-log-tools {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+@media (max-width: 575px) {
+    .nncr-log-wrap .main-view-card-header {
+        flex-wrap: wrap;
+    }
+
+    .nncr-log-tools {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

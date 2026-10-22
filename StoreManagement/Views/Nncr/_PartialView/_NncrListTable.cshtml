@@ -2,99 +2,150 @@
 @using StoreManagement.Models
 @{
     Func<string, string> dashIfEmpty = s => string.IsNullOrWhiteSpace(s) ? "—" : s.Trim();
+    Func<string, string> statusTone = key =>
+        key == "awaiting" ? "is-info"
+        : key == "overdue" ? "is-brand"
+        : key == "approved" ? "is-success"
+        : key == "rejected" ? "is-warning"
+        : "";
 }
-        <div class="table-responsive">
-            <table class="table nncr-table" id="nncrTable">
-                <thead>
-                    <tr>
-                        <th class="sortable" data-sort-key="date">Date of Incident <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th class="sortable" data-sort-key="due">Due Date <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th class="sortable" data-sort-col="2">NNCR No. <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th class="sortable" data-sort-col="3">Supplier <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th class="sortable" data-sort-col="4">Site Warehouse <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th class="sortable" data-sort-col="5">Type of Non-conformance <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th class="sortable" data-sort-col="6">Interception <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        @*<th>Details of the Non-conformance</th>
-                        <th class="sortable" data-sort-col="8">Issued By <i class="bi bi-arrow-down-up sort-icon"></i></th>*@
-                        <th class="sortable" data-sort-col="9">Status <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model == null || Model.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="11">
-                                <div class="empty-state">
-                                    <div class="empty-icon">&#128203;</div>
-                                    <div class="fw-semibold">No NNCR reports yet</div>
-                                    <div class="small">Filed reports will show up here. <a href="@Url.Action("Quality", "Nncr")" class="view-link">File an NNCR &rarr;</a></div>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        for (int i = 0; i < Model.Count; i++)
-                        {
-                            var nncr = Model[i];
-                            string statusUrl = Url.Action("NncrStatus", "Nncr") + "?token=" + Url.Encode(nncr.ResponseToken ?? "");
-                            string searchText = string.Join(" ", new[] {
-                                nncr.ReportNumber, nncr.SupplierName, nncr.SiteWarehouseName, nncr.IssuedByName,
-                                nncr.NonconformanceType, nncr.NonconformanceInterception, nncr.DetailsOfNonconformance
-                            }).ToLowerInvariant();
-                            string types = string.IsNullOrWhiteSpace(nncr.NonconformanceType) ? "—" : nncr.NonconformanceType.Replace("; ", ", ");
-                            string interceptions = string.IsNullOrWhiteSpace(nncr.NonconformanceInterception) ? "—" : nncr.NonconformanceInterception.Replace("; ", ", ");
-                            string rowClass = "nncr-row status-row-" + nncr.StatusKey
-                                + (nncr.IsOverdue ? " is-overdue" : "")
-                                + (nncr.IsDueSoon ? " is-due-soon" : "");
+<div class="main-list-table-wrapper">
 
-                            <tr class="@rowClass"
-                                data-index="@i"
-                                data-status="@nncr.StatusKey"
-                                data-supplier="@(nncr.SupplierName ?? "")"
-                                data-date="@(nncr.DateOfIncident.HasValue ? nncr.DateOfIncident.Value.ToString("yyyy-MM-dd") : "")"
-                                data-due="@(nncr.DueDate.HasValue ? nncr.DueDate.Value.ToString("yyyy-MM-dd") : "")"
-                                data-search="@searchText"
-                                data-href="@statusUrl">
-                                <td class="font-mono fw-semibold text-nowrap">@(nncr.DateOfIncident.HasValue ? nncr.DateOfIncident.Value.ToString("MMM dd, yyyy") : "—")</td>
-                                <td class="text-nowrap">
-                                    <div class="font-mono">
-                                        @if (nncr.IsOverdue || nncr.IsDueSoon)
-                                        {
-                                            <i class="bi bi-exclamation-triangle-fill due-warning-icon" title="@nncr.DueText" aria-label="@nncr.DueText"></i>
-                                        }
-                                        @(nncr.DueDate.HasValue ? nncr.DueDate.Value.ToString("MMM dd, yyyy") : "—")
-                                    </div>
-                                    @if (!string.IsNullOrEmpty(nncr.DueText))
+    <div class="table-responsive">
+
+        <table class="table main-list-table nncr-table" id="nncrTable">
+
+            <thead>
+                <tr>
+                    <th class="sortable" data-column="date" data-sort-key="date">
+                        <div class="th-content">
+                            <span class="th-label">DATE OF INCIDENT</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Date of Incident" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="due" data-sort-key="due">
+                        <div class="th-content">
+                            <span class="th-label">DUE DATE</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Due Date" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="number" data-sort-col="2">
+                        <div class="th-content">
+                            <span class="th-label">NNCR NO.</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by NNCR No." tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="supplier" data-sort-col="3">
+                        <div class="th-content">
+                            <span class="th-label">SUPPLIER</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Supplier" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="warehouse" data-sort-col="4">
+                        <div class="th-content">
+                            <span class="th-label">SITE WAREHOUSE</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Site Warehouse" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="type" data-sort-col="5">
+                        <div class="th-content">
+                            <span class="th-label">TYPE OF NON-CONFORMANCE</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Type of Non-conformance" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="interception" data-sort-col="6">
+                        <div class="th-content">
+                            <span class="th-label">INTERCEPTION</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Interception" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="sortable" data-column="status" data-sort-col="7">
+                        <div class="th-content">
+                            <span class="th-label">STATUS</span>
+                            <button type="button" class="btn main-column-sort" aria-label="Sort by Status" tabindex="-1"><i class="fa fa-sort sort-icon"></i></button>
+                        </div>
+                    </th>
+                    <th class="actions-column main-actions-sticky" data-column="actions">ACTIONS</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model == null || Model.Count == 0)
+                {
+                    <tr class="main-empty-row">
+                        <td colspan="9">
+                            <div class="main-empty-state">
+                                <div class="main-empty-state-icon"><i class="fa fa-file-text-o"></i></div>
+                                <div class="main-empty-state-title">No NNCR reports yet</div>
+                                <div class="main-empty-state-text">Filed reports will show up here. <a href="@Url.Action("Quality", "Nncr")">File an NNCR</a></div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    for (int i = 0; i < Model.Count; i++)
+                    {
+                        var nncr = Model[i];
+                        string statusUrl = Url.Action("NncrStatus", "Nncr") + "?token=" + Url.Encode(nncr.ResponseToken ?? "");
+                        string searchText = string.Join(" ", new[] {
+                            nncr.ReportNumber, nncr.SupplierName, nncr.SiteWarehouseName, nncr.IssuedByName,
+                            nncr.NonconformanceType, nncr.NonconformanceInterception, nncr.DetailsOfNonconformance
+                        }).ToLowerInvariant();
+                        string types = string.IsNullOrWhiteSpace(nncr.NonconformanceType) ? "—" : nncr.NonconformanceType.Replace("; ", ", ");
+                        string interceptions = string.IsNullOrWhiteSpace(nncr.NonconformanceInterception) ? "—" : nncr.NonconformanceInterception.Replace("; ", ", ");
+                        string rowClass = "nncr-row status-row-" + nncr.StatusKey
+                            + (nncr.IsOverdue ? " is-overdue" : "")
+                            + (nncr.IsDueSoon ? " is-due-soon" : "");
+
+                        <tr class="@rowClass"
+                            data-index="@i"
+                            data-status="@nncr.StatusKey"
+                            data-supplier="@(nncr.SupplierName ?? "")"
+                            data-date="@(nncr.DateOfIncident.HasValue ? nncr.DateOfIncident.Value.ToString("yyyy-MM-dd") : "")"
+                            data-due="@(nncr.DueDate.HasValue ? nncr.DueDate.Value.ToString("yyyy-MM-dd") : "")"
+                            data-search="@searchText"
+                            data-href="@statusUrl">
+                            <td data-column="date" class="nncr-date-cell">@(nncr.DateOfIncident.HasValue ? nncr.DateOfIncident.Value.ToString("MMM dd, yyyy") : "—")</td>
+                            <td data-column="due">
+                                <div class="nncr-due-line">
+                                    @if (nncr.IsOverdue || nncr.IsDueSoon)
                                     {
-                                        <div class="due-text @(nncr.IsOverdue ? "is-overdue" : nncr.IsDueSoon ? "is-due-soon" : "")">@nncr.DueText</div>
+                                        <i class="fa fa-exclamation-triangle nncr-due-icon" title="@nncr.DueText" aria-label="@nncr.DueText"></i>
                                     }
-                                </td>
-                                <td class="font-mono text-nowrap"><a href="@statusUrl" class="nncr-no-link">@dashIfEmpty(nncr.ReportNumber)</a></td>
-                                <td class="font-mono text-secondary truncate-cell" title="@(nncr.SupplierName ?? "")">@dashIfEmpty(nncr.SupplierName)</td>
-                                <td class="font-mono text-secondary truncate-cell" title="@(nncr.SiteWarehouseName ?? "")">@dashIfEmpty(nncr.SiteWarehouseName)</td>
-                                <td class="font-mono text-secondary truncate-cell" title="@types">@types</td>
-                                <td class="font-mono text-secondary truncate-cell" title="@interceptions">@interceptions</td>
-                                @*<td class="details-cell"><div class="details-clamp" title="@(nncr.DetailsOfNonconformance ?? "")">@dashIfEmpty(nncr.DetailsOfNonconformance)</div></td>
-                                <td class="font-mono text-secondary text-nowrap">@dashIfEmpty(nncr.IssuedByName)</td>*@
-                                <td>
-                                    <span class="status-pill status-pill-@nncr.StatusKey"><span class="dot"></span>@dashIfEmpty(nncr.StatusLabel)</span>
-                                </td>
-                                <td class="text-end">
-                                    <a href="@statusUrl" class="view-link">View &rarr;</a>
-                                </td>
-                            </tr>
-                        }
-                        <tr id="nncrNoMatchRow" class="d-none">
-                            <td colspan="11">
-                                <div class="empty-state">
-                                    <div class="empty-icon">&#128269;</div>
-                                    <div class="fw-semibold">No NNCR reports match the current filters</div>
+                                    <span>@(nncr.DueDate.HasValue ? nncr.DueDate.Value.ToString("MMM dd, yyyy") : "—")</span>
                                 </div>
+                                @if (!string.IsNullOrEmpty(nncr.DueText))
+                                {
+                                    <div class="nncr-due-text @(nncr.IsOverdue ? "is-overdue" : nncr.IsDueSoon ? "is-due-soon" : "")">@nncr.DueText</div>
+                                }
+                            </td>
+                            <td data-column="number"><a href="@statusUrl" class="main-chip nncr-no-link">@dashIfEmpty(nncr.ReportNumber)</a></td>
+                            <td data-column="supplier"><div class="nncr-cell-text" title="@(nncr.SupplierName ?? "")">@dashIfEmpty(nncr.SupplierName)</div></td>
+                            <td data-column="warehouse"><div class="nncr-cell-text" title="@(nncr.SiteWarehouseName ?? "")">@dashIfEmpty(nncr.SiteWarehouseName)</div></td>
+                            <td data-column="type"><div class="nncr-cell-text" title="@types">@types</div></td>
+                            <td data-column="interception"><div class="nncr-cell-text" title="@interceptions">@interceptions</div></td>
+                            <td data-column="status">
+                                <span class="main-badge @statusTone(nncr.StatusKey)"><i class="fa fa-circle"></i>@dashIfEmpty(nncr.StatusLabel)</span>
+                            </td>
+                            <td data-column="actions" class="actions-column main-actions-sticky">
+                                <a href="@statusUrl" class="btn btn-primary btn-sm" title="View NNCR" aria-label="View NNCR">View</a>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+                    <tr id="nncrNoMatchRow" class="main-empty-row d-none">
+                        <td colspan="9">
+                            <div class="main-empty-state">
+                                <div class="main-empty-state-icon"><i class="fa fa-search"></i></div>
+                                <div class="main-empty-state-title">No NNCR reports match the current filters</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

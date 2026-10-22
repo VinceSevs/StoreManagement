@@ -2,7 +2,7 @@
     'use strict';
 
     var DATA = window.NNCR_LIST_DATA || { totalCount: 0, rows: [] };
-    var PAGE_SIZE = 8;
+    var PAGE_SIZE = 10;
 
     var table = document.getElementById('nncrTable');
     if (!table) return;
@@ -55,72 +55,72 @@
         var start = (state.page - 1) * PAGE_SIZE;
         var end = start + PAGE_SIZE;
 
-        rows.forEach(function (row) { row.style.display = 'none'; });
-        matching.slice(start, end).forEach(function (row) { row.style.display = ''; });
+        rows.forEach(function (row) {
+            row.style.display = 'none';
+            row.classList.remove('is-even');
+        });
+        matching.slice(start, end).forEach(function (row, i) {
+            row.style.display = '';
+            row.classList.toggle('is-even', i % 2 === 1);
+        });
 
         if (noMatchRow) noMatchRow.classList.toggle('d-none', total > 0 || rows.length === 0);
 
         var info = document.getElementById('nncrPageInfo');
         if (info) {
             info.textContent = total === 0
-                ? '0 of ' + DATA.totalCount + ' shown'
-                : (start + 1) + ' to ' + Math.min(end, total) + ' of ' + total + ' shown';
+                ? 'Showing 0 of ' + DATA.totalCount + ' entries'
+                : 'Showing ' + (start + 1) + ' to ' + Math.min(end, total) + ' of ' + total + ' entries';
         }
 
-        var count = document.getElementById('nncrCount');
-        if (count) count.textContent = total + ' of ' + DATA.totalCount + ' match' + (total === 1 ? '' : 'es');
-
         renderPagination(totalPages);
+    }
+
+    // First, last and the pages around the current one; "..." for the gaps
+    function buildPageWindow(current, totalPages) {
+        var pages = [];
+        for (var p = 1; p <= totalPages; p++) {
+            if (p === 1 || p === totalPages || Math.abs(p - current) <= 1) pages.push(p);
+            else if (pages[pages.length - 1] !== '...') pages.push('...');
+        }
+        return pages;
     }
 
     function renderPagination(totalPages) {
         var pager = document.getElementById('nncrPagination');
         if (!pager) return;
         pager.innerHTML = '';
-        if (totalPages <= 1) return;
+        if (state.matching.length === 0) return;
 
-        function addItem(label, page, opts) {
-            opts = opts || {};
-            var li = document.createElement('li');
-            li.className = 'page-item' + (opts.disabled ? ' disabled' : '') + (opts.active ? ' active' : '');
+        function addButton(content, page, className, disabled, label) {
             var btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'page-link';
-            btn.textContent = label;
-            if (!opts.disabled && !opts.active) {
+            btn.className = 'btn main-pagination-btn' + (className ? ' ' + className : '');
+            if (label) btn.setAttribute('aria-label', label);
+            btn.innerHTML = content;
+            if (disabled) {
+                btn.disabled = true;
+            } else {
                 btn.addEventListener('click', function () {
                     state.page = page;
                     renderPage();
                 });
             }
-            li.appendChild(btn);
-            pager.appendChild(li);
+            pager.appendChild(btn);
         }
 
-        var MAX_VISIBLE = 5;
-        var winStart = Math.max(1, state.page - Math.floor(MAX_VISIBLE / 2));
-        var winEnd = winStart + MAX_VISIBLE - 1;
-        if (winEnd > totalPages) {
-            winEnd = totalPages;
-            winStart = Math.max(1, winEnd - MAX_VISIBLE + 1);
-        }
-
-        addItem('Previous', state.page - 1, { disabled: state.page === 1 });
-        for (var p = winStart; p <= winEnd; p++) {
-            addItem(String(p), p, { active: p === state.page });
-        }
-        addItem('Next', state.page + 1, { disabled: state.page === totalPages });
-    }
-
-    function jumpToPage() {
-        var input = document.getElementById('nncrPageJumpInput');
-        if (!input) return;
-        var target = parseInt(input.value, 10);
-        if (isNaN(target) || target < 1) target = 1;
-        if (target > state.totalPages) target = state.totalPages;
-        state.page = target;
-        renderPage();
-        input.value = '';
+        addButton('<i class="fa fa-chevron-left"></i>', state.page - 1, 'main-pagination-nav-btn', state.page === 1, 'Previous page');
+        buildPageWindow(state.page, totalPages).forEach(function (p) {
+            if (p === '...') {
+                var gap = document.createElement('span');
+                gap.className = 'main-pagination-ellipsis';
+                gap.textContent = '...';
+                pager.appendChild(gap);
+            } else {
+                addButton(String(p), p, p === state.page ? 'main-pagination-btn-active' : '', false, 'Page ' + p);
+            }
+        });
+        addButton('<i class="fa fa-chevron-right"></i>', state.page + 1, 'main-pagination-nav-btn', state.page === totalPages, 'Next page');
     }
 
     // ---------- Sorting ----------
@@ -146,10 +146,12 @@
         rows.forEach(function (row) { tbody.appendChild(row); });
         if (noMatchRow) tbody.appendChild(noMatchRow);
 
-        table.querySelectorAll('th.sortable .sort-icon').forEach(function (icon) {
-            icon.className = icon.parentNode === th
-                ? 'bi sort-icon ' + (state.sortDir === 'asc' ? 'bi-sort-up' : 'bi-sort-down')
-                : 'bi bi-arrow-down-up sort-icon';
+        table.querySelectorAll('th.sortable').forEach(function (header) {
+            var active = header === th;
+            var icon = header.querySelector('.sort-icon');
+            var btn = header.querySelector('.main-column-sort');
+            if (icon) icon.className = 'fa sort-icon ' + (active ? (state.sortDir === 'asc' ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort');
+            if (btn) btn.classList.toggle('is-active', active);
         });
 
         applyFilters();
@@ -218,13 +220,13 @@
 
     // ---------- Wiring ----------
     function selectStatusCard(card) {
-        document.querySelectorAll('.stat-card').forEach(function (c) { c.classList.remove('active'); });
-        card.classList.add('active');
+        document.querySelectorAll('.nncr-stat').forEach(function (c) { c.classList.remove('is-active'); });
+        card.classList.add('is-active');
         state.status = card.getAttribute('data-status') || 'all';
         applyFilters();
     }
 
-    document.querySelectorAll('.stat-card').forEach(function (card) {
+    document.querySelectorAll('.nncr-stat').forEach(function (card) {
         card.addEventListener('click', function () { selectStatusCard(card); });
         card.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectStatusCard(card); }
@@ -234,6 +236,12 @@
     var searchEl = document.getElementById('nncrSearch');
     if (searchEl) searchEl.addEventListener('input', function () {
         state.search = this.value.trim().toLowerCase();
+        applyFilters();
+    });
+
+    var searchBtn = document.getElementById('nncrSearchBtn');
+    if (searchBtn && searchEl) searchBtn.addEventListener('click', function () {
+        state.search = searchEl.value.trim().toLowerCase();
         applyFilters();
     });
 
@@ -258,12 +266,14 @@
     var exportBtn = document.getElementById('exportExcelBtn');
     if (exportBtn) exportBtn.addEventListener('click', exportToExcel);
 
-    var jumpBtn = document.getElementById('nncrPageJumpBtn');
-    if (jumpBtn) jumpBtn.addEventListener('click', jumpToPage);
-    var jumpInput = document.getElementById('nncrPageJumpInput');
-    if (jumpInput) jumpInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); jumpToPage(); }
-    });
+    var sizeEl = document.getElementById('nncrPageSize');
+    if (sizeEl) {
+        PAGE_SIZE = parseInt(sizeEl.value, 10) || PAGE_SIZE;
+        sizeEl.addEventListener('change', function () {
+            PAGE_SIZE = parseInt(this.value, 10) || 10;
+            applyFilters();
+        });
+    }
 
     renderPage();
 })();

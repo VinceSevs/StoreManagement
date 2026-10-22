@@ -4,13 +4,21 @@ using System.Collections.Generic;
 namespace StoreManagement.Models
 {
     // NNCR workflow: QA files and it goes straight to the supplier (AwaitingResponse)
-    // -> supplier approves/rejects via the emailed link (Responded)
+    // -> supplier approves/rejects via the emailed link (Approved or Rejected)
     // -> a role 49 user closes it (Closed).
     // "Overdue" is not stored; it is an AwaitingResponse NNCR past its DueDate.
     public static class NncrStatuses
     {
         public const string AwaitingResponse = "Awaiting Response";
-        public const string Responded = "Responded";
+        public const string Approved = "Approved";
+        public const string Rejected = "Rejected";
+
+        public static string FromDecision(string decision)
+        {
+            return decision == NncrDecisions.Approve ? Approved
+                : decision == NncrDecisions.Reject ? Rejected
+                : null;
+        }
         public const string Closed = "Closed";
     }
 
@@ -58,7 +66,7 @@ namespace StoreManagement.Models
         }
     }
 
-    // One row of tbl_NonconformanceHdr plus display names resolved via JOIN.
+    // One NNCR row of tbl_QualityIncidentHdr plus display names resolved via JOIN.
     public class NncrReport
     {
         public int EventID { get; set; }
@@ -101,7 +109,16 @@ namespace StoreManagement.Models
 
         public List<NncrAttachment> Attachments { get; set; } = new List<NncrAttachment>();
 
+        // Activity log (dbo.tbl_NncrLog), newest first; filled for the status page.
+        public List<NncrLogEntry> Logs { get; set; } = new List<NncrLogEntry>();
+
         public bool IsAwaitingResponse => Status == NncrStatuses.AwaitingResponse;
+
+        // The supplier has answered (Approved / Rejected), whether or not QA has closed it yet.
+        public bool HasSupplierResponse => Status == NncrStatuses.Approved || Status == NncrStatuses.Rejected || Status == NncrStatuses.Closed;
+
+        // Answered by the supplier and waiting for QA to close it.
+        public bool IsReadyToClose => Status == NncrStatuses.Approved || Status == NncrStatuses.Rejected;
 
         public bool IsOverdue => IsAwaitingResponse && DueDate.HasValue && DateTime.Today > DueDate.Value.Date;
 
@@ -111,7 +128,7 @@ namespace StoreManagement.Models
 
         public bool IsDueSoon => WorkingDaysLeft.HasValue && WorkingDaysLeft.Value <= NncrDueDates.DueSoonWorkingDays;
 
-        // "awaiting" | "overdue" | "responded" | "closed" | "other" — CSS/filter key.
+        // "awaiting" | "overdue" | "approved" | "rejected" | "closed" | "other" — CSS/filter key.
         public string StatusKey
         {
             get
@@ -120,7 +137,8 @@ namespace StoreManagement.Models
                 switch (Status)
                 {
                     case NncrStatuses.AwaitingResponse: return "awaiting";
-                    case NncrStatuses.Responded: return "responded";
+                    case NncrStatuses.Approved: return "approved";
+                    case NncrStatuses.Rejected: return "rejected";
                     case NncrStatuses.Closed: return "closed";
                     default: return "other";
                 }
@@ -135,7 +153,8 @@ namespace StoreManagement.Models
                 switch (Status)
                 {
                     case NncrStatuses.AwaitingResponse: return "Awaiting Response";
-                    case NncrStatuses.Responded: return "Responded";
+                    case NncrStatuses.Approved: return "Approved";
+                    case NncrStatuses.Rejected: return "Rejected";
                     case NncrStatuses.Closed: return "Closed";
                     default: return Status;
                 }

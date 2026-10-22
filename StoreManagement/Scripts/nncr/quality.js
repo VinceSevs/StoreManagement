@@ -4,7 +4,8 @@
    Endpoints come from window.NNCR_QUALITY_CONFIG (set inline in the view). */
 
 var NNCR_MAX_CHECKLIST_LENGTH = 500;
-var NNCR_BRAND_COLOR = '#7d1f27';
+var NNCR_BRAND_COLOR = '#c60404';
+var NNCR_STATUS_CLASS = 'nncr-actions-lead nncr-submit-status';
 
 function nncrConfig() {
 	return window.NNCR_QUALITY_CONFIG || {};
@@ -79,17 +80,43 @@ function initAttachments() {
 	});
 }
 
+var attachmentPreviewUrls = [];
+
+function attachmentIcon(fileName) {
+	var ext = (fileName.split('.').pop() || '').toLowerCase();
+	if (ext === 'pdf') return '\uD83D\uDCD5';
+	if (ext === 'doc' || ext === 'docx') return '\uD83D\uDCC4';
+	if (ext === 'xls' || ext === 'xlsx' || ext === 'csv') return '\uD83D\uDCCA';
+	return '\uD83D\uDCCE';
+}
+
+// Same cards as the CAR report form: image preview or a file tile, with a remove button.
 function renderAttachments() {
 	var cfg = nncrConfig();
+	attachmentPreviewUrls.forEach(function (u) { URL.revokeObjectURL(u); });
+	attachmentPreviewUrls = [];
+
+	var empty = document.getElementById('attachmentsEmpty');
+	if (empty) empty.style.display = selectedFiles.length ? 'none' : 'block';
+
 	document.getElementById('attachmentsList').innerHTML = selectedFiles.map(function (f, i) {
 		var tooBig = f.size > cfg.maxFileBytes;
-		return '<li class="list-group-item d-flex align-items-center gap-2 px-0">' +
-			'<i class="bi bi-paperclip text-secondary"></i>' +
-			'<span class="text-truncate">' + escapeHtml(f.name) + '</span>' +
-			'<span class="small ' + (tooBig ? 'text-danger fw-semibold' : 'text-secondary') + ' text-nowrap">' + formatBytes(f.size) + (tooBig ? ' &mdash; too large' : '') + '</span>' +
-			'<button type="button" class="btn btn-sm btn-link text-danger ms-auto d-print-none" data-remove-index="' + i + '" title="Remove">' +
-			'<i class="bi bi-x-lg"></i></button>' +
-			'</li>';
+		var isImage = !!(f.type && f.type.indexOf('image/') === 0);
+		var preview;
+		if (isImage) {
+			var url = URL.createObjectURL(f);
+			attachmentPreviewUrls.push(url);
+			preview = '<img src="' + url + '" alt="' + escapeHtml(f.name) + '">';
+		} else {
+			preview = '<div class="capa-attach-file">' +
+				'<span class="capa-attach-ext">' + attachmentIcon(f.name) + '</span>' +
+				'<small>' + escapeHtml(f.name) + '</small></div>';
+		}
+		return '<div class="col"><div class="capa-attach-thumb">' +
+			'<button type="button" class="btn-close d-print-none" aria-label="Remove" title="Remove" data-remove-index="' + i + '"></button>' +
+			preview +
+			'<span class="capa-attach-size' + (tooBig ? ' is-error' : '') + '">' + (isImage ? escapeHtml(f.name) + ' &middot; ' : '') + formatBytes(f.size) + (tooBig ? ' &mdash; too large' : '') + '</span>' +
+			'</div></div>';
 	}).join('');
 }
 
@@ -174,7 +201,7 @@ function initSupplierSearch() {
 	});
 
 	dropdown.addEventListener('mousedown', function (e) {
-		var item = e.target.closest('.list-group-item[data-index]');
+		var item = e.target.closest('.nncr-ac-item[data-index]');
 		if (!item) return;
 		e.preventDefault();
 		selectSupplier(supplierMatches[Number(item.dataset.index)]);
@@ -202,21 +229,21 @@ function renderSupplierMatches(term) {
 	supplierActiveIndex = -1;
 
 	if (supplierMatches.length === 0) {
-		dropdown.innerHTML = '<div class="list-group-item small text-secondary fst-italic">No matching supplier.</div>';
+		dropdown.innerHTML = '<div class="nncr-ac-note">No matching supplier.</div>';
 	} else {
 		dropdown.innerHTML = supplierMatches.map(function (s, i) {
-			return '<button type="button" class="list-group-item list-group-item-action" data-index="' + i + '">' +
+			return '<button type="button" class="nncr-ac-item" data-index="' + i + '">' +
 				highlightMatch(String(s.name || ''), term) + '</button>';
 		}).join('') +
 			(all.length > SUPPLIER_MAX_RESULTS
-				? '<div class="list-group-item small text-secondary fst-italic">Showing ' + SUPPLIER_MAX_RESULTS + ' of ' + all.length + ' &mdash; keep typing to narrow down.</div>'
+				? '<div class="nncr-ac-note">Showing ' + SUPPLIER_MAX_RESULTS + ' of ' + all.length + ' &mdash; keep typing to narrow down.</div>'
 				: '');
 	}
 	dropdown.classList.add('open');
 }
 
 function setSupplierActive(index) {
-	var items = document.querySelectorAll('#supplierDropdown .list-group-item[data-index]');
+	var items = document.querySelectorAll('#supplierDropdown .nncr-ac-item[data-index]');
 	items.forEach(function (el, i) { el.classList.toggle('active', i === index); });
 	supplierActiveIndex = index;
 	if (items[index]) items[index].scrollIntoView({ block: 'nearest' });
@@ -235,8 +262,8 @@ function showSupplierEmail(supplier) {
 	var hint = document.getElementById('supplierEmailHint');
 	if (!supplier) { hint.innerHTML = ''; return; }
 	hint.innerHTML = supplier.email
-		? '<i class="bi bi-envelope"></i> Will be sent to <span class="font-mono">' + escapeHtml(supplier.email) + '</span>'
-		: '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> This supplier has no email on file.</span>';
+		? '<i class="fa fa-envelope-o"></i> Will be sent to <span class="font-mono">' + escapeHtml(supplier.email) + '</span>'
+		: '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> This supplier has no email on file.</span>';
 }
 
 function closeSupplierDropdown() {
@@ -325,7 +352,7 @@ async function submitNncrForm() {
 
 	setSaving(true);
 	statusEl.textContent = '';
-	statusEl.className = 'me-auto small fw-semibold';
+	statusEl.className = NNCR_STATUS_CLASS;
 
 	try {
 		// No Content-Type header: the browser sets the multipart boundary for FormData.
@@ -338,7 +365,7 @@ async function submitNncrForm() {
 
 		if (response.ok && result && result.success) {
 			statusEl.textContent = 'Saved — ' + result.reportNumber;
-			statusEl.className = 'me-auto small fw-semibold text-success';
+			statusEl.className = NNCR_STATUS_CLASS + ' text-success';
 
 			if (result.attachmentError) {
 				await Swal.fire({ icon: 'warning', title: 'Attachments not saved', text: result.attachmentError, confirmButtonColor: NNCR_BRAND_COLOR });
@@ -376,8 +403,8 @@ function showSupplierEmailPopup(reportNumber, email, emailSent, emailError) {
 		? '<span class="font-mono">' + escapeHtml(email.To) + '</span>'
 		: '<span class="text-danger">No email on file for this supplier</span>';
 	var banner = emailSent
-		? '<div class="alert alert-success py-2 mb-2"><i class="bi bi-envelope-check"></i> Email sent to the supplier.</div>'
-		: '<div class="alert alert-warning py-2 mb-2"><i class="bi bi-exclamation-triangle"></i> Email not sent: ' + escapeHtml(emailError) +
+		? '<div class="alert alert-success py-2 mb-2"><i class="fa fa-check-circle"></i> Email sent to the supplier.</div>'
+		: '<div class="alert alert-warning py-2 mb-2"><i class="fa fa-exclamation-triangle"></i> Email not sent: ' + escapeHtml(emailError) +
 			' You can send it later from the NNCR status page, or share the response form link.</div>';
 
 	return Swal.fire({
@@ -393,7 +420,7 @@ function showSupplierEmailPopup(reportNumber, email, emailSent, emailError) {
 			'</div></div>',
 		showDenyButton: true,
 		showCancelButton: true,
-		confirmButtonText: '<i class="bi bi-box-arrow-up-right"></i> Open response form',
+		confirmButtonText: '<i class="fa fa-external-link"></i> Open response form',
 		denyButtonText: 'View status',
 		cancelButtonText: 'File another',
 		confirmButtonColor: NNCR_BRAND_COLOR,
@@ -422,7 +449,7 @@ function resetNncrForm() {
 	setDueDate();
 	var statusEl = document.getElementById('submitStatus');
 	statusEl.textContent = '';
-	statusEl.className = 'me-auto small fw-semibold';
+	statusEl.className = NNCR_STATUS_CLASS;
 }
 
 function clearNncrForm() {

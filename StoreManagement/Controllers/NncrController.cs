@@ -24,6 +24,7 @@ namespace IsseERP.Controllers
         private const int MaxChecklistLength = 500; // NonconformanceType / NonconformanceInterception columns
 
         private readonly NncrRepository _nncrRepo = new NncrRepository();
+        private readonly NncrLogRepository _nncrLog = new NncrLogRepository();
         private readonly NncrNotificationService _notifier = new NncrNotificationService();
         private readonly WarehouseService _warehouseService = new WarehouseService();
         private readonly VendorService _vendorService = new VendorService();
@@ -139,6 +140,7 @@ namespace IsseERP.Controllers
                 var nncr = await _nncrRepo.GetByToken(saved.ResponseToken) ?? saved;
                 string emailError = TrySendSupplierEmail(nncr);
                 await _capaLogService.AddLog($"Filed {nncr.ReportNumber}", "Submit NNCR", user.UserID);
+                await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.Filed, $"NNCR filed against {nncr.SupplierName}", user.UserID, user.DisplayName);
 
                 return Json(new
                 {
@@ -197,14 +199,22 @@ namespace IsseERP.Controllers
                 return Json(new { success = false, message = "NNCR not found." });
             }
 
+            int? vendorId = await _nncrRepo.GetSupplierVendorId(request.ResponseToken);
+            if (vendorId == null)
+            {
+                Response.StatusCode = 422;
+                return Json(new { success = false, message = "This NNCR is not linked to a registered supplier, so the response cannot be accepted. Please contact QA." });
+            }
+
             if (!await _nncrRepo.SubmitSupplierResponse(request.ResponseToken, request.Decision, request.VendorRemarks.Trim(),
-                    nncr.IssuedToSupplier, nncr.SupplierEmail))
+                    vendorId.Value, nncr.SupplierEmail))
             {
                 Response.StatusCode = 409;
                 return Json(new { success = false, message = "This NNCR is no longer awaiting a response (it may have been answered already)." });
             }
 
-            await _capaLogService.AddLog($"{nncr.SupplierName} responded to {nncr.ReportNumber} ({request.Decision})", "Submit NNCR Response", 1);
+            await _capaLogService.AddLog($"{nncr.SupplierName} responded to {nncr.ReportNumber} ({request.Decision})", "Submit NNCR Response", vendorId.Value);
+            await _nncrLog.Add(nncr.ReportNumber, request.Decision == NncrDecisions.Approve ? NncrLogActions.Approved : NncrLogActions.Rejected, $"Supplier {(request.Decision == NncrDecisions.Approve ? "approved" : "rejected")} the NNCR", vendorId.Value, nncr.SupplierName);
             return Json(new { success = true });
         }
 
@@ -217,6 +227,9 @@ namespace IsseERP.Controllers
             if (nncr == null) return View("NncrResponseInvalid");
 
             nncr.Attachments = Attachments().List(nncr.ReportNumber);
+            bool canViewLog = UserAccess.CanViewNncrLog(CurrentUser());
+            ViewBag.CanViewLog = canViewLog;
+            if (canViewLog) nncr.Logs = await _nncrLog.GetForReport(nncr.ReportNumber);
             ViewBag.CanClose = UserAccess.CanCloseNncr(CurrentUser());
             ViewBag.SupplierEmail = SupplierEmailPreview(nncr);
             return View(nncr);
@@ -249,6 +262,7 @@ namespace IsseERP.Controllers
 
             var user = CurrentUser();
             await _capaLogService.AddLog($"Emailed {nncr.ReportNumber} to {nncr.SupplierEmail}", "Send NNCR Email", user?.UserID ?? 0);
+            await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.Emailed, $"Supplier email re-sent to {nncr.SupplierEmail}", user?.UserID ?? 0, user?.DisplayName);
             return Json(new { success = true, to = nncr.SupplierEmail });
         }
 
@@ -272,11 +286,12 @@ namespace IsseERP.Controllers
             if (!await _nncrRepo.Close(request.ResponseToken, user.UserID))
             {
                 Response.StatusCode = 409;
-                return Json(new { success = false, message = "This NNCR can only be closed after the supplier has responded." });
+                return Json(new { success = false, message = "This NNCR can only be closed after the supplier has approved or rejected it." });
             }
 
             var nncr = await _nncrRepo.GetByToken(request.ResponseToken);
             await _capaLogService.AddLog($"Closed {nncr?.ReportNumber}", "Close NNCR", user.UserID);
+            await _nncrLog.Add(nncr?.ReportNumber, NncrLogActions.Closed, "NNCR closed", user.UserID, user.DisplayName);
             return Json(new { success = true });
         }
 
