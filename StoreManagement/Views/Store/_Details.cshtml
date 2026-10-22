@@ -1,22 +1,47 @@
 @model StoreManagement.Models.Store
 
-<div class="modal-header" style="border-bottom-color:var(--lead-border)">
-    <h5 class="modal-title"><i class="bi bi-shop me-1" style="color:var(--lead-primary)"></i> @Model.StoreName <span class="text-muted">#@Model.StoreNumber</span></h5>
+<div class="main-form-header">
+    <div class="main-form-title-wrapper">
+        <div class="main-form-icon"><i class="fa fa-building-o"></i></div>
+        <div>
+            <h3>@Model.StoreName</h3>
+            <p>Store #@Model.StoreNumber</p>
+        </div>
+    </div>
+    <span class="main-badge main-view-readonly-tag" title="This record is read-only">
+        <i class="fa fa-eye" aria-hidden="true"></i>
+        <span class="main-view-readonly-text">View only</span>
+    </span>
+    <button type="button" class="main-form-close" onclick="closeModal()" aria-label="Close">
+        <i class="fa fa-times"></i>
+    </button>
 </div>
-<div class="modal-body">
-    <div class="mb-3">
-        <label class="form-label small text-uppercase text-secondary">City Name</label>
-        <input type="text" value="@Model.CityName" disabled class="form-control" style="background-color:var(--lead-primary-light)" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label small text-uppercase text-secondary">State</label>
-        <input type="text" value="@Model.StateName" disabled class="form-control" style="background-color:var(--lead-primary-light)" />
-    </div>
-    <div class="mb-0">
-        <label class="form-label small text-uppercase text-secondary">Coordinates</label>
-        <input type="text" value="@Model.Coordinates" disabled class="form-control font-mono" style="background-color:var(--lead-primary-light)" />
-    </div>
+
+<div class="main-form-body main-view-cards" data-store-view="1">
+    <section class="main-view-card">
+        <header class="main-view-card-header">
+            <span class="main-view-card-icon"><i class="fa fa-map-marker"></i></span>
+            <h4>Location</h4>
+        </header>
+        <div class="main-view-card-body">
+            <dl class="row main-view-fields">
+                <div class="col-12 col-sm-6 main-view-field">
+                    <dt>City Name</dt>
+                    <dd>@Model.CityName</dd>
+                </div>
+                <div class="col-12 col-sm-6 main-view-field">
+                    <dt>State</dt>
+                    <dd>@Model.StateName</dd>
+                </div>
+                <div class="col-12 main-view-field main-view-field-wide">
+                    <dt>Coordinates</dt>
+                    <dd class="main-tabular">@Model.Coordinates</dd>
+                </div>
+            </dl>
+        </div>
+    </section>
 </div>
-<div class="modal-footer">
-    <button onclick="closeModal()" class="btn btn-secondary">Close</button>
+
+<div class="main-form-footer">
+    <button type="button" onclick="closeModal()" class="btn main-form-cancel-btn">Close</button>
 </div>

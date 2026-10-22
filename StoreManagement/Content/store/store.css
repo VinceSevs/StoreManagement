@@ -1,0 +1,44 @@
+/* Store list: only what main.css does not already cover. */
+
+.store-search-form {
+    position: relative;
+}
+
+/* Search / city suggestions (list-group dropdowns) */
+.store-suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1080;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+}
+
+    .store-suggestions .list-group-item {
+        border: 0;
+        padding: 8px 12px;
+        color: #17191D;
+        font-size: 13px;
+    }
+
+    .store-suggestions .list-group-item-action:hover,
+    .store-suggestions .list-group-item-action:focus-visible {
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+        outline: none;
+    }
+
+/* Leave room under the city field so its suggestions are not clipped */
+.store-edit-body {
+    min-height: 260px;
+}
+
+/* The page-size select sits beside "Show" like the other list pages */
+#storePageSize {
+    width: auto;
+}

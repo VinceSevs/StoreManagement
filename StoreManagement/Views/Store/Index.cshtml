@@ -1,86 +1,133 @@
 @model IEnumerable<StoreManagement.Models.Store>
 
-<link href="~/Content/store/index.css" rel="stylesheet" />
+<link href="~/Content/store/store.css" rel="stylesheet" />
 
-<div class="lead-page-header">
-    <div class="lead-page-icon"><i class="bi bi-shop"></i></div>
-    <div>
-        <div class="lead-eyebrow">Store Management</div>
-        <h1>Store List</h1>
-    </div>
-</div>
+<div class="main-list-page">
 
-<div class="card shadow-sm store-list-card mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <span class="fw-semibold text-secondary small text-uppercase" style="letter-spacing:.04em">All Stores</span>
-
-        @using (Html.BeginForm("Index", "Store", FormMethod.Get))
-        {
-            <div class="position-relative" style="width: 280px;">
-                <input type="text" id="search" name="search" value="@ViewBag.Search" autocomplete="off"
-                       class="form-control lead-search"
-                       placeholder="Search stores, cities..."
-                       aria-label="Search" />
-
-                <div id="searchSuggestions" class="list-group position-absolute w-100 shadow-sm mt-1"
-                     style="display:none; z-index:1000; max-height: 250px; overflow-y: auto;">
+    <div class="main-hero">
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="Store management" />
+        <div class="main-hero-gradient"></div>
+        <div class="main-hero-content">
+            <div class="main-hero-eyebrow">STORE MANAGEMENT</div>
+            <h2 class="main-hero-heading">Stores</h2>
+            <p class="main-hero-description">
+                Browse store records and keep their city and location details up to date.
+            </p>
+            <div class="main-hero-features">
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-building-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Store Directory</div>
+                        <div class="main-hero-feature-desc">Every branch in one list</div>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 lead-table" id="storeTable">
-            <thead>
-                <tr>
-                    <th>Store Number</th>
-                    <th>Store Name</th>
-                    <th>City Name</th>
-                    <th>Coordinates</th>
-                    <th>State</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var store in Model)
-                {
-                    <tr class="store-row">
-                        <td class="font-mono fw-semibold" style="color:var(--lead-primary)">@store.StoreNumber</td>
-                        <td>@store.StoreName</td>
-                        <td>@store.CityName</td>
-                        <td>@store.Coordinates</td>
-                        <td>@store.StateName</td>
-                        <td class="text-end">
-                            <div class="btn-group btn-group-sm">
-                                <button onclick="openModal('@Url.Action("Details", new { id = store.StoreID })')"
-                                        class="btn btn-primary">View</button>
-                                <button onclick="openModal('@Url.Action("Edit", new { id = store.StoreID })')"
-                                        class="btn btn-outline-primary">Update</button>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 mt-2 border-top">
-        <span class="small text-secondary" id="storePageInfo"></span>
-        <div class="d-flex align-items-center flex-wrap gap-2">
-            <ul class="pagination pagination-sm mb-0" id="storePagination"></ul>
-            <div class="input-group input-group-sm" style="width:150px;">
-                <input type="number" min="1" class="form-control" id="storePageJumpInput" placeholder="Page #">
-                <button class="btn btn-outline-primary" type="button" id="storePageJumpBtn">Go</button>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-map-marker"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Locations</div>
+                        <div class="main-hero-feature-desc">Cities and coordinates</div>
+                    </div>
+                </div>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-pencil-square-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Quick Updates</div>
+                        <div class="main-hero-feature-desc">Edit details in a click</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="main-list-toolbar">
+        @using (Html.BeginForm("Index", "Store", FormMethod.Get, new { @class = "main-list-search store-search-form" }))
+        {
+            <div class="input-group">
+                <input type="text" id="search" name="search" value="@ViewBag.Search" autocomplete="off"
+                       class="form-control"
+                       placeholder="Search stores, cities..."
+                       aria-label="Search" />
+                <button type="submit" class="btn main-list-search-btn" title="Search">
+                    <i class="fa fa-search"></i>
+                    <span class="main-list-search-btn-text">Search</span>
+                </button>
+            </div>
+
+            <div id="searchSuggestions" class="list-group store-suggestions" style="display:none;"></div>
+        }
+    </div>
+
+    <div class="main-list-table-wrapper">
+        <div class="table-responsive">
+            <table class="table main-list-table" id="storeTable">
+                <thead>
+                    <tr>
+                        <th>STORE NUMBER</th>
+                        <th class="main-col-primary" data-column="store">STORE NAME</th>
+                        <th>CITY NAME</th>
+                        <th>COORDINATES</th>
+                        <th>STATE</th>
+                        <th class="actions-column main-actions-sticky" data-column="actions">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var store in Model)
+                    {
+                        <tr class="store-row">
+                            <td><span class="main-chip">@store.StoreNumber</span></td>
+                            <td data-column="store"><div class="main-row-title">@store.StoreName</div></td>
+                            <td><div class="main-row-detail">@store.CityName</div></td>
+                            <td><div class="main-row-detail main-tabular">@store.Coordinates</div></td>
+                            <td><div class="main-row-detail">@store.StateName</div></td>
+                            <td data-column="actions" class="main-actions-sticky">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-primary"
+                                            onclick="openModal('@Url.Action("Details", new { id = store.StoreID })')">View</button>
+                                    <button type="button" class="btn btn-outline-primary"
+                                            onclick="openModal('@Url.Action("Edit", new { id = store.StoreID })')">Update</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr class="main-empty-row">
+                            <td colspan="6">
+                                <div class="main-empty-state">
+                                    <div class="main-empty-state-icon"><i class="fa fa-building-o"></i></div>
+                                    <div class="main-empty-state-title">No stores found</div>
+                                    <div class="main-empty-state-text">Try a different search term.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="main-list-pagination">
+        <div class="main-pagination-size">
+            <span>Show</span>
+            <select id="storePageSize" class="form-control" aria-label="Rows per page">
+                <option value="8" selected>8</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span class="main-pagination-entries">entries</span>
+        </div>
+        <div class="main-pagination-summary" id="storePageInfo">Showing 0 entries</div>
+        <div class="main-pagination-controls" id="storePagination"></div>
+    </div>
+
 </div>
 
-<!-- for modals -->
-
-<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1050;">
-    <div id="modalBox" class="shadow" style="background:#fff; width:100%; max-width:450px; margin:80px auto; border-radius:8px; overflow:hidden;">
-    </div>
+<!-- Modal shell: the Details / Edit / Confirm partials load into #modalBox -->
+<div id="modalOverlay" class="main-form-overlay" style="display:none;" aria-hidden="true">
+    <div id="modalBox" class="main-form-modal is-auto is-sm" role="dialog" aria-modal="true"></div>
 </div>
 
 <script src="~/Scripts/jquery-3.7.0.min.js"></script>

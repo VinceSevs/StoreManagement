@@ -1,22 +1,40 @@
 @model StoreManagement.Models.Store
 
-<div class="modal-header" style="border-bottom-color:var(--lead-border)">
-    <h5 class="modal-title"><i class="bi bi-check2-circle me-1" style="color:var(--lead-primary)"></i> Confirm Update</h5>
-</div>
-<div class="modal-body">
-    <p class="mb-1"><strong>@Model.StoreName</strong> <span class="text-muted">#@Model.StoreNumber</span></p>
-    <p class="mb-1">City: <strong>@Model.CityName</strong></p>
-    <p class="mb-0">Coordinates: <strong>@Model.Coordinates</strong></p>
+<div class="main-form-header">
+    <div class="main-form-title-wrapper">
+        <div class="main-form-icon"><i class="fa fa-check-circle-o"></i></div>
+        <div>
+            <h3>Confirm Update</h3>
+            <p>Review the changes before saving.</p>
+        </div>
+    </div>
 </div>
 
-<form id="confirmForm" action="@Url.Action("Save")" method="post">
+<form id="confirmForm" action="@Url.Action("Save")" method="post" class="main-form-pinned">
     @Html.HiddenFor(m => m.StoreID)
     @Html.HiddenFor(m => m.CityID)
     @Html.HiddenFor(m => m.CityName)
     @Html.HiddenFor(m => m.Coordinates)
 
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Confirm</button>
-        <button type="button" onclick="closeModal()" class="btn btn-secondary">Back</button>
+    <div class="main-form-body main-view-cards" data-store-view="1">
+        <dl class="row main-view-fields">
+            <div class="col-12 main-view-field main-view-field-wide">
+                <dt>Store</dt>
+                <dd>@Model.StoreName <span class="main-chip ms-1">#@Model.StoreNumber</span></dd>
+            </div>
+            <div class="col-12 col-sm-6 main-view-field">
+                <dt>City</dt>
+                <dd>@Model.CityName</dd>
+            </div>
+            <div class="col-12 col-sm-6 main-view-field">
+                <dt>Coordinates</dt>
+                <dd class="main-tabular">@Model.Coordinates</dd>
+            </div>
+        </dl>
+    </div>
+
+    <div class="main-form-footer">
+        <button type="button" onclick="closeModal()" class="btn main-form-cancel-btn">Back</button>
+        <button type="submit" class="btn main-form-save-btn">Confirm</button>
     </div>
 </form>

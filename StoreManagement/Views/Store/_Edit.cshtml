@@ -11,30 +11,38 @@
     }
 }
 
-<div class="modal-header" style="border-bottom-color:var(--lead-border)">
-    <h5 class="modal-title"><i class="bi bi-pencil-square me-1" style="color:var(--lead-primary)"></i> Edit @Model.StoreName <span class="text-muted">#@Model.StoreNumber</span></h5>
+<div class="main-form-header">
+    <div class="main-form-title-wrapper">
+        <div class="main-form-icon"><i class="fa fa-pencil-square-o"></i></div>
+        <div>
+            <h3>Edit @Model.StoreName</h3>
+            <p>Store #@Model.StoreNumber</p>
+        </div>
+    </div>
+    <button type="button" class="main-form-close" onclick="closeModal()" aria-label="Close">
+        <i class="fa fa-times"></i>
+    </button>
 </div>
-<form id="editForm">
+<form id="editForm" class="main-form-pinned">
     @Html.HiddenFor(m => m.StoreID)
     @Html.HiddenFor(m => m.StoreNumber)
     @Html.HiddenFor(m => m.StoreName)
 
-    <div class="modal-body">
-        <div class="mb-3 position-relative" id="cityFieldWrap">
-            @Html.LabelFor(m => m.CityID, "City Name", new { @class = "form-label small text-uppercase text-secondary" })
+    <div class="main-form-body store-edit-body">
+        <div class="main-form-group position-relative" id="cityFieldWrap">
+            @Html.LabelFor(m => m.CityID, "City Name")
             <input type="text" class="form-control" id="citySearchInput" placeholder="Search city..." autocomplete="off" value="@selectedCityText" />
-            <div id="citySuggestions" class="list-group position-absolute w-100 shadow-sm mt-1"
-                 style="display:none; z-index:1080; max-height:220px; overflow-y:auto;"></div>
+            <div id="citySuggestions" class="list-group store-suggestions" style="display:none;"></div>
             @Html.DropDownListFor(m => m.CityID, (SelectList)ViewBag.Cities, new { @class = "form-select d-none" })
         </div>
-        <div class="mb-0">
-            @Html.LabelFor(m => m.Coordinates, new { @class = "form-label small text-uppercase text-secondary" })
+        <div class="main-form-group">
+            @Html.LabelFor(m => m.Coordinates)
             @Html.TextBoxFor(m => m.Coordinates, new { @class = "form-control" })
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" onclick="postToModal('@Url.Action("Confirm")', '#editForm')" class="btn btn-primary">Update</button>
-        <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+    <div class="main-form-footer">
+        <button type="button" onclick="closeModal()" class="btn main-form-cancel-btn">Cancel</button>
+        <button type="button" onclick="postToModal('@Url.Action("Confirm")', '#editForm')" class="btn main-form-save-btn">Update</button>
     </div>
 </form>
 
