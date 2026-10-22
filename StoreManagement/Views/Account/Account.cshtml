@@ -11,83 +11,113 @@
 
 <link href="~/Content/account/account.css" rel="stylesheet" />
 
-<div class="lead-page-header">
-    <div class="lead-page-icon"><i class="bi bi-person-circle"></i></div>
-    <div>
-        <div class="lead-eyebrow">My Account</div>
-        <h1>Account Settings</h1>
-    </div>
-</div>
+<div class="main-list-page">
 
-<div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card shadow-sm account-card">
-            <div class="card-body text-center py-4">
-                <div class="account-avatar-circle mx-auto mb-3" id="profileAvatar">@initials</div>
-                <h5 class="mb-1" id="profileUsername">@displayName</h5>
-                @if (!string.IsNullOrWhiteSpace(roleTitle))
-                {
-                    <div class="text-secondary small mb-1">@roleTitle</div>
-                }
-                <span class="text-secondary small d-block">@username</span>
-                <span class="text-secondary small">Employee ID: @empId</span>
+    <div class="main-hero">
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="My account" />
+        <div class="main-hero-gradient"></div>
+        <div class="main-hero-content">
+            <div class="main-hero-eyebrow">MY ACCOUNT</div>
+            <h2 class="main-hero-heading">Account Settings</h2>
+            <p class="main-hero-description">
+                Review your profile details and keep your password up to date.
+            </p>
+            <div class="main-hero-features">
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-user-circle-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Profile</div>
+                        <div class="main-hero-feature-desc">Your name and role</div>
+                    </div>
+                </div>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-lock"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Security</div>
+                        <div class="main-hero-feature-desc">Change your password</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-8">
-        @Html.AntiForgeryToken()
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="account-card account-profile">
+                <div class="account-avatar-circle" id="profileAvatar">@initials</div>
+                <h5 class="account-profile-name" id="profileUsername">@displayName</h5>
+                @if (!string.IsNullOrWhiteSpace(roleTitle))
+                {
+                    <div class="account-profile-role">@roleTitle</div>
+                }
+                <span class="account-profile-meta">@username</span>
+                <span class="main-chip mt-2">Employee ID: @empId</span>
+            </div>
+        </div>
 
-        <div class="card shadow-sm account-card">
-            <div class="account-section-header"><i class="bi bi-key"></i> Change Password</div>
-            <div class="card-body">
+        <div class="col-lg-8">
+            @Html.AntiForgeryToken()
+
+            <div class="account-card">
+                <div class="main-view-card-header account-card-header">
+                    <span class="main-view-card-icon"><i class="fa fa-key"></i></span>
+                    <h4>Change Password</h4>
+                </div>
+
                 <div id="changePasswordAlert" class="alert py-2 small" style="display:none;"></div>
 
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Current Password</label>
+                <div class="main-form-group">
+                    <label for="currentPassword">Current Password</label>
                     <div class="pwd-input-wrap">
                         <input type="password" class="form-control" id="currentPassword" autocomplete="current-password" />
                         <button type="button" class="pwd-toggle-btn" id="toggleCurrentPwd" aria-label="Show password">
-                            <i class="bi bi-eye" id="toggleCurrentPwdIcon"></i>
+                            <i class="fa fa-eye" id="toggleCurrentPwdIcon"></i>
                         </button>
                     </div>
                     <div class="caps-lock-warning" id="capsLockCurrent">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                        <i class="fa fa-exclamation-triangle"></i> Caps Lock is on
                     </div>
                 </div>
-                <div class="mb-1">
-                    <label class="form-label small fw-semibold">New Password</label>
+
+                <div class="main-form-group">
+                    <label for="newPassword">New Password</label>
                     <div class="pwd-input-wrap">
                         <input type="password" class="form-control" id="newPassword" autocomplete="new-password" />
                         <button type="button" class="pwd-toggle-btn" id="toggleNewPwd" aria-label="Show password">
-                            <i class="bi bi-eye" id="toggleNewPwdIcon"></i>
+                            <i class="fa fa-eye" id="toggleNewPwdIcon"></i>
                         </button>
                     </div>
                     <div class="caps-lock-warning" id="capsLockNew">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                        <i class="fa fa-exclamation-triangle"></i> Caps Lock is on
                     </div>
                     <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="pwdStrengthFill"></div></div>
                     <span class="pwd-strength-label" id="pwdStrengthLabel"></span>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Confirm New Password</label>
+
+                <div class="main-form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
                     <div class="pwd-input-wrap">
                         <input type="password" class="form-control" id="confirmPassword" autocomplete="new-password" />
                         <button type="button" class="pwd-toggle-btn" id="toggleConfirmPwd" aria-label="Show password">
-                            <i class="bi bi-eye" id="toggleConfirmPwdIcon"></i>
+                            <i class="fa fa-eye" id="toggleConfirmPwdIcon"></i>
                         </button>
                     </div>
                     <div class="caps-lock-warning" id="capsLockConfirm">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Caps Lock is on
+                        <i class="fa fa-exclamation-triangle"></i> Caps Lock is on
                     </div>
                 </div>
 
-                <button type="button" id="changePasswordBtn" class="btn btn-primary btn-sm">
-                    <i class="bi bi-check-circle"></i> Update Password
-                </button>
+                <div class="account-actions">
+                    <button type="button" id="changePasswordBtn" class="btn main-form-save-btn">
+                        <i class="fa fa-check-circle-o"></i> Update Password
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <script src="~/Scripts/jquery-3.7.0.min.js"></script>

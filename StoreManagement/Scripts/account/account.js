@@ -7,8 +7,8 @@
         btn.addEventListener('click', function () {
             var isHidden = input.type === 'password';
             input.type = isHidden ? 'text' : 'password';
-            icon.classList.toggle('bi-eye', !isHidden);
-            icon.classList.toggle('bi-eye-slash', isHidden);
+            icon.classList.toggle('fa-eye', !isHidden);
+            icon.classList.toggle('fa-eye-slash', isHidden);
             btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
         });
     }
@@ -51,16 +51,16 @@
         var score = calcPasswordScore(pwd);
         var pct = (score / 5) * 100;
         var label = '';
-        var color = '#dc3545';
+        var color = '#c60404';
 
         if (!pwd) {
             pct = 0;
         } else if (score >= 4) {
-            label = 'Strong'; color = '#198754';
+            label = 'Strong'; color = '#16a34a';
         } else if (score >= 3) {
-            label = 'Medium'; color = '#fd7e14';
+            label = 'Medium'; color = '#d97706';
         } else {
-            label = 'Weak'; color = '#dc3545';
+            label = 'Weak'; color = '#c60404';
         }
 
         $('#pwdStrengthFill').css({ width: pct + '%', 'background-color': color });

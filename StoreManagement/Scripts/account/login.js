@@ -31,6 +31,7 @@
         var submitBtn = document.getElementById('loginSubmitBtn');
         var btnLabel = document.getElementById('loginBtnLabel');
         var serverErrorBox = document.getElementById('loginServerError');
+        var serverErrorText = document.getElementById('loginServerErrorText');
         var formBox = document.getElementById('loginFormBox');
         var overlay = document.getElementById('loginSuccessOverlay');
 
@@ -55,29 +56,30 @@
                 })
                 .then(function (result) {
                     if (result.ok && result.data && result.data.success) {
+                        document.querySelector('.auth-wrapper').classList.add('is-leaving');
                         overlay.classList.add('show');
                         setTimeout(function () {
                             window.location.href = result.data.redirectUrl || '/';
-                        }, 1150);
+                        }, 1400);
                         return;
                     }
 
                     var message = (result.data && result.data.message) || 'Invalid username or password.';
-                    serverErrorBox.textContent = message;
-                    serverErrorBox.style.display = 'block';
+                    serverErrorText.textContent = message;
+                    serverErrorBox.style.display = 'flex';
 
                     formBox.classList.remove('shake');
                     void formBox.offsetWidth;
                     formBox.classList.add('shake');
 
                     submitBtn.disabled = false;
-                    btnLabel.textContent = 'Login';
+                    btnLabel.textContent = 'Sign In';
                 })
                 .catch(function () {
-                    serverErrorBox.textContent = 'Network error — please try again.';
-                    serverErrorBox.style.display = 'block';
+                    serverErrorText.textContent = 'Network error - please try again.';
+                    serverErrorBox.style.display = 'flex';
                     submitBtn.disabled = false;
-                    btnLabel.textContent = 'Login';
+                    btnLabel.textContent = 'Sign In';
                 });
         });
     })();

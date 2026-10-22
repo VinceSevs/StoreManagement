@@ -1,0 +1,222 @@
+/* StoreManagement additions to the LEADS auth design (auth.css):
+   password reveal, caps-lock hint, shake on error and the success overlay. */
+
+.auth-input-group {
+    position: relative;
+}
+
+    .auth-input-group.has-toggle .form-control {
+        padding-right: 44px;
+    }
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--leads-gray);
+    font-size: 16px;
+    padding: 4px 6px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+    .password-toggle-btn:hover {
+        color: var(--leads-red);
+    }
+
+#capsLockWarning {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #92620a;
+    background: #fff6e6;
+    border: 1px solid #f2dba6;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-top: 8px;
+}
+
+    #capsLockWarning.show {
+        display: flex;
+    }
+
+.auth-hint {
+    margin: -14px 0 20px;
+    font-size: 12px;
+    color: var(--leads-gray);
+}
+
+.auth-card.shake {
+    animation: authShake 0.4s ease;
+}
+
+@keyframes authShake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-6px); }
+    40%, 60% { transform: translateX(6px); }
+}
+
+.btn-auth:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Success overlay */
+.login-success-overlay {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease;
+}
+
+    .login-success-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+.success-check-svg {
+    width: 96px;
+    height: 96px;
+}
+
+.success-check-circle {
+    stroke: var(--leads-red);
+    stroke-width: 3;
+    stroke-dasharray: 226;
+    stroke-dashoffset: 226;
+}
+
+.success-check-path {
+    stroke: var(--leads-red);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+}
+
+.login-success-overlay.show .success-check-circle {
+    animation: successDrawCircle 0.5s ease forwards;
+}
+
+.login-success-overlay.show .success-check-path {
+    animation: successDrawPath 0.35s 0.45s ease forwards;
+}
+
+@keyframes successDrawCircle {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes successDrawPath {
+    to { stroke-dashoffset: 0; }
+}
+
+.success-message {
+    margin-top: 20px;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--leads-dark);
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.login-success-overlay.show .success-message {
+    animation: successMessageIn 0.4s 0.7s ease forwards;
+}
+
+@keyframes successMessageIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Long tagline: the LEADS paragraph style (huge letter-spacing) is meant for a 3-word slogan */
+.auth-brand-body p.auth-brand-tagline {
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+}
+
+.auth-footer-text a {
+    color: var(--leads-red);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .auth-footer-text a:hover {
+        text-decoration: underline;
+    }
+
+/* Success sequence: the form fades away, then the check draws on a clean screen */
+.auth-wrapper {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+    .auth-wrapper.is-leaving {
+        opacity: 0;
+        transform: scale(0.985);
+        pointer-events: none;
+    }
+
+.success-check-svg {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.login-success-overlay.show .success-check-svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Form container: the sign-in / register form sits in a white card on a light panel */
+.auth-wrapper {
+    background: #f5f6f8;
+}
+
+.auth-divider path {
+    fill: #f5f6f8;
+}
+
+.auth-form-panel {
+    background: #f5f6f8;
+}
+
+.auth-card {
+    max-width: 440px;
+    padding: 36px 34px 30px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08), 0 2px 6px rgba(17, 24, 39, 0.04);
+}
+
+@media (max-width: 575px) {
+    .auth-form-panel {
+        padding: 20px 14px;
+    }
+
+    .auth-card {
+        padding: 28px 20px 24px;
+    }
+}

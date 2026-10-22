@@ -1,104 +1,159 @@
-    .account-card {
-        border: 1px solid var(--lead-border);
-        border-radius: 14px;
-        overflow: hidden;
+/* Account page: profile card + change-password form.
+   Hero, form groups and buttons come from main.css. */
+
+.account-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.account-card-header {
+    margin-bottom: 16px;
+}
+
+.account-profile {
+    align-items: center;
+    padding: 28px 20px;
+    text-align: center;
+}
+
+.account-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: var(--main-red);
+    box-shadow: 0 0 0 6px var(--main-red-bg-soft);
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.account-profile-name {
+    margin: 0 0 4px;
+    color: #17191D;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.account-profile-role {
+    margin-bottom: 2px;
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.account-profile-meta {
+    color: #6b7280;
+    font-size: 12.5px;
+}
+
+.account-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+/* ---- Password fields ---------------------------------------------------- */
+
+.pwd-input-wrap {
+    position: relative;
+}
+
+    .pwd-input-wrap .form-control {
+        padding-right: 40px;
     }
 
-    .account-avatar-circle {
-        width: 76px;
-        height: 76px;
-        border-radius: 50%;
-        background: var(--lead-primary);
-        color: #fff;
+.pwd-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    padding: 4px 6px;
+    border: 0;
+    background: none;
+    color: #6b7280;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+    .pwd-toggle-btn:hover {
+        color: var(--main-red);
+    }
+
+    .pwd-toggle-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+        border-radius: 4px;
+    }
+
+/* Hide the browser reveal icon so it does not sit on our eye toggle */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+.pwd-strength-bar {
+    height: 6px;
+    margin-top: 8px;
+    border-radius: 999px;
+    background: #f0f1f3;
+    overflow: hidden;
+}
+
+.pwd-strength-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--main-red);
+    transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.pwd-strength-label {
+    display: block;
+    min-height: 1.1em;
+    margin-top: 4px;
+    color: #6b7280;
+    font-size: 11.5px;
+}
+
+.caps-lock-warning {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: 1px solid rgba(217, 119, 6, 0.35);
+    border-radius: 6px;
+    background: rgba(217, 119, 6, 0.08);
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+    .caps-lock-warning.show {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.6rem;
-        font-weight: 700;
-        letter-spacing: .02em;
     }
 
-    .account-section-header {
-        background: var(--lead-primary);
-        color: #fff;
-        font-weight: 600;
-        font-size: .92rem;
-        padding: .65rem 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-    }
-
-    .pwd-input-wrap {
-        position: relative;
-    }
-
-        .pwd-input-wrap input {
-            padding-right: 2.4rem;
-        }
-
+@media (prefers-reduced-motion: reduce) {
+    .pwd-strength-fill,
     .pwd-toggle-btn {
-        position: absolute;
-        right: 6px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #b89694;
-        cursor: pointer;
-        padding: 4px 6px;
-        line-height: 1;
+        transition: none;
     }
+}
 
-        .pwd-toggle-btn:hover {
-            color: var(--lead-primary);
-        }
-
-    .pwd-strength-bar {
-        height: 6px;
-        border-radius: 999px;
-        background: #eee;
-        margin-top: .5rem;
-        overflow: hidden;
+@media (max-width: 480px) {
+    .account-actions .btn {
+        width: 100%;
     }
-
-    .pwd-strength-fill {
-        height: 100%;
-        width: 0%;
-        border-radius: 999px;
-        background: #dc3545;
-        transition: width .2s ease, background-color .2s ease;
-    }
-
-    .pwd-strength-label {
-        font-size: .72rem;
-        margin-top: .25rem;
-        display: block;
-        color: var(--lead-text-muted, #8f7d7b);
-        min-height: 1.1em;
-    }
-
-    /* Hide the browser's own built-in password-reveal icon (Edge/IE) so it
-       doesn't sit on top of our custom eye toggle. */
-    input[type="password"]::-ms-reveal,
-    input[type="password"]::-ms-clear {
-        display: none;
-    }
-
-    .caps-lock-warning {
-        display: none;
-        align-items: center;
-        gap: .35rem;
-        font-size: .76rem;
-        font-weight: 600;
-        color: #92620a;
-        background: #fff6e6;
-        border: 1px solid #f2dba6;
-        border-radius: 8px;
-        padding: .3rem .55rem;
-        margin-top: .4rem;
-    }
-
-        .caps-lock-warning.show {
-            display: flex;
-        }
+}
