@@ -1,0 +1,5454 @@
+
+:root {
+    --main-red: #c60404;
+    --main-red-hover: #a80303;
+    --main-red-active: #8a0303;
+    --main-red-bg-soft: rgba(198, 4, 4, 0.06);
+    --main-red-bg-tint: rgba(198, 4, 4, 0.08);
+    --main-red-bg-strong: rgba(198, 4, 4, 0.15);
+    --main-red-shadow: rgba(198, 4, 4, 0.14);
+    --main-red-ring: rgba(198, 4, 4, 0.25);
+}
+
+
+/* =========================================
+   HERO BANNER
+   ========================================= */
+
+.main-hero {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    min-height: 180px;
+    max-height: 240px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.main-hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center right;
+    z-index: 1;
+}
+
+.main-hero-gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient( 90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 20%, rgba(255, 255, 255, 0.82) 35%, rgba(255, 255, 255, 0.55) 48%, rgba(255, 255, 255, 0.20) 62%, rgba(255, 255, 255, 0) 78% );
+}
+
+.main-hero-content {
+    position: relative;
+    z-index: 3;
+    width: 60%;
+    height: 100%;
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.main-hero-eyebrow {
+    margin-bottom: 4px;
+    color: var(--main-red);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.main-hero-heading {
+    margin: 0 0 6px;
+    color: #17191D;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.main-hero-description {
+    margin: 0 0 12px;
+    max-width: 420px;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* Feature tiles share the row equally, whether there are 1 or 4 (Manage
+   pages skip empty values): each grows from 0 to an equal share, within
+   120-200px, so tiles line up instead of each being its own text width */
+.main-hero-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.main-hero-feature {
+    display: flex;
+    flex: 1 1 0;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 120px;
+    max-width: 200px;
+}
+
+.main-hero-feature-text {
+    min-width: 0;
+}
+
+.main-hero-feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+    font-size: 14px;
+}
+
+.main-hero-feature-label {
+    color: #17191D;
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.main-hero-feature-desc {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 11.5px;
+    line-height: 1.35;
+}
+
+@media (max-width: 991px) {
+
+    .main-hero {
+        height: 190px;
+        min-height: 180px;
+        max-height: 220px;
+    }
+
+    .main-hero-content {
+        width: 70%;
+        padding: 18px 22px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .main-hero {
+        height: 240px;
+        min-height: 220px;
+        max-height: 260px;
+    }
+
+    .main-hero-bg {
+        object-position: center;
+    }
+
+    .main-hero-gradient {
+        background: linear-gradient( 180deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 255, 255, 0.90) 45%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0) 100% );
+    }
+
+    .main-hero-content {
+        width: 100%;
+        padding: 18px 20px;
+    }
+
+    .main-hero-heading {
+        font-size: 22px;
+    }
+
+    .main-hero-features {
+        gap: 12px;
+    }
+
+    /* Two equal columns; an odd last tile keeps the same width */
+    .main-hero-feature {
+        flex: 0 1 calc(50% - 6px);
+        max-width: none;
+    }
+}
+
+
+/* =========================================
+   LIST PAGE WRAPPER
+   ========================================= */
+
+.main-list-page {
+    padding: 20px;
+}
+
+
+/* =========================================
+   ADD BUTTON (lives in the toolbar)
+   ========================================= */
+
+.btn.main-list-add-btn {
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--main-red);
+    border-radius: 5px;
+    background: var(--main-red);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px var(--main-red-shadow);
+}
+
+    .btn.main-list-add-btn:hover,
+    .btn.main-list-add-btn:focus {
+        border-color: var(--main-red-hover);
+        background: var(--main-red-hover);
+        color: #ffffff;
+    }
+
+    .btn.main-list-add-btn:active {
+        border-color: var(--main-red-active);
+        background: var(--main-red-active);
+        color: #ffffff;
+    }
+
+    .btn.main-list-add-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .btn.main-list-add-btn i {
+        margin-right: 5px;
+    }
+
+.main-list-add-btn-text {
+    display: inline;
+}
+
+
+/* =========================================
+   TOOLBAR / SEARCH / STATUS FILTER
+   ========================================= */
+
+/* Children centered on both axes: every control lines up on one center
+   line, and a wrapped row with spare room stays centered */
+.main-list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Toolbar buttons (Search, Columns, Add): colors ease instead of snapping,
+   and a small press (from Store Manage, now on every list page) */
+.main-list-toolbar .btn {
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, transform 0.1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+    .main-list-toolbar .btn:active:not(:disabled) {
+        transform: scale(0.97);
+    }
+
+    /* Add while it can't be used yet (e.g. Store Manage's product list
+       still loading) */
+    .main-list-toolbar .btn.main-list-add-btn:disabled {
+        box-shadow: none;
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+@media (prefers-reduced-motion: reduce) {
+
+    .main-list-toolbar .btn:active:not(:disabled) {
+        transform: none;
+    }
+}
+
+.main-list-search {
+    flex: 1 1 0;
+    min-width: 200px;
+}
+
+    .main-list-search .input-group {
+        display: flex;
+        width: 100%;
+    }
+
+    .main-list-search .form-control {
+        height: 40px;
+        border-color: #d9d9d9;
+        border-radius: 5px 0 0 5px;
+        box-shadow: none;
+        font-size: 13px;
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+
+        .main-list-search .form-control:focus {
+            border-color: var(--main-red);
+            box-shadow: none;
+        }
+
+    .main-list-search .input-group-btn {
+        flex: 0 0 auto;
+        display: flex;
+        /* Bootstrap sets width: 1% for its table layout; under flex that
+           shrinks this wrapper to ~8px and the Search button spills over
+           the next toolbar control */
+        width: auto;
+    }
+
+.btn.main-list-search-btn {
+    height: 40px;
+    padding: 0 15px;
+    border-color: var(--main-red);
+    background: var(--main-red);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+    .btn.main-list-search-btn:hover {
+        border-color: var(--main-red-hover);
+        background: var(--main-red-hover);
+        color: #ffffff;
+    }
+
+    .btn.main-list-search-btn:active {
+        border-color: var(--main-red-active);
+        background: var(--main-red-active);
+        color: #ffffff;
+    }
+
+    .btn.main-list-search-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .btn.main-list-search-btn i {
+        margin-right: 5px;
+    }
+
+/* Beside the search box, at a fixed width that fits its longest option
+   ("Pending Approval"); the search box gives up space instead */
+.main-list-status {
+    flex: 0 0 180px;
+    width: 180px;
+}
+
+    .main-list-status .form-control {
+        width: 100%;
+        text-overflow: ellipsis;
+        height: 40px;
+        border-color: #d9d9d9;
+        border-radius: 5px;
+        box-shadow: none;
+        color: #555555;
+        font-size: 13px;
+    }
+
+/* Enhanced Status dropdown (main-scroll-select.js): the toggle takes the
+   .form-control look above; the option list matches the control's width
+   and sits above the table's sticky columns */
+.main-list-status .main-form-scroll-select-toggle {
+    position: relative;
+    display: block;
+    padding: 0 2.25rem 0 12px;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .main-list-status .main-form-scroll-select-toggle:focus-visible {
+        outline: none;
+        border-color: var(--main-red);
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.main-list-status .main-form-scroll-select-list {
+    z-index: 60;
+    max-height: min(260px, 60vh);
+}
+
+/* Tablets (sidebar open, plus the page scrollbar): a narrower search
+   minimum keeps search, Status, Columns and Add on one row, and the
+   Search button goes icon-only (as on phones) so the input keeps room */
+@media (min-width: 768px) and (max-width: 991px) {
+
+    .main-list-toolbar .main-list-search {
+        min-width: 120px;
+    }
+
+    .main-list-toolbar:has(.main-list-status) .btn.main-list-search-btn {
+        padding: 0 12px;
+    }
+
+        .main-list-toolbar:has(.main-list-status) .main-list-search-btn-text {
+            display: none;
+        }
+
+        .main-list-toolbar:has(.main-list-status) .btn.main-list-search-btn i {
+            margin-right: 0;
+        }
+}
+
+
+/* =========================================
+   CUSTOMIZE COLUMNS
+   ========================================= */
+
+.main-columns-wrapper {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.btn.main-columns-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #555555;
+    font-size: 14px;
+}
+
+    .btn.main-columns-btn:hover,
+    .btn.main-columns-btn.is-active {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .btn.main-columns-btn:active {
+        border-color: var(--main-red-active);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red-active);
+    }
+
+    .btn.main-columns-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.main-columns-popover {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 60;
+    width: 260px;
+    max-width: calc(100vw - 40px);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+}
+
+    .main-columns-popover.is-open {
+        display: block;
+    }
+
+.main-columns-popover-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #17191D;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Capped to the screen height too, so every column option
+   can be scrolled to on short (landscape) phones */
+.main-columns-popover-body {
+    padding: 6px 16px 12px;
+    max-height: min(320px, 60vh);
+    overflow-y: auto;
+}
+
+.main-columns-popover-divider {
+    height: 1px;
+    margin: 2px 0 4px;
+    background: #f0f0f0;
+}
+
+.main-column-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.main-column-toggle-row-all {
+    padding-top: 10px;
+}
+
+.main-column-toggle-label {
+    color: #374151;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+/* ---- COLUMN REORDER (main-column-reorder.js) ---- */
+
+/* Header: title on the left, reorder button on the right */
+.main-columns-popover-header:has(.main-columns-reorder-btn) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.btn.main-columns-reorder-btn {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: transparent;
+    color: #555555;
+}
+
+    .btn.main-columns-reorder-btn:hover,
+    .btn.main-columns-reorder-btn.is-active {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .btn.main-columns-reorder-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.main-columns-reorder-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    font-weight: 600;
+    background-color: currentColor;
+    mask-image: url("../icons/main-column-reorder.svg?v=2");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+}
+
+.main-columns-reorder-hint {
+    display: none;
+    padding: 7px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: var(--main-red-bg-soft);
+    color: #6b7280;
+    font-size: 11.5px;
+}
+
+    .main-columns-reorder-hint .fa {
+        margin-right: 4px;
+        color: var(--main-red);
+    }
+
+.main-columns-popover.is-reordering .main-columns-reorder-hint {
+    display: block;
+}
+
+/* Reorder mode: column rows get a grip and can be picked up by the label */
+.main-columns-popover.is-reordering .main-column-toggle-row:has(.main-column-checkbox[data-column]) {
+    margin: 0 -8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 6px;
+}
+
+    .main-columns-popover.is-reordering .main-column-toggle-row:has(.main-column-checkbox[data-column]):hover {
+        background: #f7f7f8;
+    }
+
+.main-columns-popover.is-reordering .main-column-toggle-row:has(.main-column-checkbox[data-column]) .main-column-toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+    /* Grip on the right of each draggable label (stays centered when a
+       long label wraps) */
+    .main-columns-popover.is-reordering .main-column-toggle-row:has(.main-column-checkbox[data-column]) .main-column-toggle-label::after {
+        content: "\f0c9";
+        flex: 0 0 auto;
+        color: #b0b4ba;
+        font-family: FontAwesome;
+        font-weight: normal;
+    }
+
+/* Group dividers between column rows no longer mean anything once the
+   order is changed (or while it is being changed); the one under "All" stays */
+.main-columns-popover.is-reordering .main-column-toggle-row:not(.main-column-toggle-row-all) + .main-columns-popover-divider,
+.main-columns-popover.is-reordered .main-column-toggle-row:not(.main-column-toggle-row-all) + .main-columns-popover-divider {
+    display: none;
+}
+
+    .main-columns-popover.is-reordering .main-column-toggle-label:focus-visible {
+        outline: none;
+        border-radius: 3px;
+        box-shadow: 0 0 0 2px var(--main-red-ring);
+    }
+
+/* The row being dragged follows the pointer, lifted above the list */
+.main-column-toggle-row.is-dragging {
+    position: fixed;
+    z-index: 10060;
+    /* placed at the row's own on-screen box, so no reorder-mode margins */
+    margin: 0 !important;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    outline: 1px solid var(--main-red);
+    pointer-events: none;
+}
+
+    .main-column-toggle-row.is-dragging .main-column-toggle-label {
+        color: var(--main-red);
+        cursor: grabbing;
+    }
+
+.main-columns-popover.is-dragging-column,
+.main-columns-popover.is-dragging-column * {
+    cursor: grabbing !important;
+}
+
+/* Where the dragged column will land */
+.main-column-toggle-placeholder {
+    margin: 0 -8px;
+    border: 1px dashed var(--main-red);
+    border-radius: 6px;
+    background: var(--main-red-bg-soft);
+}
+
+/* Brief highlight on the row that was just dropped */
+.main-column-toggle-row.is-dropped {
+    animation: main-column-dropped 0.4s ease;
+}
+
+@keyframes main-column-dropped {
+    from {
+        background: var(--main-red-bg-soft);
+    }
+
+    to {
+        background: transparent;
+    }
+}
+
+.main-column-checkbox {
+    position: relative;
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+}
+
+    .main-column-checkbox.is-on {
+        color: var(--main-red);
+    }
+
+    .main-column-checkbox .main-column-checkbox-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        pointer-events: none;
+    }
+
+        .main-column-checkbox .main-column-checkbox-svg rect {
+            stroke-dasharray: 88 0;
+            stroke-dashoffset: 73;
+            transition: stroke-dasharray 100ms ease;
+        }
+
+    .main-column-checkbox.is-on .main-column-checkbox-svg rect {
+        stroke-dasharray: 80 18;
+    }
+
+    .main-column-checkbox .main-column-checkbox-svg polyline {
+        stroke-dasharray: 0 30;
+        stroke-dashoffset: 1;
+        transition: stroke-dasharray 150ms ease;
+    }
+
+    .main-column-checkbox.is-on .main-column-checkbox-svg polyline {
+        stroke-dasharray: 30 30;
+    }
+
+.col-hidden {
+    display: none !important;
+}
+
+
+/* =========================================
+   TABLE
+   ========================================= */
+
+/* Same card as the toolbar and pagination above and below it, so the three
+   share one left and right edge (cell padding 16px + 1px border lines the
+   first column up with the toolbar's search box) */
+.main-list-table-wrapper {
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+    /* The scroll area clips the header's grey to the rounded corners.
+       Bootstrap 3 also gives it its own border and a 15px bottom margin on
+       phones, which would double up with the card. (Open actions menus are
+       position: fixed, so they aren't clipped.) */
+    .main-list-table-wrapper > .table-responsive {
+        margin-bottom: 0;
+        border: 0;
+        border-radius: 5px;
+    }
+
+.main-list-table {
+    /* Column widths (see COLUMN SIZING below) */
+    --col-primary-min: 240px;
+    --col-primary-max: 360px;
+    --col-text-min: 200px;
+    --col-text-max: 320px;
+    --col-meta-min: 150px;
+    --col-actions: 50px;
+
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+    /* Columns */
+
+    .main-list-table.table thead th {
+        padding: 12px 16px;
+        border-bottom: 2px solid #eeeeee;
+        background: #fafafa;
+        color: #333333;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .main-list-table.table tbody td {
+        padding: 12px 16px;
+        border-top: 0;
+        color: #333333;
+        font-size: 13px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .main-list-table tbody tr {
+        --row-bg: #ffffff;
+        box-shadow: inset 3px 0 0 0 transparent;
+        transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+        .main-list-table tbody tr:nth-child(even) {
+            --row-bg: #fbfbfc;
+            background: #fbfbfc;
+        }
+
+        .main-list-table tbody tr:hover {
+            --row-bg: #fcf5f5;
+            background: #fcf5f5;
+            box-shadow: inset 3px 0 0 0 var(--main-red);
+        }
+
+/* Header label + sort button: kept together and centered on one line (the
+   button sits right after the label, not pushed to the column's far edge,
+   so it stays next to its label in wide columns) */
+.th-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    vertical-align: middle;
+}
+
+.th-label {
+    min-width: 0;
+    text-align: left;
+}
+
+.btn.main-column-sort {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: #9a9da2;
+}
+
+    .btn.main-column-sort:hover,
+    .btn.main-column-sort.is-active {
+        color: var(--main-red);
+    }
+
+    .btn.main-column-sort:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--main-red-ring);
+    }
+
+.main-column-sort-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    mask-image: url("../icons/main-column-arrowsort.svg");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+}
+
+/* =========================================
+   COLUMN SIZING (every .main-list-table:
+   Product / Store / Vendor / Warehouse List,
+   Store Manage, Supplier Manage)
+
+   Works for any number of visible columns
+   (Customize Columns can show 1 or 30):
+
+   - The table is 100% wide and grows past
+     that only when its columns need it, so
+     a few columns fill the width and many
+     columns scroll (no fixed table minimum
+     that forces scrolling with 2 columns).
+   - Every data column is flexible: spare
+     width is shared across the visible
+     columns in proportion to their content,
+     so nothing sits squeezed or empty.
+   - Long content can't claim that share:
+     text inside the record and long-text
+     columns is capped (--col-*-max), so a
+     long address can't take most of the
+     spare width. Each column also keeps a
+     minimum, so with many columns it wraps
+     instead of collapsing.
+
+   Record column  product / store / vendor /
+                  warehouse: wraps, 240-360px
+   Long text      location / address / billing
+                  / shipping / unacceptable
+                  condition: wraps, 2 lines
+                  max (full text in the cell's
+                  title), at least 200px; the
+                  text asks for no width, so it
+                  fills its share instead of
+                  taking one
+   Created / Modified  at least 150px
+   Actions        fixed 50px, sticky right
+   Spacer         empty, takes no width (kept
+                  in the markup, not needed)
+
+   Body cells carry only data-column, so the
+   columns are matched by key as well as by
+   the header's .main-col-primary / -secondary.
+   ========================================= */
+
+.main-list-table .main-col-primary,
+.main-list-table td[data-column="product"],
+.main-list-table td[data-column="store"],
+.main-list-table td[data-column="vendor"],
+.main-list-table td[data-column="warehouse"] {
+    min-width: var(--col-primary-min);
+}
+
+.main-list-table .main-col-secondary,
+.main-list-table [data-column="location"],
+.main-list-table [data-column="address"],
+.main-list-table [data-column="billing"],
+.main-list-table [data-column="shipping"],
+.main-list-table [data-column="unacceptableCondition"] {
+    min-width: var(--col-text-min);
+}
+
+    /* Body cells of both: wrap instead of widening the table */
+    .main-list-table.table tbody td[data-column="product"],
+    .main-list-table.table tbody td[data-column="store"],
+    .main-list-table.table tbody td[data-column="vendor"],
+    .main-list-table.table tbody td[data-column="warehouse"],
+    .main-list-table.table tbody td[data-column="location"],
+    .main-list-table.table tbody td[data-column="address"],
+    .main-list-table.table tbody td[data-column="billing"],
+    .main-list-table.table tbody td[data-column="shipping"],
+    .main-list-table.table tbody td[data-column="unacceptableCondition"] {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    /* Content caps: a cell's text never asks for more than this, so the
+       column takes its share of spare width like any other */
+    .main-list-table td[data-column="product"] > *,
+    .main-list-table td[data-column="store"] > *,
+    .main-list-table td[data-column="vendor"] > *,
+    .main-list-table td[data-column="warehouse"] > * {
+        max-width: var(--col-primary-max);
+    }
+
+    .main-list-table td[data-column="location"] > .main-row-detail,
+    .main-list-table td[data-column="address"] > .main-row-detail,
+    .main-list-table td[data-column="billing"] > .main-row-detail,
+    .main-list-table td[data-column="shipping"] > .main-row-detail,
+    .main-list-table td[data-column="unacceptableCondition"] > .main-row-detail {
+        max-width: var(--col-text-max);
+        /* Long text: 2 lines, then an ellipsis */
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+        line-height: 1.45;
+    }
+
+    /* Better still: the text asks for no width at all (so the column gets
+       the same kind of share as its neighbours), then fills whatever width
+       the column ends up with. The cap above is the fallback. */
+    @supports (contain: inline-size) {
+
+        .main-list-table td[data-column="location"] > .main-row-detail,
+        .main-list-table td[data-column="address"] > .main-row-detail,
+        .main-list-table td[data-column="billing"] > .main-row-detail,
+        .main-list-table td[data-column="shipping"] > .main-row-detail,
+        .main-list-table td[data-column="unacceptableCondition"] > .main-row-detail {
+            max-width: none;
+            contain: inline-size;
+        }
+    }
+
+/* Created / Modified: name, date and time stay on their own lines */
+.created-modified-column {
+    min-width: var(--col-meta-min);
+}
+
+/* Empty column before Actions: no width, no padding */
+.main-list-table .main-col-spacer {
+    width: 0;
+    min-width: 0;
+    padding: 0 !important;
+}
+
+.actions-column {
+    width: var(--col-actions, 50px);
+    text-align: center;
+}
+
+
+/* ---- STICKY ACTIONS COLUMN --- */
+
+.main-actions-sticky {
+    position: sticky;
+    width: var(--col-actions, 50px);
+    text-align: center;
+    right: 0;
+    box-shadow: -6px 0 8px -6px rgba(0, 0, 0, 0.12);
+    z-index: 4;
+}
+
+.main-list-table.table thead th.main-actions-sticky {
+    background: #fafafa;
+    z-index: 5;
+}
+
+.main-list-table.table tbody td.main-actions-sticky {
+    background: var(--row-bg, #ffffff);
+}
+
+/* Holds one 32px button: tighter sides than the data columns */
+.main-list-table.table thead th.main-actions-sticky,
+.main-list-table.table tbody td.main-actions-sticky {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.main-actions-sticky:has(.main-actions-dropdown.is-open) {
+    z-index: 20;
+}
+
+/* Phones: a little less side padding, so more of each row fits before the
+   table scrolls (the toolbar is tighter there too) */
+@media (max-width: 767px) {
+
+    .main-list-table.table thead th,
+    .main-list-table.table tbody td {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+
+/* =========================================
+   CELL TEXT (every .main-list-table)
+   One rhythm for stacked lines in a cell:
+
+   .main-row-title     the record's name     13px, #111, 500
+   .main-row-detail    a value / 2nd line    12px, #333
+   .main-row-detail-muted, .main-hint,
+   .main-meta-date / -time                   11.5px, #6b7280
+
+   Lines in a cell sit 2px apart. Muted text
+   is #6b7280 (4.8:1 on white, AA), not the
+   lighter greys used before.
+   ========================================= */
+
+.main-row-title {
+    margin-bottom: 2px;
+    color: #111111;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+    .main-row-title:last-child {
+        margin-bottom: 0;
+    }
+
+/* Flex column: several values (contacts, brand extensions) stack 2px apart */
+.main-row-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: #333333;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+    .main-row-detail + .main-row-detail {
+        margin-top: 2px;
+    }
+
+.main-row-detail-muted {
+    color: #6b7280;
+    font-size: 11.5px;
+}
+
+.main-row-contact-line {
+    display: block;
+    white-space: nowrap;
+}
+
+/* Hints under a value in a list cell (item code, "Current ₱...",
+   "Takes effect ...") */
+.main-list-table .main-hint {
+    margin-top: 2px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+    /* The title already leaves the 2px */
+    .main-list-table .main-row-title + .main-hint {
+        margin-top: 0;
+    }
+
+
+/* =========================================
+   CREATED / MODIFIED COLUMNS
+   Name, then date and time in muted text
+   ========================================= */
+
+.main-meta-name {
+    margin-bottom: 2px;
+    color: #333333;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.main-meta-date,
+.main-meta-time {
+    color: #6b7280;
+    font-size: 11.5px;
+    line-height: 1.4;
+}
+
+    .main-meta-date + .main-meta-time {
+        margin-top: 2px;
+    }
+
+    .main-meta-time i {
+        width: 12px;
+        margin-right: 2px;
+        text-align: center;
+    }
+
+
+/*  ROW ACTIONS MENU */
+
+.main-actions-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.btn.main-actions-trigger {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #111111;
+    font-size: 14px;
+}
+
+    .btn.main-actions-trigger:hover,
+    .btn.main-actions-trigger.is-active {
+        border-color: var(--main-red-hover);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red-hover);
+    }
+
+    .btn.main-actions-trigger:active {
+        border-color: var(--main-red-active);
+        color: var(--main-red-active);
+    }
+
+    .btn.main-actions-trigger:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.main-actions-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 70;
+    min-width: 150px;
+    padding: 6px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+    text-align: left;
+}
+
+    .main-actions-dropdown.is-open {
+        display: block;
+        animation: mainActionsMenuShow 0.12s ease-out;
+    }
+
+@keyframes mainActionsMenuShow {
+
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-actions-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #333333;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .main-actions-item i {
+        width: 14px;
+        color: #999999;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .main-actions-item:hover,
+    .main-actions-item:focus-visible {
+        background: #f5f5f5;
+        color: #111111;
+        outline: none;
+    }
+
+    .main-actions-item:hover i,
+    .main-actions-item:focus-visible i {
+        color: var(--main-red);
+    }
+
+.main-actions-item-danger {
+    color: var(--main-red);
+}
+
+    .main-actions-item-danger i {
+        color: var(--main-red);
+    }
+
+    .main-actions-item-danger:hover,
+    .main-actions-item-danger:focus-visible {
+        background: var(--main-red-bg-soft);
+        color: var(--main-red-hover);
+    }
+
+    .main-actions-item-danger:hover i,
+    .main-actions-item-danger:focus-visible i {
+        color: var(--main-red-hover);
+    }
+
+/* Unavailable action (e.g. Vendor Item Approval before a price is entered) */
+
+.main-actions-item.is-disabled,
+.main-actions-item.is-disabled:hover {
+    background: transparent;
+    color: #b5b7ba;
+    cursor: not-allowed;
+}
+
+    .main-actions-item.is-disabled i,
+    .main-actions-item.is-disabled:hover i {
+        color: #cfd1d4;
+    }
+
+@media (max-width: 767px) {
+
+    .main-actions-dropdown {
+        min-width: 130px;
+    }
+}
+
+
+/* =========================================
+   VIEW (DETAILS) ROWS
+   Label / value pairs in the small review
+   dialogs (Manage Item, Approve Status
+   Change, Approve Incoming Price): label on
+   the left, value right-aligned, hairlines
+   between rows.
+   ========================================= */
+
+.main-view-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f2f4;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+    .main-view-row:first-child {
+        padding-top: 2px;
+    }
+
+    .main-view-row:last-of-type,
+    .main-view-row:has(+ :not(.main-view-row)) {
+        border-bottom: 0;
+    }
+
+    /* A form row right after the summary (Manage Item) */
+    .main-view-row + .row {
+        margin-top: 14px;
+    }
+
+.main-view-label {
+    flex: 0 0 auto;
+    color: #6b7280;
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.main-view-value {
+    min-width: 0;
+    color: #111827;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+/* Status Change value: current chip -> new chip (Store Manage approval) */
+.sm-status-change {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+    .sm-status-change .fa-long-arrow-right {
+        color: #9a9da2;
+    }
+
+
+/* =========================================
+   ADD / EDIT FORM POPUP
+   ========================================= */
+
+.main-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 15px 30px;
+    background: rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+}
+
+.main-form-modal {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height:90%;
+    max-width: 850px;
+    max-height: 790px;
+    background: #ffffff;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    animation: mainFormShow 0.18s ease-out;
+}
+
+@keyframes mainFormShow {
+
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ---- HEADER ---- */
+
+.main-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 25px;
+    border-bottom: 1px solid #eeeeee;
+    background: #ffffff;
+}
+
+.main-form-title-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.main-form-icon {
+    width: 42px;
+    height: 42px;
+    margin-right: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+    font-size: 18px;
+}
+
+.main-form-header h3 {
+    margin: 0 0 3px;
+    color: #111111;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.main-form-header p {
+    margin: 0;
+    color: #777777;
+    font-size: 13px;
+}
+
+.main-form-close {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #777777;
+    font-size: 16px;
+    transition: all 0.15s ease;
+}
+
+    .main-form-close:hover {
+        background: #f5f5f5;
+        color: var(--main-red);
+    }
+
+
+/* ---- BODY ---- */
+
+.main-form-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 25px 25px 20px;
+    max-height: calc(80vh - 90px);
+    overflow-y: auto;
+}
+
+    .main-form-body .row {
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .main-form-body [class*="col-"] {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+.remove-form-body{
+
+}
+/* =========================================
+   DROPDOWN ARROW 
+   ========================================= */
+select.form-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.25rem;
+}
+
+    select.form-control[multiple],
+    select.form-control[size]:not([size="1"]) {
+        background-image: none;
+        padding-right: 0.75rem;
+    }
+
+
+.main-form-group {
+    margin-bottom: 20px;
+}
+
+    /* .main-form-label: same look for captions that aren't a <label> -
+       headings, or names of custom controls tied with aria-labelledby */
+    .main-form-group label,
+    .main-form-group .main-form-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #333333;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .main-form-group .required {
+        color: var(--main-red);
+    }
+
+    .main-form-group .form-control {     
+        width: 100%;
+        max-width: none;
+        height: 40px;
+        border: 1px solid #d9d9d9;
+        border-radius: 5px;
+        box-shadow: none;
+        color: #222222;
+        font-size: 13px;
+    }
+
+        .main-form-group .form-control:focus {
+            border-color: var(--main-red);
+            box-shadow: 0 0 0 2px var(--main-red-bg-tint);
+        }
+
+        .main-form-group .form-control::placeholder {
+            color: #aaaaaa;
+        }
+
+        .main-form-group textarea.form-control {
+            height: auto;
+            min-height: 80px;
+            padding-top: 9px;
+            padding-bottom: 9px;
+            resize: vertical;
+        }
+
+
+    /* Brand Extension (Store form): same look as the enhanced
+       dropdowns (.main-form-scroll-select-toggle) - placeholder
+       color, chevron size/position and open state */
+    .main-form-group .main-brand-extension-btn {
+        position: relative;
+        display: block;
+        width: 100%;
+        padding-right: 2.25rem;
+        background: #ffffff;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .main-form-group .main-brand-extension-btn-label {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .main-form-group .main-brand-extension-btn-label.is-placeholder {
+            color: #aaaaaa;
+        }
+
+    .main-form-group .main-brand-extension-btn-caret {
+        position: absolute;
+        top: 50%;
+        right: 0.75rem;
+        margin-top: -6px;
+        color: #343a40;
+        font-size: 12px;
+        line-height: 12px;
+        transition: transform 0.15s ease;
+    }
+
+    .main-form-group .main-brand-extension-btn.is-active {
+        border-color: #e5091b;
+        box-shadow: 0 0 0 3px rgba(229, 9, 27, 0.12);
+    }
+
+        .main-form-group .main-brand-extension-btn.is-active .main-brand-extension-btn-caret {
+            transform: rotate(180deg);
+        }
+
+.main-form-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    margin-top: 4px;
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border: 1px solid #eeeeee;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.main-form-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #777777;
+}
+
+    .main-form-meta-item i {
+        font-size: 11px;
+        color: #aaaaaa;
+    }
+
+.main-form-meta-label {
+    font-weight: 600;
+    color: #555555;
+}
+
+.main-form-meta-value {
+    color: #333333;
+}
+
+
+/* ---- FOOTER ---- */
+
+.main-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+    gap: 10px;
+    padding-top: 5px;
+    margin:10px;
+    border-top: 1px solid #eeeeee;
+}
+
+.btn.main-form-cancel-btn {
+    min-width: 90px;
+    height: 38px;
+    border: 1px solid #d5d5d5;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #555555;
+    font-size: 13px;
+}
+
+    .btn.main-form-cancel-btn:hover {
+        background: #f7f7f7;
+        color: #333333;
+    }
+
+    .btn.main-form-cancel-btn:active {
+        background: #eeeeee;
+        color: #333333;
+    }
+
+    .btn.main-form-cancel-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    }
+
+.btn.main-form-save-btn {
+    min-width: 135px;
+    height: 38px;
+    border: 1px solid var(--main-red);
+    border-radius: 5px;
+    background: var(--main-red);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+    .btn.main-form-save-btn:hover,
+    .btn.main-form-save-btn:focus {
+        border-color: var(--main-red-hover);
+        background: var(--main-red-hover);
+        color: #ffffff;
+    }
+
+    .btn.main-form-save-btn:active {
+        border-color: var(--main-red-active);
+        background: var(--main-red-active);
+        color: #ffffff;
+    }
+
+    .btn.main-form-save-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .btn.main-form-save-btn i {
+        margin-right: 5px;
+    }
+
+    /* Nothing to save yet (e.g. Edit Vendor before any change): faded, and
+       no hover/press darkening so it doesn't look clickable */
+    .btn.main-form-save-btn:disabled,
+    .btn.main-form-save-btn:disabled:hover,
+    .btn.main-form-save-btn:disabled:focus,
+    .btn.main-form-save-btn:disabled:active {
+        border-color: var(--main-red);
+        background: var(--main-red);
+        color: #ffffff;
+        box-shadow: none;
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+/* Positive/confirm variant of the save button (e.g. approving a pending
+   vendor price) - same shape as main-form-save-btn, green instead of red. */
+.btn.main-form-approve-btn {
+    min-width: 135px;
+    height: 38px;
+    border: 1px solid #16a34a;
+    border-radius: 5px;
+    background: #16a34a;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+    .btn.main-form-approve-btn:hover,
+    .btn.main-form-approve-btn:focus {
+        border-color: #15803d;
+        background: #15803d;
+        color: #ffffff;
+    }
+
+    .btn.main-form-approve-btn:active {
+        border-color: #14532d;
+        background: #14532d;
+        color: #ffffff;
+    }
+
+    .btn.main-form-approve-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn.main-form-approve-btn i {
+        margin-right: 5px;
+    }
+
+    .btn.main-form-next-btn i {
+        margin-right: 0;
+        margin-left: 5px;
+    }
+
+@media (max-width: 767px) {
+
+    .main-form-overlay {
+        padding: 20px 10px;
+    }
+
+    .main-form-header {
+        padding: 18px;
+    }
+
+    .main-form-body {
+        padding: 20px 18px;
+    }
+
+    .main-form-header h3 {
+        font-size: 18px;
+    }
+
+    .main-form-header p {
+        font-size: 12px;
+    }
+
+    .main-form-footer {
+        justify-content: stretch;
+    }
+
+        .main-form-footer .btn {
+            flex: 1;
+        }
+
+    .main-form-meta-value,
+    .main-form-meta-label {
+        font-size: 9px;
+    }
+
+    
+}
+
+
+/* =========================================
+   PAGINATION
+   ========================================= */
+
+.main-list-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.main-pagination-size {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 8px;
+    font-size: 13px;
+    color: #555555;
+    white-space: nowrap;
+}
+
+    /* Room on the right for the select.form-control arrow,
+       so "100" never runs under it */
+    .main-pagination-size select.form-control {
+        flex: 0 0 auto;
+        width: 72px;
+        max-width: none;
+        height: 34px;
+        padding: 0 26px 0 10px;
+        border-color: #d9d9d9;
+        background-position: right 8px center;
+        box-shadow: none;
+        font-size: 13px;
+        line-height: normal;
+    }
+
+.main-pagination-summary {
+    min-width: 0;
+    font-size: 12px;
+    color: #777777;
+}
+
+.main-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.btn.main-pagination-btn {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #333333;
+    font-size: 12px;
+}
+
+    .btn.main-pagination-btn:hover:not(:disabled) {
+        border-color: var(--main-red-hover);
+        color: var(--main-red-hover);
+    }
+
+    .btn.main-pagination-btn:active:not(:disabled) {
+        border-color: var(--main-red-active);
+        color: var(--main-red-active);
+    }
+
+    .btn.main-pagination-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .btn.main-pagination-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+.btn.main-pagination-btn-active {
+    border-color: var(--main-red);
+    background: var(--main-red);
+    color: #ffffff;
+}
+
+    .btn.main-pagination-btn-active:hover {
+        border-color: var(--main-red);
+        background: var(--main-red);
+        color: #ffffff;
+    }
+
+
+/* ---- PREVIOUS / NEXT (solid, same as other primary buttons) ---- */
+
+.btn.main-pagination-nav-btn {
+    border-color: rgb(33, 37, 41);
+    background: #ffffff;
+    color: rgb(33, 37, 41);
+}
+
+    .btn.main-pagination-nav-btn:hover:not(:disabled) {
+        border-color: var(--main-red-hover);
+        background: var(--main-red-hover);
+        color: #ffffff;
+    }
+
+    .btn.main-pagination-nav-btn:active:not(:disabled) {
+        border-color: var(--main-red-active);
+        background: var(--main-red-active);
+        color: #ffffff;
+    }
+
+.main-pagination-ellipsis {
+    padding: 0 4px;
+    color: #999999;
+    font-size: 12px;
+}
+
+/* Tablets (and desktops with little room):*/
+@media (max-width: 991px) {
+
+    .main-pagination-controls {
+        margin-left: auto;
+        justify-content: flex-end;
+    }
+
+    .main-pagination-summary {
+        order: 3;
+        flex: 1 1 100%;
+        text-align: center;
+    }
+}
+
+
+/* =========================================
+   MOBILE (list page / toolbar / table)
+   ========================================= */
+
+@media (max-width: 767px) {
+
+    .main-list-page {
+        padding: 15px;
+    }
+
+    .main-columns-popover {
+        width: 240px;
+        right: -8px;
+    }
+
+    .btn.main-list-add-btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        font-size: 14px;
+    }
+
+        .btn.main-list-add-btn i {
+            margin-right: 0;
+        }
+
+    .main-list-add-btn-text {
+        display: none;
+    }
+
+    /* Search shrinks to fit beside the icon buttons (Columns / Add) */
+    .main-list-search {
+        min-width: 0;
+    }
+
+    .main-list-search .input-group {
+        display: flex;
+        width: 100%;
+    }
+
+    /* Status filter: full-width second row under search + actions */
+    .main-list-status {
+        flex: 1 1 100%;
+        order: 1;
+        width: auto;
+        min-width: 0;
+    }
+
+        /* Larger touch targets in the Status option list */
+        .main-list-status .main-form-scroll-select-option {
+            padding: 11px 14px;
+            font-size: 14px;
+        }
+
+    .main-list-toolbar {
+        padding: 8px;
+        align-items: center;
+    }  
+
+    .btn.main-list-search-btn {
+        padding: 0 12px;
+    }
+
+    .main-list-search-btn-text {
+        display: none;
+    }
+
+    .btn.main-list-search-btn i {
+        margin-right: 0;
+    }
+
+    /* Phones: page size, then the page buttons, each centered on its own row */
+    .main-list-pagination {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 10px;
+    }
+
+    .main-pagination-controls {
+        margin-left: 0;
+        justify-content: center;
+    }
+
+    .main-pagination-summary {
+        display: none;
+    }
+
+    .main-pagination-entries{
+        display:none;
+    }
+}
+
+/* Small phones: slightly smaller page buttons so a full set
+   (Prev 1 ... 99 100 101 ... 250 Next) fits on one line */
+@media (max-width: 400px) {
+
+    .main-pagination-controls {
+        gap: 3px;
+    }
+
+    .btn.main-pagination-btn {
+        min-width: 28px;
+        height: 28px;
+        padding: 0 5px;
+    }
+
+    .main-pagination-ellipsis {
+        padding: 0 2px;
+    }
+}
+
+
+
+.main-form-modal.is-sm {
+    max-width: 500px;
+}
+
+.main-form-modal.is-md {
+    max-width: 650px;
+}
+
+.main-form-modal.is-lg {
+    max-width: 750px;
+}
+
+.main-form-modal.is-auto {
+    height: auto;
+    max-height: 90%;
+}
+
+    .main-form-modal.is-auto .main-form-body {
+        padding-bottom: 8px;
+    }
+
+    .main-form-modal.is-auto .main-form-footer {
+        padding-top: 10px;
+    }
+
+/* A modal opened over another modal (e.g. the map picker over the form) */
+.main-form-overlay.is-stacked {
+    z-index: 10050;
+}
+
+/* Centered message in a small alert modal */
+.main-modal-message {
+    margin: 0;
+    color: #2E3339;
+    font-size: 13.5px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+
+/* ---- Pinned modal layout -----------------------------------------------
+   The tab content scrolls while Record Info (.main-form-meta) and the
+   footer stay at the bottom on every tab.
+
+   .main-form-body.is-pinned
+   └── .main-form-pinned          (the body itself, or a <form> inside it)
+       ├── .main-form-scroll      flex: 1, scrolls
+       ├── .main-form-meta        stays at the bottom
+       └── .main-form-footer      stays at the bottom */
+
+.main-form-body.is-pinned {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.main-form-pinned {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.main-form-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    /* Room for Bootstrap rows' -10px side margins, which overflow-x: hidden
+       would otherwise clip */
+    margin: 0 -10px;
+    padding: 0 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.main-form-pinned > .main-form-meta,
+.main-form-pinned > .main-form-footer {
+    flex: 0 0 auto;
+}
+
+.main-form-pinned > .main-form-meta {
+    margin-top: 14px;
+}
+
+
+/* ---- Tabs: a tab whose fields still have a problem ---------------------
+   Red dot on its icon, so an error on a tab that isn't showing isn't missed */
+
+.main-form-tab.has-error .main-form-tab-icon {
+    position: relative;
+}
+
+    .main-form-tab.has-error .main-form-tab-icon::after {
+        content: "";
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        width: 10px;
+        height: 10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        background: var(--main-red);
+    }
+
+.main-form-tab.has-error .main-form-tab-label {
+    color: var(--main-red);
+}
+
+
+/* ---- Buttons ----------------------------------------------------------- */
+
+/* Secondary action in the brand color (e.g. Add Contact); .is-icon for a
+   square icon-only version (e.g. remove a row) */
+.btn.main-outline-btn {
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--main-red);
+    border-radius: 5px;
+    background: #ffffff;
+    color: var(--main-red);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+    .btn.main-outline-btn:hover:not(:disabled),
+    .btn.main-outline-btn:focus:not(:disabled) {
+        border-color: var(--main-red-hover);
+        background: var(--main-red);
+        color: #ffffff;
+    }
+
+    .btn.main-outline-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .btn.main-outline-btn:disabled {
+        border-color: #d9d9d9;
+        background: #ffffff;
+        color: #bbbbbb;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+
+    .btn.main-outline-btn i {
+        margin-right: 5px;
+    }
+
+    .btn.main-outline-btn.is-icon {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        font-size: 13px;
+    }
+
+        .btn.main-outline-btn.is-icon i {
+            margin-right: 0;
+        }
+
+/* ---- Contact cards (Add/Edit Store, Vendor and Warehouse) --------------- */
+
+/* One card per contact: a numbered head with its remove button, then the
+   fields in two lines - who they are (person / department / position) and
+   how to reach them (number / e-mail, which gets the wider column). Rows are
+   built by build*ContactRow() in each module's list script. */
+.main-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    counter-reset: main-contact;
+}
+
+.main-contact-card {
+    counter-increment: main-contact;
+    padding: 8px 14px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fafbfc;
+}
+
+    .main-contact-card.is-entering {
+        animation: mainContactCardIn 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+@keyframes mainContactCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .main-contact-card.is-entering {
+        animation: none;
+    }
+}
+
+.main-contact-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 30px;
+    margin-bottom: 6px;
+}
+
+.main-contact-card-title {
+    color: #777777;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+    .main-contact-card-title::after {
+        content: " " counter(main-contact);
+    }
+
+/* A lone contact can't be removed - keep the space so the head doesn't jump */
+.main-contact-card .main-icon-btn:disabled {
+    visibility: hidden;
+}
+
+.main-contact-card-fields {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px 10px;
+}
+
+.main-contact-field {
+    grid-column: span 2;
+    min-width: 0;
+}
+
+    .main-contact-field.is-wide {
+        grid-column: span 4;
+    }
+
+    .main-form-group .main-contact-field label {
+        margin-bottom: 5px;
+        color: #555555;
+        font-size: 12px;
+    }
+
+    .main-contact-field .form-control {
+        background: #ffffff;
+    }
+
+    /* Not .required: the forms' group-level required scan reads that class,
+       and contact rows are validated per row instead */
+    .main-contact-field .main-contact-required {
+        color: var(--main-red);
+    }
+
+@media (max-width: 767px) {
+
+    .main-contact-card-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .main-contact-field,
+    .main-contact-field.is-wide {
+        grid-column: auto;
+    }
+}
+
+/* Small neutral icon button (remove a chip, calendar month arrows);
+   .is-sm for the tighter 28px size */
+.main-icon-btn {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #555555;
+    font-size: 13px;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+    .main-icon-btn:hover:not(:disabled),
+    .main-icon-btn:focus-visible:not(:disabled) {
+        border-color: var(--main-red);
+        color: var(--main-red);
+        outline: none;
+    }
+
+    .main-icon-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .main-icon-btn.is-sm {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+
+/* ---- Chips, badges and counts -----------------------------------------
+   Tones are shared so a meaning always has the same color:
+   brand (red) · success (green) · info (blue) · warning (amber) · neutral */
+
+/* Chip: identifier / attribute (vendor code, VAT status) */
+.main-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border: 1px solid var(--main-red-bg-strong);
+    border-radius: 10px;
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+    .main-chip i {
+        font-size: 9px;
+    }
+
+    .main-chip.is-success {
+        border-color: rgba(22, 163, 74, 0.3);
+        background: rgba(22, 163, 74, 0.1);
+        color: #15803d;
+    }
+
+    /* Neutral: a state that isn't an alert (e.g. Inactive record) */
+    .main-chip.is-neutral {
+        border-color: #e1e3e6;
+        background: #f1f2f4;
+        color: #6b7280;
+    }
+
+    .main-chip.is-info {
+        border-color: rgba(37, 99, 235, 0.28);
+        background: rgba(37, 99, 235, 0.1);
+        color: #1d4ed8;
+    }
+
+/* Badge: status (Active, Pending Approval, VAT Inc, Already added ...) */
+.main-badge {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #f0f1f3;
+    color: #555555;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+    .main-badge i {
+        font-size: 8px;
+    }
+
+    .main-badge.is-brand {
+        background: var(--main-red-bg-tint);
+        color: var(--main-red);
+    }
+
+    .main-badge.is-success {
+        background: rgba(22, 163, 74, 0.13);
+        color: #15803d;
+    }
+
+    .main-badge.is-info {
+        background: rgba(37, 99, 235, 0.12);
+        color: #1d4ed8;
+    }
+
+    .main-badge.is-warning {
+        background: rgba(217, 119, 6, 0.14);
+        color: #b45309;
+    }
+
+/* Count: small number beside a heading (selected products, contacts) */
+.main-count {
+    display: inline-block;
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #f0f1f3;
+    color: #555555;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+    .main-count.is-brand {
+        background: var(--main-red-bg-tint);
+        color: var(--main-red);
+    }
+
+.main-form-section-title .main-count {
+    margin-left: 6px;
+}
+
+
+/* ---- Secondary text ---------------------------------------------------- */
+
+/* Muted second line under a value (item code, "was ₱100.00", hints) */
+.main-hint {
+    margin-top: 2px;
+    color: #9a9da2;
+    font-size: 11.5px;
+    font-weight: 400;
+}
+
+/* Placeholder for a value that isn't set */
+.main-dash {
+    color: #c2c4c7;
+    font-weight: 400;
+}
+
+/* Aligned figures for codes and numbers */
+.main-tabular {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
+}
+
+
+/* ---- Empty states ------------------------------------------------------ */
+
+/* Inline: "No historical pricing available ..." */
+.main-empty {
+    padding: 20px 12px;
+    color: #9a9da2;
+    font-size: 12.5px;
+    text-align: center;
+}
+
+    .main-empty.is-boxed {
+        padding: 18px 12px;
+        border: 1px dashed #e1e3e6;
+        border-radius: 8px;
+    }
+
+/* Full: icon + title + text, for an empty list table */
+.main-empty-state {
+    padding: 32px 16px;
+    text-align: center;
+    white-space: normal;
+}
+
+.main-empty-state-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+    font-size: 16px;
+}
+
+.main-empty-state-title {
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.main-empty-state-text {
+    margin-top: 2px;
+    color: #888888;
+    font-size: 12px;
+}
+
+/* "Not found" illustration in place of the icon (Store / Vendor List):
+   the record's subject in grey with a red magnifier */
+.main-empty-svg {
+    display: block;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 12px;
+}
+
+.main-empty-svg-bg {
+    fill: var(--main-red-bg-tint);
+}
+
+.main-empty-svg-subject,
+.main-empty-svg-search {
+    fill: #ffffff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.main-empty-svg-subject {
+    stroke: #8a8d91;
+}
+
+.main-empty-svg-search {
+    stroke: var(--main-red);
+}
+
+/* The row that holds an empty state doesn't take the hover treatment */
+.main-list-table tbody tr.main-empty-row,
+.main-list-table tbody tr.main-empty-row:hover {
+    background: #ffffff;
+    box-shadow: none;
+}
+
+    .main-list-table tbody tr.main-empty-row td,
+    .main-data-table tbody tr.main-empty-row td {
+        white-space: normal;
+    }
+
+
+/* ---- Inline alerts (messages inside a form or dialog) ------------------
+   .is-collapsible starts hidden and shows with .is-visible */
+
+.main-inline-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 12px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    text-align: left;
+}
+
+    .main-inline-alert i {
+        margin-top: 2px;
+    }
+
+    .main-inline-alert.is-warning {
+        border-color: rgba(217, 119, 6, 0.35);
+        background: rgba(217, 119, 6, 0.08);
+        color: #92400e;
+    }
+
+        .main-inline-alert.is-warning i {
+            color: #b45309;
+        }
+
+    .main-inline-alert.is-danger {
+        border-color: var(--main-red-ring);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .main-inline-alert.is-collapsible:not(.is-visible) {
+        display: none;
+    }
+
+.main-form-group > .main-inline-alert {
+    margin-top: 8px;
+}
+
+
+/* ---- Record hero (a hero that introduces one record) -------------------
+   .main-hero.is-record grows with its content, shows values in the
+   features, and adds a breadcrumb / back button / title row. */
+
+.main-hero.is-record {
+    height: auto;
+    min-height: 200px;
+    max-height: none;
+}
+
+    .main-hero.is-record .main-hero-content {
+        height: auto;
+        min-height: 200px;
+    }
+
+    .main-hero.is-record .main-hero-feature-desc {
+        color: #17191D;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+.main-hero-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+    .main-hero-breadcrumb a {
+        color: var(--main-red);
+        text-decoration: none;
+    }
+
+        .main-hero-breadcrumb a:hover,
+        .main-hero-breadcrumb a:focus {
+            color: var(--main-red-hover);
+            text-decoration: none;
+        }
+
+    .main-hero-breadcrumb i {
+        color: #c2c4c7;
+        font-size: 11px;
+    }
+
+    .main-hero-breadcrumb span {
+        color: #6b7280;
+    }
+
+.main-hero-back {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #555555 !important;
+    font-size: 11px;
+    text-decoration: none !important;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+    .main-hero-back:hover,
+    .main-hero-back:focus {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red) !important;
+        transform: translateX(-2px);
+    }
+
+    .main-hero-back:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.main-hero-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+    .main-hero-title-row .main-hero-heading {
+        margin: 0;
+        word-break: break-word;
+    }
+
+/* ---- Record shown in a list page's hero (Product List: double-click a row)
+   X closes it, the box mirrors the product's dimensions and the ring in
+   the corner shows its status. */
+
+.main-hero [hidden] {
+    display: none !important;
+}
+
+/* Background image and gradient hidden while a record is shown */
+.main-hero.is-plain {
+    /* Scrolled into view on a phone tap - clear the 68px sticky top header */
+    scroll-margin-top: 76px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Stays in view below the sticky top header (68px) while the list scrolls.
+   Phones skip this - the card would cover most of the screen. */
+@media (min-width: 768px) {
+
+    .main-hero.is-plain {
+        position: sticky;
+        top: 76px;
+        z-index: 50;
+        box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+    }
+}
+
+    /* Tinted by the record's status (same states as the corner ring):
+       red = inactive, green glass = setup ongoing, green = setup complete */
+    .main-hero.is-plain.is-status-inactive {
+        border-color: rgba(198, 4, 4, 0.2);
+        background: linear-gradient(90deg, #ffffff 0%, #fdf2f2 55%, #fbe3e3 100%);
+    }
+
+    /* Frosted green glass: translucent tint over a blur of what's behind
+       (the list scrolling under the sticky card), with a light top edge */
+    .main-hero.is-plain.is-status-ongoing {
+        border-color: rgba(22, 163, 74, 0.28);
+        background: linear-gradient(135deg, rgba(240, 253, 244, 0.78) 0%, rgba(209, 250, 223, 0.62) 55%, rgba(167, 243, 196, 0.55) 100%);
+        -webkit-backdrop-filter: blur(12px) saturate(140%);
+        backdrop-filter: blur(12px) saturate(140%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 rgba(22, 163, 74, 0.08), 0 6px 18px rgba(22, 163, 74, 0.10);
+    }
+
+    .main-hero.is-plain.is-status-complete {
+        border-color: rgba(22, 163, 74, 0.22);
+        background: linear-gradient(90deg, #ffffff 0%, #f2fbf5 55%, #dcf5e4 100%);
+    }
+
+@media (max-width: 767px) {
+
+    /* Text sits over the whole card on phones, so tint top-to-bottom */
+    .main-hero.is-plain.is-status-inactive {
+        background: linear-gradient(180deg, #ffffff 0%, #fbe3e3 100%);
+    }
+
+    .main-hero.is-plain.is-status-ongoing {
+        background: linear-gradient(180deg, rgba(240, 253, 244, 0.8) 0%, rgba(167, 243, 196, 0.55) 100%);
+    }
+
+    .main-hero.is-plain.is-status-complete {
+        background: linear-gradient(180deg, #ffffff 0%, #dcf5e4 100%);
+    }
+}
+
+/* Pinned to the card's top-left corner (the content box starts there) */
+.main-hero-close {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    z-index: 1;
+    margin: 0;
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: var(--main-red);
+    font-size: 24px;
+    line-height: 1;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+    .main-hero-close:hover,
+    .main-hero-close:focus {
+        color: var(--main-red-hover);
+        transform: scale(1.1);
+    }
+
+    .main-hero-close:focus-visible {
+        outline: none;
+        border-radius: 5px;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.main-hero-box {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 18%;
+    z-index: 3;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.main-hero-status {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 4;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffffff;
+    font-size: 22px;
+}
+
+.main-hero-status-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+    .main-hero-status-ring circle {
+        fill: none;
+        stroke-width: 5;
+    }
+
+.main-hero-status-track {
+    stroke: #e5e7eb;
+    stroke-dasharray: 4 3;
+}
+
+.main-hero-status-progress {
+    stroke: #16a34a;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.main-hero-status i {
+    position: relative;
+    color: #17191D;
+}
+
+.main-hero-status.is-complete i {
+    color: #16a34a;
+}
+
+.main-hero-status.is-inactive .main-hero-status-progress {
+    stroke: var(--main-red);
+}
+
+.main-hero-status.is-inactive i {
+    color: var(--main-red);
+}
+
+@media (max-width: 767px) {
+
+    .main-hero.is-record,
+    .main-hero.is-record .main-hero-content {
+        min-height: 220px;
+    }
+
+    .main-hero.is-record .main-hero-description {
+        display: none;
+    }
+}
+
+/* Record shown in a list hero: room at the top for the X and on the right
+   for the status ring; the box shrinks, then drops out as space runs low */
+.main-hero.is-plain .main-hero-content {
+    padding-top: 40px;
+}
+
+@media (max-width: 1199px) {
+
+    .main-hero-box {
+        right: 96px;
+        width: 160px;
+    }
+}
+
+@media (max-width: 991px) {
+
+    /* Box moves under the status ring, scaled down, with the text kept
+       clear of that right-hand column */
+    .main-hero-box {
+        top: 84px;
+        bottom: auto;
+        right: 8px;
+        width: 110px;
+        height: 110px;
+        justify-content: center;
+    }
+
+        .main-hero-box .product-box-scene {
+            height: 110px;
+            transform: scale(0.8);
+        }
+
+    .main-hero.is-plain .main-hero-content {
+        width: 100%;
+        padding-right: 124px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .main-hero.is-plain,
+    .main-hero.is-plain .main-hero-content {
+        min-height: 0;
+    }
+
+    .main-hero.is-plain .main-hero-content {
+        padding: 58px 104px 18px 16px;
+    }
+
+    .main-hero-box {
+        top: 56px;
+        right: 4px;
+        width: 96px;
+        height: 96px;
+    }
+
+        .main-hero-box .product-box-scene {
+            height: 96px;
+            transform: scale(0.65);
+        }
+
+    /* Ring moves into the X's row so the title can use the full width */
+    .main-hero-status {
+        top: 8px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+
+    .main-hero-status-ring circle {
+        stroke-width: 6;
+    }
+
+    .main-hero.is-plain .main-hero-heading {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    /* One tile per row on very narrow phones */
+    .main-hero.is-plain .main-hero-feature {
+        flex-basis: 100%;
+    }
+}
+
+
+/* =========================================
+   VIEW / DETAIL MODALS
+   Every read-only View: Product, Vendor,
+   Store, Warehouse, Store Manage (Product
+   View) and Supplier Manage (Vendor Item).
+
+   Markup:
+   .main-form-modal.is-view
+   ├── .main-form-header       icon, title (+ status pill), subtitle,
+   │                           .main-view-readonly-tag, close
+   ├── .main-form-tabs         the Add / Edit pill tabs, unchanged
+   └── .main-form-body.main-view-cards
+       ├── .main-form-scroll
+       │   ├── .main-view-card     one per section: header + body
+       │   │   └── .main-view-fields / -contacts / -item / .main-history-*
+       │   └── .main-view-record-info   Created / Last Modified
+       └── .main-form-footer   Close
+
+   Direction: the Add / Edit form, read-only.
+   Same modal, header, pill tabs, width,
+   paddings, 3-column field grid and red
+   uppercase section titles. What changes:
+   each value sits in a soft grey, borderless
+   well instead of a white bordered input, a
+   "View only" badge sits in the header, and
+   Record Information uses the form's meta
+   strip.
+   ========================================= */
+
+.main-form-modal.is-view {
+    --view-line: #eeeeee;
+    --view-well: #f7f8fa;
+    --view-well-line: #f0f1f3;
+    --view-ink: #222222;
+    --view-ink-muted: #6b7280;
+    --view-ink-faint: #9ca3af;
+}
+
+/* ---- Header (the Add / Edit header; only these additions) --------------- */
+
+.main-form-modal.is-view .main-form-title-wrapper {
+    min-width: 0;
+}
+
+.main-form-modal.is-view .main-form-icon {
+    flex: 0 0 auto;
+}
+
+/* Status pill beside the title (Product, Store; Supplier's Vendor Item
+   puts its pill in .vi-view-title-row) */
+.main-view-status-pill {
+    margin-left: 8px;
+    vertical-align: 3px;
+}
+
+/* "View only" badge (a .main-badge): pushed to the right, next to Close */
+.main-view-readonly-tag {
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+    .main-view-readonly-tag i {
+        font-size: 11px;
+    }
+
+/* ---- Body: the form's white body; sections stacked ---------------------- */
+
+.main-view-cards .main-form-tab-panel + .main-form-tab-panel {
+    margin-top: 24px;
+}
+
+/* ---- Section: a form section title with a hairline running to the right - */
+
+.main-view-card + .main-view-card {
+    margin-top: 24px;
+}
+
+.main-view-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+    margin-bottom: 12px;
+}
+
+    .main-view-card-header h4 {
+        display: flex;
+        flex: 1 1 auto;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        margin: 0;
+        color: var(--main-red);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+
+        .main-view-card-header h4::after {
+            content: "";
+            flex: 1 1 auto;
+            min-width: 16px;
+            height: 1px;
+            background: var(--view-line, #eeeeee);
+        }
+
+    /* Count beside a heading (Contact Persons) */
+    .main-view-card-header .main-count {
+        flex: 0 0 auto;
+    }
+
+.main-view-card-icon {
+    flex: 0 0 14px;
+    width: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--main-red);
+    font-size: 12px;
+}
+
+/* ---- Fields --------------------------------------------------------------
+   Label above value, on the form's own Bootstrap 3 grid:
+     <dl class="row main-view-fields">
+       <div class="col-xs-12 col-sm-6 col-md-4 main-view-field">   1 / 2 / 3 up
+       <div class="col-xs-12 main-view-field main-view-field-wide">  full row
+   The 20px gutter is the form's (.main-form-body .row / [class*="col-"]).
+   The row is a wrapping flex row, so a tall value (Unacceptable Condition)
+   never snags the next row the way floats do. */
+
+.row.main-view-fields {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 16px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+    /* Bootstrap's clearfix pseudo-elements would become flex items */
+    .row.main-view-fields::before,
+    .row.main-view-fields::after {
+        display: none;
+    }
+
+.main-view-field {
+    min-width: 0;
+}
+
+    .main-view-field dt {
+        margin-bottom: 6px;
+        color: var(--view-ink-muted, #6b7280);
+        font-size: 12.5px;
+        font-weight: 600;
+        line-height: 1.35;
+    }
+
+    /* Read-only value: same height and radius as the form's input, but a
+       borderless grey well - clearly filled in, clearly not editable */
+    .main-view-field dd {       
+        min-height: 40px;
+        margin: 0;
+        padding: 9px 12px;
+        border: 1px solid var(--view-well-line, #f0f1f3);
+        border-radius: 5px;
+        background: var(--view-well, #f7f8fa);
+        color: var(--view-ink, #222222);
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 20px;
+        overflow-wrap: anywhere;
+        cursor: default;
+    }
+
+        .main-view-field dd .main-badge {
+            vertical-align: 1px;
+        }
+
+/* A field with several values (e.g. Brand Extension): one box each, side by
+   side in a row that wraps; the label keeps its own line above them */
+.main-view-field-multi {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+    .main-view-field-multi dt {
+        flex: 0 0 100%;
+        margin-bottom: 0;
+    }
+
+    .main-view-field-multi dd {
+        flex: 0 1 auto;
+    }
+
+/* A wide field first (the record's name) reads as its headline */
+.main-view-card-body > .main-view-fields > .main-view-field-wide:first-child dd {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* More content under the grid (Product box preview, Store map) */
+.main-view-card-body > .main-view-fields:not(:last-child) {
+    margin-bottom: 16px;
+}
+
+/* ---- Icon + label + value rows (Vendor addresses) ------------------------
+   Laid out like a full-width field: a small icon leads the label line, and
+   the value (and its map) start at the section's left edge, so they line
+   up with the fields above instead of sitting indented past an icon tile.
+   .vendor-view-address only groups the pieces in the markup. */
+
+.main-view-item {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr);
+    column-gap: 6px;
+    align-items: center;
+}
+
+    /* Same spacing as between fields */
+    .main-view-item + .main-view-item {
+        margin-top: 16px;
+    }
+
+    .main-view-item > .vendor-view-address {
+        display: contents;
+    }
+
+    .main-view-item .main-view-item-value,
+    .main-view-item .vendor-view-map-status,
+    .main-view-item .vendor-view-map {
+        grid-column: 1 / -1;
+    }
+
+.main-view-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--main-red);
+    font-size: 12px;
+}
+
+.main-view-item-label {
+    color: var(--view-ink-muted, #6b7280);
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.main-view-item-value {
+    margin-top: 6px;
+    padding: 9px 12px;
+    border: 1px solid var(--view-well-line, #f0f1f3);
+    border-radius: 5px;
+    background: var(--view-well, #f7f8fa);
+    color: var(--view-ink, #222222);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+}
+
+/* ---- Contact persons --------------------------------------------------- */
+
+.main-view-contacts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px 20px;
+}
+
+    .main-view-contacts > .main-empty {
+        grid-column: 1 / -1;
+    }
+
+.main-view-contact {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--view-well-line, #f0f1f3);
+    border-radius: 5px;
+    background: var(--view-well, #f7f8fa);
+}
+
+.main-view-contact-avatar {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.main-view-contact-body {
+    min-width: 0;
+}
+
+.main-view-contact-name {
+    color: var(--view-ink, #222222);
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.main-view-contact-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    color: #555555;
+    font-size: 12.5px;
+    word-break: break-all;
+}
+
+    .main-view-contact-line i {
+        flex: 0 0 12px;
+        color: var(--view-ink-faint, #9ca3af);
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .main-view-contact-line .main-view-contact-label {
+        flex: 0 0 auto;
+        color: var(--view-ink-faint, #9ca3af);
+        word-break: normal;
+    }
+
+/* ---- Record Information: the form's meta strip (.main-form-meta) -------- */
+
+.main-view-record-info {
+    margin-top: 24px;
+}
+
+    .main-view-record-info .main-view-card-header {
+        display: none;
+    }
+
+    /* Not a .row: a single strip, so no grid or gutters */
+    .main-view-record-info .main-view-card-body > .main-view-fields {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 24px;
+        margin: 0;
+        padding: 10px 14px;
+        border: 1px solid #eeeeee;
+        border-radius: 5px;
+        background: #f9f9f9;
+    }
+
+        .main-view-record-info .main-view-card-body > .main-view-fields > .main-view-field {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .main-view-record-info .main-view-field dt,
+        .main-view-record-info .main-view-field dd {
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .main-view-record-info .main-view-field dt {
+            color: #555555;
+            font-weight: 600;
+        }
+
+        .main-view-record-info .main-view-field dd {
+            color: #333333;
+            font-weight: 400;
+        }
+
+/* ---- Inside a section: shared pieces fitted to the read-only look ------- */
+
+/* Product box preview: a calm well, not a dashed drop zone */
+.main-view-card .product-box-preview {
+    margin-bottom: 0;
+    border: 1px solid var(--view-well-line, #f0f1f3);
+    border-radius: 5px;
+    background: var(--view-well, #f7f8fa);
+}
+
+.main-view-card .product-dimension-row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+    .main-view-card .product-dimension-row > [class*="col-"] {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+/* Tables (Historical Pricing, Logs) sit flush in the section */
+.main-view-card .main-data-table-wrapper {
+    margin-bottom: 0;
+}
+
+/* The history list scrolls inside its section */
+.main-view-card .main-history-list {
+    max-height: 360px;
+}
+
+/* ---- Read-only maps (Store / Warehouse location, Vendor addresses) ------ */
+
+/* The fields above already end with the 16px field gap
+   (.main-view-fields:not(:last-child)), so no extra space here: Coordinates
+   sits as far below City as any field below another */
+.store-view-map-row,
+.warehouse-view-map-row {
+    margin-top: 0;
+}
+
+.store-map,
+.warehouse-view-map,
+.vendor-view-map {
+    width: 100%;
+    margin-top: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+    background: #f2f2f2;
+}
+
+.store-map,
+.warehouse-view-map {
+    height: 260px;
+}
+
+.vendor-view-map {
+    height: 180px;
+}
+
+.vendor-view-map-status {
+    margin-top: 6px;
+    color: #9a9da2;
+    font-size: 11.5px;
+}
+
+/* ---- Long values (Product: Unacceptable Condition): clamped to 2 lines,
+   "See more" expands the full text ---------------------------------------- */
+
+.product-view-expandable {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.product-view-expandable-text {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+    .product-view-expandable-text.is-collapsed {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+    }
+
+.product-view-see-more {
+    margin-top: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .product-view-see-more:hover,
+    .product-view-see-more:focus-visible {
+        text-decoration: underline;
+    }
+
+/* ---- Store Manage statuses in the View header pill (Active uses
+   .vi-pill-active) -------------------------------------------------------- */
+
+.vi-pill.sm-pill-pending {
+    background: rgba(217, 119, 6, 0.14);
+    color: #b45309;
+}
+
+.vi-pill.sm-pill-scheduled {
+    background: #f0f1f3;
+    color: #555555;
+}
+
+.vi-pill.sm-pill-replacement {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+}
+
+.vi-pill.sm-pill-restricted {
+    background: var(--main-red-bg-tint);
+    color: var(--main-red);
+}
+
+/* ---- Phones ------------------------------------------------------------ */
+
+@media (max-width: 767px) {
+
+    /* Badge keeps its icon only; the close button stays in reach */
+    .main-view-readonly-tag .main-view-readonly-text {
+        display: none;
+    }
+
+    .row.main-view-fields {
+        row-gap: 12px;
+    }
+
+    .main-view-contacts {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .main-view-cards .main-form-tab-panel + .main-form-tab-panel,
+    .main-view-card + .main-view-card,
+    .main-view-record-info {
+        margin-top: 20px;
+    }
+
+    .main-view-record-info .main-view-card-body > .main-view-fields {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Review dialog rows: value under the label instead of squeezed */
+    .main-view-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .main-view-value {
+        text-align: left;
+    }
+
+    .sm-status-change {
+        justify-content: flex-start;
+    }
+}
+
+
+/* ---- Logs / record information -----------------------------------------
+   Log tables and action labels. */
+
+/* Action label in a log table (Created / Modified / Approved) */
+.main-log-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+    .main-log-action i {
+        color: #9a9da2;
+        font-size: 12px;
+    }
+
+    .main-log-action.is-created i {
+        color: var(--main-red);
+    }
+
+    .main-log-action.is-approved i {
+        color: #15803d;
+    }
+
+
+/* ---- Data table (compact table inside a view / modal) ------------------ */
+
+.main-data-table-wrapper {
+    margin-bottom: 0;
+    border: 1px solid #eeeeee;
+    border-radius: 6px;
+}
+
+.table.main-data-table {
+    min-width: 580px;
+    margin-bottom: 0;
+}
+
+    .table.main-data-table thead th {
+        padding: 9px 12px;
+        border-bottom: 1px solid #eeeeee;
+        background: #fafafa;
+        color: #333333;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+    }
+
+    .table.main-data-table tbody td {
+        padding: 9px 12px;
+        border-top: 1px solid #f4f4f5;
+        color: #333333;
+        font-size: 12.5px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .table.main-data-table tbody tr:first-child td {
+        border-top: 0;
+    }
+
+    .main-data-table .is-num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .table.main-data-table tbody td.is-num {
+        color: #17191D;
+        font-weight: 700;
+    }
+
+/* Numeric column in a list table: right-aligned like .main-data-table, so
+   digits line up down the column */
+.main-list-table .is-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.main-list-table.table tbody td.is-num {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+/* =========================================
+   VENDOR ITEMS (Vendor > Manage)
+   ========================================= */
+
+
+/* Record status pills (Store / Product lists and details) */
+
+.vi-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+    .vi-pill i {
+        font-size: 8px;
+    }
+
+.vi-pill-active {
+    background: rgba(22, 163, 74, 0.14);
+    color: #15803d;
+}
+
+.vi-pill-inactive {
+    background: #f1f1f1;
+    color: #777777;
+}
+
+.vi-price-note {
+    margin-bottom: 12px;
+}
+
+
+/* "Changed from ..." under an edited Incoming Price field (only shown when
+   the value actually differs from the pending price) */
+.vi-change-hint {
+    margin-top: 6px;
+    color: #b45309;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+    .vi-change-hint::before {
+        content: "\f040";
+        margin-right: 5px;
+        font-family: FontAwesome;
+        font-weight: normal;
+    }
+
+
+/* Effectivity Date picker (Incoming Price): a month calendar that can
+   disable individual days, which <input type="date"> cannot */
+
+.vi-datepicker {
+    position: relative;
+}
+
+.main-form-group .form-control.vi-datepicker-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .vi-datepicker-toggle .fa {
+        color: #757575;
+    }
+
+    .vi-datepicker-toggle[aria-expanded="true"] {
+        border-color: var(--main-red);
+        box-shadow: 0 0 0 2px var(--main-red-bg-tint);
+    }
+
+.vi-datepicker-text.is-placeholder {
+    color: #aaaaaa;
+}
+
+/* Fixed (positioned by JS) so the modal's scroll area can't clip it */
+.vi-datepicker-popover {
+    display: none;
+    position: fixed;
+    z-index: 10050;
+    width: 280px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+}
+
+    .vi-datepicker-popover.is-open {
+        display: block;
+    }
+
+.vi-datepicker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.vi-datepicker-month {
+    color: #17191D;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.vi-datepicker-weekdays,
+.vi-datepicker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+    .vi-datepicker-weekdays span {
+        padding: 4px 0;
+        color: #9a9da2;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+.vi-datepicker-day {
+    height: 32px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: #1f2937;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+    .vi-datepicker-day:hover:not(:disabled):not(.is-selected) {
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+    .vi-datepicker-day:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--main-red-ring);
+    }
+
+    .vi-datepicker-day.is-today {
+        border-color: #d9d9d9;
+        font-weight: 700;
+    }
+
+    .vi-datepicker-day.is-selected {
+        border-color: var(--main-red);
+        background: var(--main-red);
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .vi-datepicker-day.is-past {
+        color: #cfd1d4;
+        cursor: not-allowed;
+    }
+
+    /* Already used for a previous price: struck through and tinted */
+    .vi-datepicker-day.is-used {
+        background: #f3f4f6;
+        color: #b5b7ba;
+        text-decoration: line-through;
+        cursor: not-allowed;
+    }
+
+    .vi-datepicker-day.is-empty {
+        pointer-events: none;
+    }
+
+/* Time row inside the popover: Time [hh:mm] [Done] */
+.vi-datepicker-time {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+    .vi-datepicker-time label {
+        margin: 0;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .vi-datepicker-time .form-control {
+        flex: 1;
+        min-width: 0;
+        height: 32px;
+        padding: 4px 8px;
+        font-size: 13px;
+    }
+
+.btn.vi-datepicker-done {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--main-red);
+    border-radius: 5px;
+    background: var(--main-red);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+    .btn.vi-datepicker-done:hover,
+    .btn.vi-datepicker-done:focus {
+        border-color: var(--main-red-hover);
+        background: var(--main-red-hover);
+        color: #ffffff;
+    }
+
+.vi-datepicker-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.vi-datepicker-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+}
+
+    .vi-datepicker-swatch.is-used {
+        background: #f3f4f6;
+        border: 1px solid #e1e3e6;
+    }
+
+
+
+
+/* =========================================
+   VENDOR ITEM: ADD PRODUCT SEARCH (combobox)
+   ========================================= */
+
+.vi-picker {
+    position: relative;
+}
+
+.vi-picker-results {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+    .vi-picker-results.is-open {
+        display: block;
+    }
+
+.vi-picker-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 14px;
+    border: 0;
+    border-bottom: 1px solid #f3f4f6;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .vi-picker-option:last-child {
+        border-bottom: 0;
+    }
+
+    .vi-picker-option:hover,
+    .vi-picker-option:focus-visible {
+        background: var(--main-red-bg-soft);
+        outline: none;
+    }
+
+.vi-picker-option-name {
+    margin-right: 5px;
+    color: #17191D;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.vi-picker-option-code {
+    margin-top: 1px;
+    color: #9a9da2;
+    font-size: 11px;
+}
+
+/* Already linked to this vendor / already queued in this form */
+
+.vi-picker-option.is-linked,
+.vi-picker-option.is-picked {
+    cursor: default;
+}
+
+    .vi-picker-option.is-linked .vi-picker-option-name,
+    .vi-picker-option.is-linked .vi-picker-option-code {
+        color: #9a9da2;
+    }
+
+    .vi-picker-option.is-linked:hover,
+    .vi-picker-option.is-linked:focus-visible {
+        background: #fafafa;
+    }
+
+/* Selected products (multi-add) */
+
+.vi-selected-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+    .vi-selected-header .main-form-section-title {
+        flex: 1 1 auto;
+    }
+
+.vi-selected-clear-all {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #777777;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+    .vi-selected-clear-all:hover,
+    .vi-selected-clear-all:focus-visible {
+        color: var(--main-red);
+        outline: none;
+    }
+
+.vi-selected-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .vi-selected-list .vi-selected-product {
+        margin-top: 0;
+        padding: 10px 14px;
+    }
+
+/* Selected product preview card */
+
+.vi-selected-product {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+    .vi-selected-product.is-visible {
+        display: flex;
+    }
+
+.vi-selected-product-name {
+    color: #17191D;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vi-selected-product-code {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+/* =========================================
+   VENDOR ITEM: VIEW (Status in the header,
+   folder tabs: All / Primary / Historical
+   Pricing)
+   ========================================= */
+
+.vi-view-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 3px;
+}
+
+    .vi-view-title-row h3 {
+        margin: 0;
+    }
+
+.vi-view-amount {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.vi-view-amount-new {
+    color: #15803d;
+}
+
+.vi-view-amount-spaced {
+    margin-top: 8px;
+}
+
+
+/* =========================================
+   HISTORICAL PRICING - UNIT COST TREND
+   One series, so no legend box: the title
+   names it. Stat tiles lead, then a step
+   area chart with a snapping crosshair.
+   Marks carry the brand red; every text
+   stays in ink tokens.
+   ========================================= */
+
+.vi-price-chart {
+    position: relative;
+    margin-bottom: 14px;
+    padding: 16px 16px 12px;
+    border: 1px solid #eceef1;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.vi-trend-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-bottom: 12px;
+}
+
+.vi-trend-title {
+    color: #17191D;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.vi-trend-sub {
+    color: #8a8d91;
+    font-size: 11.5px;
+}
+
+
+/* Stat tiles: label, value (proportional figures), optional delta */
+
+.vi-trend-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.vi-trend-stat {
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #f0f1f3;
+    border-radius: 6px;
+    background: #fafbfc;
+    overflow: hidden;
+}
+
+.vi-trend-stat-label {
+    color: #8a8d91;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.vi-trend-stat-value {
+    margin-top: 3px;
+    color: #111111;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vi-trend-stat-meta {
+    margin-top: 2px;
+    color: #8a8d91;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Delta: direction shown by arrow + sign + words, color only reinforces.
+   For a purchase cost, going up is the unfavourable direction. */
+.vi-trend-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+    .vi-trend-delta i {
+        font-size: 12px;
+    }
+
+    /* Arrow up (price went up) is green, arrow down is red */
+    .vi-trend-delta.is-up {
+        color: #15803d;
+    }
+
+    .vi-trend-delta.is-down {
+        color: #b91c1c;
+    }
+
+    .vi-trend-delta.is-flat {
+        color: #555555;
+    }
+
+
+/* Plot */
+
+.vi-trend-plot {
+    position: relative;
+}
+
+    .vi-trend-plot svg {
+        display: block;
+        overflow: visible;
+    }
+
+    .vi-trend-plot:focus {
+        outline: none;
+    }
+
+    .vi-trend-plot:focus-visible {
+        border-radius: 4px;
+        box-shadow: 0 0 0 2px var(--main-red-ring);
+    }
+
+/* Gridlines and axes: solid hairlines one step off the surface */
+.vi-trend-grid {
+    stroke: #eef0f2;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.vi-trend-baseline {
+    stroke: #d9dce0;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.vi-trend-axis {
+    fill: #8a8d91;
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 2px line in the series color */
+.vi-trend-line {
+    fill: none;
+    stroke: var(--main-red);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+/* Markers: filled series color with a 2px surface ring */
+.vi-trend-dot {
+    fill: var(--main-red);
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+
+/* Endpoint label - ink, not the series color */
+.vi-trend-end-label {
+    fill: #17191D;
+    font-size: 11.5px;
+    font-weight: 700;
+    paint-order: stroke;
+    stroke: #ffffff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+}
+
+/* Crosshair: hairline that snaps to the nearest effectivity date */
+.vi-trend-crosshair {
+    stroke: #9a9da2;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+    pointer-events: none;
+}
+
+.vi-trend-hit {
+    fill: transparent;
+    cursor: crosshair;
+}
+
+
+/* Tooltip: value leads, label follows; line key for the series */
+
+.vi-trend-tooltip {
+    position: absolute;
+    z-index: 2;
+    min-width: 170px;
+    padding: 9px 11px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.14);
+    font-size: 11.5px;
+    line-height: 1.45;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+}
+
+    .vi-trend-tooltip.is-visible {
+        opacity: 1;
+    }
+
+.vi-trend-tip-date {
+    color: #8a8d91;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.vi-trend-tip-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 4px;
+}
+
+.vi-trend-tip-key {
+    flex: 0 0 auto;
+    width: 12px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--main-red);
+}
+
+.vi-trend-tip-value {
+    color: #111111;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vi-trend-tip-series {
+    color: #6b7280;
+}
+
+.vi-trend-tip-change {
+    margin-top: 3px;
+    white-space: nowrap;
+}
+
+
+/* Notes and empty state */
+
+.vi-trend-note {
+    margin-top: 8px;
+    color: #9a9da2;
+    font-size: 11px;
+}
+
+
+
+@media (max-width: 767px) {
+
+    .vi-price-chart {
+        padding: 12px 12px 10px;
+    }
+
+    .vi-trend-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* ============================================
+   PRODUCT FORM — PILL-STYLE TABS EDIT/ADD FORM
+   ============================================ */
+
+.main-form-tabs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 25px;
+    background: #ffffff;
+    border-bottom: 1px solid #eeeeee;
+/*    overflow-x: auto;*/
+}
+
+.main-form-tab {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+    height: 42px;
+    padding: 4px 18px 4px 4px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #8a8a8a;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.main-form-tab-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    color: #a3a3a3;
+    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .main-form-tab:hover:not(.is-active) {
+        background: #f5f5f5;
+        color: #555555;
+    }
+
+        .main-form-tab:hover:not(.is-active) .main-form-tab-icon {
+            border-color: #d8d8d8;
+            color: #777777;
+        }
+
+    .main-form-tab.is-active {
+        background: rgba(229, 9, 27, 0.08);
+        color: #1a1a1a;
+    }
+
+        .main-form-tab.is-active .main-form-tab-icon {
+            background: #e5091b;
+            border-color: #e5091b;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(229, 9, 27, 0.35);
+        }
+
+    .main-form-tab:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(229, 9, 27, 0.25);
+        z-index: 1;
+    }
+
+.main-form-tab-panel {
+    display: none;
+}
+
+    .main-form-tab-panel.is-active {
+        display: block;
+        animation: mainFormTabPanelShow 0.15s ease-out;
+    }
+
+@keyframes mainFormTabPanelShow {
+
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ---- SECTION TITLES (used inside any tab panel) ---- */
+
+.main-form-section-title {
+    margin: 4px 0 14px;
+    padding-top: 14px;
+    border-top: 1px solid #eeeeee;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+    .main-form-section-title:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+    }
+
+
+/* ---- READONLY / CALCULATED FIELDS ---- */
+
+.main-form-readonly-badge {
+    margin-left: 4px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #f0f0f0;
+    color: #888888;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+}
+
+.main-form-calculated-field {
+    background: #f5f5f5 !important;
+    color: #555555;
+    font-weight: 600;
+    cursor: not-allowed;
+}
+
+    .main-form-calculated-field:focus {
+        border-color: #d9d9d9 !important;
+        box-shadow: none !important;
+    }
+
+
+/* ---- MACROMATIX (AUTO-GENERATED) SECTION ---- */
+
+.main-form-macro-section {
+    margin-top: 6px;
+    padding: 16px 18px 4px;
+    border: 1px dashed var(--main-red-ring);
+    border-radius: 8px;
+    background: var(--main-red-bg-soft);
+}
+
+.main-form-macro-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+    .main-form-macro-title i {
+        font-size: 13px;
+    }
+
+.main-form-macro-section .form-control[readonly] {
+    border-color: var(--main-red-ring);
+    background: #ffffff;
+    color: var(--main-red);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+
+/* =========================================
+   PRODUCT DIMENSION FIELDS
+   ========================================= */
+
+.product-dimension-row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.product-dimension-input-group {
+    display: flex;
+    gap: 6px;
+}
+
+    .product-dimension-input-group .form-control {  
+        width: 100%;
+    }
+
+.product-dimension-unit-select {
+    flex: 0 0 68px;
+    width: 68px;
+    padding: 0 4px;
+    text-align: center;
+}
+
+.product-dimension-unit-suffix {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    padding: 0 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    background: #f5f5f5;
+    color: #555555;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* ---- BOX PREVIEW (ANIMATED 3D)
+   Live preview of the box shape built from
+   Length / Width / Height, spinning for a
+   clear sense of depth.
+   ---- */
+
+.product-box-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 10px 20px;
+    margin-bottom: 14px;
+    border: 1px dashed #e2e2e2;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.product-box-preview-label {
+    color: #999999;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.product-box-scene {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 600px;
+}
+
+.product-box {
+    position: relative;
+    width: var(--box-w, 60px);
+    height: var(--box-h, 60px);
+    transform-style: preserve-3d;
+    transition: width 0.35s ease, height 0.35s ease;
+    animation: productBoxSpin 8s linear infinite;
+}
+
+@keyframes productBoxSpin {
+
+    from {
+        transform: rotateX(-22deg) rotateY(0deg);
+    }
+
+    to {
+        transform: rotateX(-22deg) rotateY(360deg);
+    }
+}
+
+.product-box-face {
+    position: absolute;
+    border: 1px solid var(--main-red);
+    background: var(--main-red-bg-strong);
+    box-sizing: border-box;
+    transition: width 0.35s ease, height 0.35s ease, left 0.35s ease, top 0.35s ease, transform 0.35s ease;
+}
+
+.product-box-face-front,
+.product-box-face-back {
+    left: 0;
+    top: 0;
+    width: var(--box-w, 60px);
+    height: var(--box-h, 60px);
+}
+
+.product-box-face-front {
+    transform: translateZ(calc(var(--box-d, 60px) / 2));
+}
+
+.product-box-face-back {
+    transform: translateZ(calc(var(--box-d, 60px) / -2)) rotateY(180deg);
+}
+
+.product-box-face-left,
+.product-box-face-right {
+    top: 0;
+    left: calc((var(--box-w, 60px) - var(--box-d, 60px)) / 2);
+    width: var(--box-d, 60px);
+    height: var(--box-h, 60px);
+}
+
+.product-box-face-right {
+    transform: rotateY(90deg) translateZ(calc(var(--box-w, 60px) / 2));
+}
+
+.product-box-face-left {
+    transform: rotateY(-90deg) translateZ(calc(var(--box-w, 60px) / 2));
+}
+
+.product-box-face-top,
+.product-box-face-bottom {
+    left: 0;
+    top: calc((var(--box-h, 60px) - var(--box-d, 60px)) / 2);
+    width: var(--box-w, 60px);
+    height: var(--box-d, 60px);
+}
+
+.product-box-face-top {
+    transform: rotateX(90deg) translateZ(calc(var(--box-h, 60px) / 2));
+}
+
+.product-box-face-bottom {
+    transform: rotateX(-90deg) translateZ(calc(var(--box-h, 60px) / 2));
+}
+
+
+/* =========================================
+   PRODUCT FORM — CLICKABLE PROGRESS STEPPER
+   (Add / Edit Product only)
+   ========================================= */
+
+.main-form-stepper {
+    gap: 0;
+    overflow-x: visible;
+}
+
+    .main-form-stepper .main-form-tab {
+        position: relative;
+        z-index: 1;
+    }
+
+    .main-form-stepper .main-form-stepper-arrow {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        margin: 0 14px;
+        color: #d4d4d4;
+        font-size: 11px;
+        line-height: 1;
+        transition: color 0.2s ease;
+    }
+
+        .main-form-stepper .main-form-stepper-arrow i {
+            margin: 0 -1px;
+        }
+
+        /* Arrow leading out of the current step: flowing chevrons */
+        .main-form-stepper .main-form-stepper-arrow.is-next {
+            color: #e5091b;
+        }
+
+            .main-form-stepper .main-form-stepper-arrow.is-next i {
+                animation: mainFormStepperArrowFlow 1.2s ease-in-out infinite;
+            }
+
+                .main-form-stepper .main-form-stepper-arrow.is-next i:nth-child(2) {
+                    animation-delay: 0.2s;
+                }
+
+                .main-form-stepper .main-form-stepper-arrow.is-next i:nth-child(3) {
+                    animation-delay: 0.4s;
+                }
+
+        /* Arrows behind the current step: solid, no motion */
+        .main-form-stepper .main-form-stepper-arrow.is-complete {
+            color: #e5091b;
+        }
+
+@keyframes mainFormStepperArrowFlow {
+
+    0%, 100% {
+        opacity: 0.2;
+        transform: translateX(-3px);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(2px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .main-form-stepper .main-form-stepper-arrow.is-next i {
+        animation: none;
+    }
+}
+
+    .main-form-stepper .main-form-tab.is-complete {
+        color: #1a1a1a;
+    }
+
+        .main-form-stepper .main-form-tab.is-complete .main-form-tab-icon {
+            background: #ffffff;
+            border-color: #e5091b;
+            color: #e5091b;
+        }
+
+
+/* =========================================
+   FORM FIELD ERROR (e.g. duplicate Item Code)
+   ========================================= */
+
+.main-form-field-error {
+    margin-top: 6px;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+    .main-form-field-error .fa {
+        margin-right: 4px;
+    }
+
+.main-form-group .form-control.is-invalid,
+.main-form-group .form-control.is-invalid:focus {
+    border-color: var(--main-red);
+    box-shadow: 0 0 0 2px var(--main-red-bg-tint);
+}
+
+
+/* =========================================
+   PRODUCT FORM — SCROLLABLE SELECT (Category)
+   ========================================= */
+
+.main-form-scroll-select {
+    position: relative;
+}
+
+/* Native <select> kept behind an enhanced dropdown */
+.main-form-scroll-select select.main-form-scroll-select-native {
+    position: absolute;
+    min-height: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.main-form-group .main-form-scroll-select-toggle {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding-right: 2.25rem;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .main-form-scroll-select-toggle span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .main-form-scroll-select-toggle span.is-placeholder {
+            color: #aaaaaa;
+        }
+
+    /* Chevron pinned to the right edge, aligned with the
+       select.form-control arrows (right 0.75rem) */
+    .main-form-scroll-select-toggle .fa {
+        position: absolute;
+        top: 50%;
+        right: 0.75rem;
+        margin-top: -6px;
+        color: #343a40;
+        font-size: 12px;
+        line-height: 12px;
+        transition: transform 0.15s ease;
+    }
+
+.main-form-scroll-select.is-open .main-form-scroll-select-toggle {
+    border-color: #e5091b;
+    box-shadow: 0 0 0 3px rgba(229, 9, 27, 0.12);
+}
+
+    .main-form-scroll-select.is-open .main-form-scroll-select-toggle .fa {
+        transform: rotate(180deg);
+    }
+
+.main-form-scroll-select-list {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    max-height: 200px;
+    margin: 0;
+    padding: 4px 0;
+    overflow-y: auto;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.main-form-scroll-select.is-open .main-form-scroll-select-list {
+    display: block;
+}
+
+.main-form-scroll-select-option {
+    padding: 8px 12px;
+    color: #333333;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+    .main-form-scroll-select-option:hover,
+    .main-form-scroll-select-option:focus {
+        outline: none;
+        background: #f5f5f5;
+    }
+
+    .main-form-scroll-select-option.is-selected {
+        background: rgba(229, 9, 27, 0.08);
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+
+/* =========================================
+   PRODUCT FORM — RESPONSIVE
+   ========================================= */
+
+@media (max-width: 767px) {
+
+    .main-form-tabs {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .main-form-tab {
+        height: 36px;
+        gap: 8px;
+        padding: 3px 14px 3px 3px;
+        font-size: 12.5px;
+    }
+
+    .main-form-tab-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    /* Stepper collapses to icon-only steps on mobile */
+    .main-form-stepper {
+        gap: 0;
+        padding: 14px 20px;
+    }
+
+        .main-form-stepper .main-form-tab {
+            height: auto;
+            padding: 0;
+            border-radius: 50%;
+        }
+
+            .main-form-stepper .main-form-tab:hover:not(.is-active),
+            .main-form-stepper .main-form-tab.is-active {
+                background: transparent;
+            }
+
+        .main-form-stepper .main-form-tab-label {
+            display: none;
+        }
+
+        .main-form-stepper .main-form-tab-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 15px;
+        }
+
+        .main-form-stepper .main-form-stepper-arrow {
+            margin: 0 10px;
+            font-size: 12px;
+        }
+
+    /* View tabs (Store / Vendor / Product / Vendor Item): icon-only on
+       mobile, same look as
+       the stepper above - the active tab keeps its filled red icon, and
+       each button's title / aria-label still names it. */
+    .main-form-tabs-icons-mobile {
+        gap: 25px;
+        padding: 12px 15px;
+    }
+
+        .main-form-tabs-icons-mobile .main-form-tab {
+            height: auto;
+            padding: 0;
+            border-radius: 50%;
+        }
+
+            .main-form-tabs-icons-mobile .main-form-tab:hover:not(.is-active),
+            .main-form-tabs-icons-mobile .main-form-tab.is-active {
+                background: transparent;
+            }
+
+        .main-form-tabs-icons-mobile .main-form-tab-label {
+            display: none;
+        }
+
+        .main-form-tabs-icons-mobile .main-form-tab-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 15px;
+        }
+
+    .main-list-search{
+        display:flex;
+        align-items: center;
+        justify-content:center;
+    }
+}
+
+
+
+/* Sits above any form modal it is confirming */
+.main-form-overlay.main-confirm-overlay {
+    z-index: 10060;
+    align-items: center;
+    padding: 20px 15px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+/* Every confirmation shares these styles. _ConfirmDialog uses the
+   .main-confirm-* markup directly; pages that keep their own dialog
+   markup (Store, Product) put .main-confirm-modal on it and their
+   .main-form-header / -body / -footer pieces are laid out to match. */
+.main-confirm-modal {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 28px 24px;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    text-align: center;
+    animation: mainFormShow 0.18s ease-out;
+}
+
+.main-confirm-modal .main-form-header {
+    display: block;
+    padding: 0;
+    border-bottom: 0;
+    background: transparent;
+}
+
+.main-confirm-modal .main-form-title-wrapper {
+    display: block;
+}
+
+.main-confirm-icon,
+.main-confirm-modal .main-form-icon {
+    width: 52px;
+    height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 14px;
+    border-radius: 50%;
+    background: var(--main-red-bg-tint);
+    box-shadow: 0 0 0 6px var(--main-red-bg-soft);
+    color: var(--main-red);
+    font-size: 20px;
+}
+
+/* Success dialog (MainSuccess): same icon, green like .main-form-approve-btn */
+.main-confirm-icon.is-success {
+    background: rgba(22, 163, 74, 0.12);
+    box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.06);
+    color: #16a34a;
+}
+
+.main-confirm-title,
+.main-confirm-modal .main-form-header h3 {
+    margin: 0 0 8px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* A header subtitle reads as the first line of the message */
+.main-confirm-message,
+.main-confirm-modal .main-form-header p {
+    margin: 0 auto;
+    max-width: 330px;
+    color: #4b5563;
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.main-confirm-modal .main-form-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.main-confirm-modal .main-form-body {
+    flex: none;
+    max-height: none;
+    padding: 0;
+    overflow: visible;
+}
+
+/* Error from the action being confirmed (a .main-inline-alert.is-danger) */
+.main-confirm-modal .main-inline-alert {
+    margin-top: 14px;
+}
+
+.main-confirm-actions,
+.main-confirm-modal .main-form-footer {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+    gap: 10px;
+    margin: 22px 0 0;
+    padding: 0;
+    border-top: 0;
+}
+
+    /* Both buttons share the width equally, so every confirmation lines up */
+    .main-confirm-actions .btn,
+    .main-confirm-modal .main-form-footer .btn {
+        flex: 1 1 0;
+        min-width: 0;
+        height: 40px;
+    }
+
+    .main-confirm-actions .btn.main-confirm-ok.is-busy {
+        cursor: progress;
+    }
+
+@media (max-width: 480px) {
+
+    .main-confirm-modal {
+        padding: 22px 18px 18px;
+    }
+
+    .main-confirm-title,
+    .main-confirm-modal .main-form-header h3 {
+        font-size: 17px;
+    }
+
+    .main-confirm-actions,
+    .main-confirm-modal .main-form-footer {
+        flex-direction: column-reverse;
+    }
+}
+
+/* =========================================
+   VIEW DETAILS - HISTORY LOGS (with date
+   filter calendar), STATUS PILL and SUCCESS
+   TOAST. Shared by the Store and Product
+   list pages.
+   ========================================= */
+
+/* A divided list (not boxed rows), so a long history stays easy to scan */
+.main-history-list {
+    display: flex;
+    flex-direction: column;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.main-history-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f2f4;
+}
+
+    .main-history-row:first-child {
+        padding-top: 0;
+    }
+
+    .main-history-row:last-of-type {
+        border-bottom: 0;
+    }
+
+.main-history-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--main-red-bg-soft);
+    color: var(--main-red);
+    font-size: 11px;
+}
+
+.main-history-text {
+    flex: 1;
+    min-width: 0;
+    padding-top: 3px;
+    font-size: 13px;
+    color: #374151;
+}
+
+.main-history-user {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* ---- Date filter calendar (button + chip sit in the card header) ---- */
+
+.main-history-calendar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid #e3e3e3;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #555555;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+    .main-history-calendar-btn:hover,
+    .main-history-calendar-btn.is-open,
+    .main-history-calendar-btn.is-filtered {
+        border-color: var(--main-red-ring);
+        background: var(--main-red-bg-soft);
+        color: var(--main-red);
+    }
+
+.main-history-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 4px 3px 10px;
+    border-radius: 999px;
+    background: var(--main-red-bg-soft);
+    color: var(--main-red);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+.main-history-filter-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+    .main-history-filter-clear:hover {
+        background: var(--main-red-bg-tint);
+    }
+
+.main-history-calendar {
+    margin: 6px 0 4px;
+    padding: 12px;
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+    /* Popup variant: floats under the calendar button instead of pushing the
+       log list down. Fixed so the card's overflow: hidden can't clip it; the
+       page script sets top / left from the button (see Warehouse Details). */
+    .main-history-calendar.is-popup {
+        position: fixed;
+        z-index: 10060;
+        width: 290px;
+        max-width: calc(100vw - 16px);
+        margin: 0;
+        border-color: #e3e3e3;
+        box-shadow: 0 12px 32px rgba(16, 24, 40, 0.18);
+        animation: mainHistoryCalendarPopupShow 0.12s ease-out;
+    }
+
+@keyframes mainHistoryCalendarPopupShow {
+
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-history-calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+}
+
+    .main-history-calendar-nav button {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: #555555;
+        font-size: 11px;
+        cursor: pointer;
+    }
+
+        .main-history-calendar-nav button:hover {
+            background: #f3f3f3;
+        }
+
+.main-history-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+}
+
+.main-history-calendar-weekday {
+    padding: 4px 0;
+    text-align: center;
+    color: #9a9da2;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.main-history-calendar-day {
+    position: relative;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #222222;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+}
+
+    .main-history-calendar-day:hover {
+        background: #f3f3f3;
+    }
+
+    .main-history-calendar-day.is-outside {
+        color: #c4c6ca;
+    }
+
+    .main-history-calendar-day.is-today {
+        font-weight: 700;
+        box-shadow: inset 0 0 0 1px #d6d6d6;
+    }
+
+    /* A dot marks days that have at least one log */
+    .main-history-calendar-day.has-logs::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 4px;
+        width: 4px;
+        height: 4px;
+        margin-left: -2px;
+        border-radius: 50%;
+        background: var(--main-red);
+    }
+
+    .main-history-calendar-day.is-in-range {
+        border-radius: 0;
+        background: var(--main-red-bg-soft);
+    }
+
+    .main-history-calendar-day.is-range-start,
+    .main-history-calendar-day.is-range-end {
+        background: var(--main-red);
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+        .main-history-calendar-day.is-range-start.has-logs::after,
+        .main-history-calendar-day.is-range-end.has-logs::after {
+            background: #ffffff;
+        }
+
+.main-history-calendar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.main-history-calendar-hint {
+    color: #777777;
+    font-size: 11.5px;
+}
+
+.main-history-calendar-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .main-history-calendar-link:hover {
+        text-decoration: underline;
+    }
+
+/* Under this month's logs when earlier months are hidden */
+.main-history-older-hint {
+    padding: 4px 2px 0;
+    color: #9a9da2;
+    font-size: 11.5px;
+    text-align: center;
+}
+
+/* Phones: the date drops under the text instead of squeezing it */
+@media (max-width: 575px) {
+
+    .main-history-row {
+        flex-wrap: wrap;
+    }
+
+    .main-history-date {
+        flex-basis: 100%;
+        padding-left: 38px; /* icon 26px + row gap 12px */
+        margin-top: -6px;
+    }
+}
+
+/* What an update changed, listed under "Updated by ..." */
+.main-history-changes {
+    margin: 5px 0 0;
+    padding: 0;
+    list-style: none;
+    color: #555555;
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+
+    .main-history-changes li {
+        overflow-wrap: anywhere;
+    }
+
+    .main-history-changes .fa {
+        margin: 0 3px;
+        color: #9a9da2;
+    }
+
+.main-history-change-field {
+    font-weight: 600;
+    color: #333333;
+}
+
+.main-history-change-value {
+    color: #222222;
+}
+
+.main-history-change-blank {
+    color: #9a9da2;
+    font-style: italic;
+}
+
+.main-history-date {
+    padding-top: 4px;
+    color: #6b7280;
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.main-history-empty {
+    padding: 20px 10px;
+    text-align: center;
+    color: #9a9da2;
+    font-size: 12.5px;
+}
+
+.main-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    z-index: 10000;
+    padding: 12px 22px;
+    border-radius: 6px;
+    background: #1f7a3f;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 10px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+
+    .main-toast.main-toast-visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, 0);
+    }

@@ -40,14 +40,20 @@ namespace StoreManagement.Models
             }
         }
 
-        // tbl_UserAccount.role_id values allowed to close NNCRs (QA supervisors); they also get NNCR access.
+        // tbl_UserAccount.role_id values allowed to close NNCRs. NNCR itself is IT-only
+        // (AllAccessDepartment), so these roles only matter for users inside that department.
         public static readonly int[] NncrCloserRoles = { 49, 8 };
 
         public static bool CanAccess(Login user, AppSection section)
         {
             if (user == null) return false;
-            if (section == AppSection.Nncr && CanCloseNncr(user)) return true;
             return CanAccess(user.DepartmentId, section);
+        }
+
+        // The NNCR activity log (and its Excel / PDF export) is for AllAccessDepartment only.
+        public static bool CanViewNncrLog(Login user)
+        {
+            return user != null && user.DepartmentId == AllAccessDepartment;
         }
 
         public static bool CanCloseNncr(Login user)

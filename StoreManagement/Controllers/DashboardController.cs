@@ -23,8 +23,6 @@ namespace StoreManagement.Controllers
             List<CapaReportModel> carReports;
             try
             {
-                // Read-only dashboard: deliberately does NOT call CloseAllOverdue()
-                // (that mutates the DB).
                 carReports = await capaService.GetAllCapaReports();
             }
             catch
@@ -37,22 +35,6 @@ namespace StoreManagement.Controllers
 
             var model = BuildDashboard(carReports, pcrs, ncrs);
             return View(model);
-        }
-
-        // Mirrors CapaList.cshtml's computeStatusKey so the dashboard's CAR
-        // buckets match what the CAR list/status pages already show.
-        private static string CarStatusKey(CapaReportModel c)
-        {
-            if (string.Equals(c.Status, "Cancelled", StringComparison.OrdinalIgnoreCase)) return "cancelled";
-            if (string.Equals(c.Status, "Closed", StringComparison.OrdinalIgnoreCase)) return "closed";
-
-            bool s2Done = !string.IsNullOrWhiteSpace(c.ImmediateAction);
-            bool s2Verified = !string.IsNullOrWhiteSpace(c.IaVerifiedBy);
-            bool s4Verified = !string.IsNullOrWhiteSpace(c.CapaVerifiedBy);
-
-            if (!s2Done) return "response";
-            if (!s2Verified || !s4Verified) return "verify";
-            return "closed";
         }
 
         // PCR DocStatus codes: closing paths (QA remarks 8/9/10, or explicit close)
@@ -102,7 +84,7 @@ namespace StoreManagement.Controllers
             var carStats = new DashboardStats { Total = carReports.Count };
             foreach (var c in carReports)
             {
-                switch (CarStatusKey(c))
+                switch (c.StatusKey)
                 {
                     case "response": carStats.Open++; break;
                     case "verify": carStats.InVerification++; break;

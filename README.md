@@ -130,6 +130,11 @@ locally via ADO.NET — the external API is notification-only.
   these throws a constraint-violation exception. Follow the existing
   pattern in `CapaService.cs` (`SubmitVerification`,
   `SubmitNotEffectiveLoop`) when adding new fields to that table.
+- **NNCRs share `tbl_QualityIncidentHdr` with CARs.** NNCR rows have a
+  `ReportNumber` of `NNCR-####` (CARs are `CAR-#####`), and `CapaService`
+  bulk queries filter on `LIKE 'CAR-%'` so NNCRs never show up in CAR lists
+  or get auto-closed. NNCR fields are stored in CAR columns of a suitable type (mapping at the top of `NncrRepository.cs`), so there is no schema change. Run `Database/nncr_copy_to_quality_incident_hdr.sql` once
+  per database that already has NNCRs in `tbl_NonconformanceHdr`.
 - **No ORM in active use.** Despite the `EntityFramework` package
   reference, all data access is hand-written ADO.NET. New features should
   follow that same pattern rather than introducing EF for just one area.

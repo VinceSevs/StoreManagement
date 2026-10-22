@@ -1,49 +1,83 @@
-﻿@{
+@{
     ViewBag.Title = "Home Page";
+
+    var currentUserProfile = StoreManagement.Models.UserAccess.Current(Context);
+    string displayName = currentUserProfile != null ? currentUserProfile.DisplayName : User.Identity.Name;
+    string firstName = string.IsNullOrWhiteSpace(displayName) ? "" : displayName.Trim().Split(' ')[0];
+
+    bool canDashboard = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Dashboard);
+    bool canCar = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Car);
+    bool canNncr = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.Nncr);
+    bool canComplaint = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.ComplaintReport);
+    bool canPdfReceipt = StoreManagement.Models.UserAccess.CanAccess(currentUserProfile, StoreManagement.Models.AppSection.PdfReceipt);
 }
 
 <main>
     @if (User.Identity.IsAuthenticated)
     {
-        <div class="lead-page-header">
-            <div class="lead-page-icon"><i class="bi bi-house-door"></i></div>
-            <div>
-                <div class="lead-eyebrow">Welcome</div>
-                <h1>ASP.NET</h1>
+        <div class="dashboard-container">
+
+            <div class="dashboard-welcome">
+                <h1>Welcome back, @firstName</h1>
+                <p>Here's quick access to what you work with most.</p>
             </div>
-        </div>
 
-        <section class="card shadow-sm p-4 mb-4" aria-labelledby="aspnetTitle">
-            <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-            <p class="mb-0"><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-        </section>
+            <div class="dashboard-grid">
 
-        <div class="row g-3">
-            <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-                <div class="card shadow-sm p-3 h-100">
-                    <h2 id="gettingStartedTitle" class="h5">Getting started</h2>
-                    <p class="text-secondary">
-                        ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                        enables a clean separation of concerns and gives you full control over markup
-                        for enjoyable, agile development.
-                    </p>
-                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-                </div>
-            </section>
-            <section class="col-md-4" aria-labelledby="librariesTitle">
-                <div class="card shadow-sm p-3 h-100">
-                    <h2 id="librariesTitle" class="h5">Get more libraries</h2>
-                    <p class="text-secondary">NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-                </div>
-            </section>
-            <section class="col-md-4" aria-labelledby="hostingTitle">
-                <div class="card shadow-sm p-3 h-100">
-                    <h2 id="hostingTitle" class="h5">Web Hosting</h2>
-                    <p class="text-secondary">You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-                </div>
-            </section>
+                @if (canDashboard)
+                {
+                    <a href="@Url.Action("Index", "Dashboard")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-tachometer"></i></span>
+                        <span class="dashboard-card-label">Dashboard</span>
+                    </a>
+                }
+
+                @if (canCar)
+                {
+                    <a href="@Url.Action("CapaList", "Capa")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-folder-open-o"></i></span>
+                        <span class="dashboard-card-label">CAR List</span>
+                    </a>
+                    <a href="@Url.Action("Quality", "Capa")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-plus-square-o"></i></span>
+                        <span class="dashboard-card-label">CAR Report Form</span>
+                    </a>
+                }
+
+                @if (canNncr)
+                {
+                    <a href="@Url.Action("NncrList", "Nncr")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-list-alt"></i></span>
+                        <span class="dashboard-card-label">NNCR List</span>
+                    </a>
+                    <a href="@Url.Action("Quality", "Nncr")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-pencil-square-o"></i></span>
+                        <span class="dashboard-card-label">NNCR Report Form</span>
+                    </a>
+                }
+
+                @if (canComplaint)
+                {
+                    <a href="@Url.Action("Index", "ComplaintReport")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-file-text-o"></i></span>
+                        <span class="dashboard-card-label">Product Complaint</span>
+                    </a>
+                    <a href="@Url.Action("Index", "Ncr")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-exclamation-triangle"></i></span>
+                        <span class="dashboard-card-label">Non-Conformance</span>
+                    </a>
+                }
+
+                @if (canPdfReceipt)
+                {
+                    <a href="@Url.Action("PdfReceipt", "Finance")" class="dashboard-card">
+                        <span class="dashboard-card-icon"><i class="fa fa-file-pdf-o"></i></span>
+                        <span class="dashboard-card-label">PDF Receipt</span>
+                    </a>
+                }
+
+            </div>
+
         </div>
     }
     else

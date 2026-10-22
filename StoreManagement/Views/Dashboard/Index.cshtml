@@ -6,40 +6,72 @@
 
 }*@
 
-<link href="~/Content/dashboard/index.css" rel="stylesheet" />
+<link href="~/Content/dashboard/dashboard.css" rel="stylesheet" />
 
-<div class="lead-page-header dash-toolbar">
-    <div class="d-flex align-items-center gap-3">
-        <div class="lead-page-icon"><i class="bi bi-speedometer2"></i></div>
-        <div>
-            <div class="lead-eyebrow">Overview</div>
-            <h1>Dashboard</h1>
+<div class="main-list-page">
+
+    <div class="main-hero">
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="Quality assurance dashboard" />
+        <div class="main-hero-gradient"></div>
+        <div class="main-hero-content">
+            <div class="main-hero-eyebrow">QUALITY ASSURANCE</div>
+            <h2 class="main-hero-heading">Dashboard</h2>
+            <p class="main-hero-description">
+                Track corrective action reports and customer complaints at a glance.
+            </p>
+            <div class="main-hero-features">
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-folder-open-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">CAR Tracking</div>
+                        <div class="main-hero-feature-desc">Follow every corrective action</div>
+                    </div>
+                </div>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-file-text-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Complaints</div>
+                        <div class="main-hero-feature-desc">PCR and NCR records in one view</div>
+                    </div>
+                </div>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-line-chart"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Trends</div>
+                        <div class="main-hero-feature-desc">Spot patterns and projections</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="dash-toolbar-controls">
-        <div>
-            <label class="small fw-semibold text-secondary d-block mb-1" for="dashTrendRangeSelect">Trend Range</label>
-            <select id="dashTrendRangeSelect" class="form-select dash-filter-select">
+
+    <div class="main-list-toolbar dash-toolbar">
+        <div class="dash-toolbar-field">
+            <label class="dash-toolbar-label" for="dashTrendRangeSelect">Trend Range</label>
+            <select id="dashTrendRangeSelect" class="form-select">
                 <option value="3">Last 3 Months</option>
                 <option value="6" selected>Last 6 Months</option>
                 <option value="12">Last 12 Months</option>
                 <option value="24">Last 24 Months</option>
             </select>
         </div>
-        <div>
-            <label class="small fw-semibold text-secondary d-block mb-1" for="dashFilterSelect">View</label>
-            <select id="dashFilterSelect" class="form-select dash-filter-select">
+        <div class="dash-toolbar-field">
+            <label class="dash-toolbar-label" for="dashFilterSelect">View</label>
+            <select id="dashFilterSelect" class="form-select">
                 <option value="all">All Modules</option>
                 <option value="car">CAR</option>
                 <option value="complaint">Complaint Report</option>
             </select>
         </div>
     </div>
+
+    @Html.Partial("~/Views/Dashboard/_PartialView/_IndexCarSection.cshtml", Model)
+
+    @Html.Partial("~/Views/Dashboard/_PartialView/_IndexComplaintSection.cshtml", Model)
+
 </div>
-
-@Html.Partial("~/Views/Dashboard/_PartialView/_IndexCarSection.cshtml", Model)
-
-@Html.Partial("~/Views/Dashboard/_PartialView/_IndexComplaintSection.cshtml", Model)
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>

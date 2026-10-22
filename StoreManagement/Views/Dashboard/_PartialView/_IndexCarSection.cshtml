@@ -29,45 +29,62 @@
 
 <!-- ===================== CAR SECTION ===================== -->
 <div class="dash-section" data-section="car" id="carSection">
-    <div class="dash-section-title">
-        <span class="icon-chip"><i class="bi bi-folder2-open"></i></span> CAR (Corrective Action Report)
+    <div class="dash-section-head">
+        <h3 class="dash-section-title">
+            <span class="dash-section-icon"><i class="fa fa-folder-open-o"></i></span> CAR (Corrective Action Report)
+        </h3>
     </div>
 
-    <div class="dash-stat-row">
-        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#7d1f27;" title="View all CAR reports">
-            <div class="dash-stat-value">@Model.CarStats.Total</div>
-            <div class="dash-stat-label">Total</div>
-            <div class="dash-stat-delta" id="carTotalDelta"></div>
+    <div class="dash-kpi-grid">
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-kpi" title="View all CAR reports">
+            <span class="dash-kpi-icon"><i class="fa fa-folder-open-o"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value">@Model.CarStats.Total</div>
+                <div class="dash-kpi-label">Total</div>
+                <div class="dash-kpi-delta" id="carTotalDelta"></div>
+            </div>
         </a>
-        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#c07a00;" title="View all CAR reports">
-            <div class="dash-stat-value">@Model.CarStats.Open</div>
-            <div class="dash-stat-label">Awaiting Response</div>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-kpi is-warning" title="View all CAR reports">
+            <span class="dash-kpi-icon"><i class="fa fa-clock-o"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value">@Model.CarStats.Open</div>
+                <div class="dash-kpi-label">Awaiting Response</div>
+            </div>
         </a>
-        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#2f6690;" title="View all CAR reports">
-            <div class="dash-stat-value">@Model.CarStats.InVerification</div>
-            <div class="dash-stat-label">Awaiting Verification</div>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-kpi is-info" title="View all CAR reports">
+            <span class="dash-kpi-icon"><i class="fa fa-search"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value">@Model.CarStats.InVerification</div>
+                <div class="dash-kpi-label">Awaiting Verification</div>
+            </div>
         </a>
-        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#2f6b46;" title="View all CAR reports">
-            <div class="dash-stat-value">@Model.CarStats.Closed</div>
-            <div class="dash-stat-label">Closed</div>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-kpi is-success" title="View all CAR reports">
+            <span class="dash-kpi-icon"><i class="fa fa-check-circle-o"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value">@Model.CarStats.Closed</div>
+                <div class="dash-kpi-label">Closed</div>
+            </div>
         </a>
-        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-stat-card" style="--accent:#8f7d7b;" title="View all CAR reports">
-            <div class="dash-stat-value">@Model.CarStats.Cancelled</div>
-            <div class="dash-stat-label">Cancelled</div>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="dash-kpi is-neutral" title="View all CAR reports">
+            <span class="dash-kpi-icon"><i class="fa fa-ban"></i></span>
+            <div class="dash-kpi-body">
+                <div class="dash-kpi-value">@Model.CarStats.Cancelled</div>
+                <div class="dash-kpi-label">Cancelled</div>
+            </div>
         </a>
     </div>
 
     <div class="row g-3">
         <div class="col-lg-4">
             <div class="dash-card">
-                <h6>Status Breakdown</h6>
+                <h4 class="dash-card-title">Status Breakdown</h4>
                 @if (Model.CarStats.Total == 0)
                 {
                     <div class="dash-empty">No CAR reports yet.</div>
                 }
                 else
                 {
-                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@carStatusSummary</span></div>
+                    <div class="dash-summary"><i class="fa fa-lightbulb-o"></i><span>@carStatusSummary</span></div>
                     <div class="dash-chart-wrap"><canvas id="carStatusChart"></canvas></div>
                     <table class="table dash-data-table mb-0">
                         <thead><tr><th>Status</th><th class="text-end">Count</th></tr></thead>
@@ -83,32 +100,34 @@
         </div>
         <div class="col-lg-8">
             <div class="dash-card">
-                <h6>Reports Filed Over Time</h6>
+                <h4 class="dash-card-title">Reports Filed Over Time</h4>
                 @if (Model.CarStats.Total == 0)
                 {
                     <div class="dash-empty">No CAR reports yet.</div>
                 }
                 else
                 {
-                    <div class="dash-summary" id="carTrendSummary"><i class="bi bi-lightbulb"></i><span></span></div>
+                    <div class="dash-summary" id="carTrendSummary"><i class="fa fa-lightbulb-o"></i><span></span></div>
                     <div class="dash-chart-wrap"><canvas id="carTrendChart"></canvas></div>
-                    <table class="table dash-data-table mb-0">
-                        <thead id="carTrendHead"></thead>
-                        <tbody id="carTrendBody"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table dash-data-table mb-0">
+                            <thead id="carTrendHead"></thead>
+                            <tbody id="carTrendBody"></tbody>
+                        </table>
+                    </div>
                 }
             </div>
         </div>
         <div class="col-12">
             <div class="dash-card">
-                <h6>Reports by Classification (who's responsible)</h6>
+                <h4 class="dash-card-title">Reports by Classification (who's responsible)</h4>
                 @if (Model.CarClassificationLabels.Count == 0)
                 {
                     <div class="dash-empty">No CAR reports yet.</div>
                 }
                 else
                 {
-                    <div class="dash-summary"><i class="bi bi-lightbulb"></i><span>@carClassificationSummary</span></div>
+                    <div class="dash-summary"><i class="fa fa-lightbulb-o"></i><span>@carClassificationSummary</span></div>
                     <div class="dash-chart-wrap dash-chart-tall"><canvas id="carClassificationChart"></canvas></div>
                     <table class="table dash-data-table mb-0">
                         <thead><tr><th>Classification</th><th class="text-end">Count</th></tr></thead>
@@ -125,8 +144,8 @@
     </div>
 
     <div class="dash-view-all">
-        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="btn btn-outline-primary btn-sm">
-            View All CAR Reports <i class="bi bi-arrow-right"></i>
+        <a href="@Url.Action("CapaList", "Capa")" target="_blank" class="btn dash-view-all-btn">
+            View All CAR Reports <i class="fa fa-arrow-right"></i>
         </a>
     </div>
 </div>

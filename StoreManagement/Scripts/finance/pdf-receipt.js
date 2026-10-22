@@ -51,9 +51,9 @@
             var h = parsed.length ? parsed[0].header : {};
             document.getElementById('rcptAccountName').textContent = h.accountName || 'Transaction History Report';
             document.getElementById('rcptAccountMeta').innerHTML =
-                (h.accountNumber ? '<span><i class="bi bi-person-vcard"></i> Account ' + esc(h.accountNumber) + '</span>' : '') +
-                (h.period ? '<span><i class="bi bi-calendar3"></i> ' + esc(h.period) + '</span>' : '') +
-                (h.tin ? '<span><i class="bi bi-hash"></i> TIN ' + esc(h.tin) + '</span>' : '');
+                (h.accountNumber ? '<span><i class="fa fa-id-card-o"></i> Account ' + esc(h.accountNumber) + '</span>' : '') +
+                (h.period ? '<span><i class="fa fa-calendar"></i> ' + esc(h.period) + '</span>' : '') +
+                (h.tin ? '<span><i class="fa fa-hashtag"></i> TIN ' + esc(h.tin) + '</span>' : '');
             document.getElementById('rcptStats').innerHTML =
                 stat('Receipts', rows.length.toLocaleString()) +
                 stat('Pages', Math.ceil(rows.length / 4).toLocaleString()) +
@@ -63,8 +63,8 @@
             document.getElementById('rcptRows').innerHTML = receiptRows.map(function (r) {
                 var included = !onlyEsi.checked || r.esi;
                 return '<tr' + (included ? '' : ' class="rcpt-muted-row" title="Not included (no E-SI No.)"') + '>' +
-                    '<td>' + esc(r.plateNumber) + '</td><td class="font-mono">' + esc(r.refNo) +
-                    '</td><td class="font-mono">' + (r.esi ? esc(r.esi) : '&mdash;') + '</td><td>' + esc(r.date) +
+                    '<td>' + esc(r.plateNumber) + '</td><td class="main-tabular">' + esc(r.refNo) +
+                    '</td><td class="main-tabular">' + (r.esi ? esc(r.esi) : '&mdash;') + '</td><td>' + esc(r.date) +
                     '</td><td>' + esc(r.time) + '</td><td>' + esc(r.zone) + '</td><td>' + esc(r.entry) +
                     '</td><td>' + esc(r.exit) + '</td><td class="text-end">' + money(r.amounts.vatable) +
                     '</td><td class="text-end">' + money(r.amounts.vat) + '</td><td class="text-end fw-semibold">' +
@@ -80,7 +80,7 @@
                 return /\.pdf$/i.test(f.name) || f.type === 'application/pdf';
             });
             if (!files.length) {
-                setStatus('<i class="bi bi-exclamation-circle"></i> Please choose a PDF file.', 'text-danger');
+                setStatus('<i class="fa fa-exclamation-circle"></i> Please choose a PDF file.', 'text-danger');
                 return;
             }
 
@@ -96,14 +96,14 @@
                 receiptRows = FinanceReceiptPdf.fromParsed(parsed);
                 if (!receiptRows.length) {
                     resultCard.classList.add('d-none');
-                    setStatus('<i class="bi bi-exclamation-circle"></i> No toll transactions were found. Make sure this is a Transaction History Report PDF.', 'text-danger');
+                    setStatus('<i class="fa fa-exclamation-circle"></i> No toll transactions were found. Make sure this is a Transaction History Report PDF.', 'text-danger');
                     return;
                 }
                 generate();
-                setStatus('<i class="bi bi-check-circle-fill"></i> ' + receiptRows.length + ' transaction(s) read &mdash; receipts generated.', 'text-success');
+                setStatus('<i class="fa fa-check-circle"></i> ' + receiptRows.length + ' transaction(s) read &mdash; receipts generated.', 'text-success');
             } catch (e) {
                 resultCard.classList.add('d-none');
-                setStatus('<i class="bi bi-exclamation-circle"></i> Could not read the PDF: ' + esc(e.message), 'text-danger');
+                setStatus('<i class="fa fa-exclamation-circle"></i> Could not read the PDF: ' + esc(e.message), 'text-danger');
             }
         }
 

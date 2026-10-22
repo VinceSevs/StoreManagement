@@ -56,8 +56,8 @@
     var currentComplaintScope = 'all';
     var currentRangeMonths = 6;
 
-    Chart.defaults.font.family = "'Inter', Arial, sans-serif";
-    Chart.defaults.color = '#8f7d7b';
+    Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+    Chart.defaults.color = '#6b7280';
 
     // A bad/empty dataset in one chart must never stop the rest of the
     // dashboard's charts from being created, so each one is isolated here.
@@ -133,9 +133,9 @@
         var delta = monthOverMonthDelta(values);
         if (delta === null) { el.innerHTML = ''; return; }
         var isUp = delta > 0;
-        var icon = delta === 0 ? 'bi-dash' : (isUp ? 'bi-arrow-up-short' : 'bi-arrow-down-short');
-        var cls = delta === 0 ? 'text-secondary' : (isUp ? 'text-danger' : 'text-success');
-        el.innerHTML = '<span class="' + cls + ' small fw-semibold"><i class="bi ' + icon + '"></i> '
+        var icon = delta === 0 ? 'fa-minus' : (isUp ? 'fa-arrow-up' : 'fa-arrow-down');
+        var cls = delta === 0 ? 'is-flat' : (isUp ? 'is-up' : 'is-down');
+        el.innerHTML = '<span class="' + cls + ' fw-semibold"><i class="fa ' + icon + '"></i> '
             + Math.abs(delta) + '% vs last month</span>';
     }
 
@@ -214,7 +214,7 @@
             labels: trendLabels,
             values: carTrend,
             seriesLabel: 'CAR Filed',
-            color: '#7d1f27',
+            color: '#c60404',
             months: currentRangeMonths,
             summaryId: 'carTrendSummary',
             summaryLabel: 'CAR filings'
@@ -232,7 +232,7 @@
             labels: trendLabels,
             values: d.trend,
             seriesLabel: d.trendLabel,
-            color: '#c07a00',
+            color: '#c60404',
             months: currentRangeMonths,
             summaryId: 'complaintTrendSummary',
             summaryLabel: d.summaryLabel + ' filings'
@@ -251,7 +251,7 @@
             labels: ['Awaiting Response', 'Awaiting Verification', 'Closed', 'Cancelled'],
             datasets: [{
                 data: [carStats.open, carStats.verify, carStats.closed, carStats.cancelled],
-                backgroundColor: ['#c07a00', '#2f6690', '#2f6b46', '#8f7d7b'],
+                backgroundColor: ['#d97706', '#2563eb', '#16a34a', '#8a8d91'],
                 borderWidth: 0
             }]
         },
@@ -264,7 +264,7 @@
 
     var carTrendChart = safeCreateChart('carTrendChart', {
         type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#7d1f27', backgroundColor: 'rgba(125,31,39,.12)', fill: true, tension: .35, pointRadius: 3 }] },
+        data: { labels: [], datasets: [{ data: [], borderColor: '#c60404', backgroundColor: 'rgba(198,4,4,.10)', fill: true, tension: .35, pointRadius: 3 }] },
         options: {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
@@ -279,7 +279,7 @@
             datasets: [{
                 label: 'CAR Reports',
                 data: carClassificationCounts,
-                backgroundColor: '#7d1f27',
+                backgroundColor: '#c60404',
                 borderRadius: 6,
                 maxBarThickness: 42
             }]
@@ -299,7 +299,7 @@
             labels: ['Open / Ongoing', 'Closed', 'Cancelled / Invalid'],
             datasets: [{
                 data: [scopeData.all.open, scopeData.all.closed, scopeData.all.cancelled],
-                backgroundColor: ['#c07a00', '#2f6b46', '#8f7d7b'],
+                backgroundColor: ['#d97706', '#16a34a', '#8a8d91'],
                 borderWidth: 0
             }]
         },
@@ -312,7 +312,7 @@
 
     var complaintTrendChart = safeCreateChart('complaintTrendChart', {
         type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: '#7d1f27', backgroundColor: 'rgba(125,31,39,.12)', fill: true, tension: .35, pointRadius: 3 }] },
+        data: { labels: [], datasets: [{ data: [], borderColor: '#c60404', backgroundColor: 'rgba(198,4,4,.10)', fill: true, tension: .35, pointRadius: 3 }] },
         options: {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
@@ -325,8 +325,8 @@
         data: {
             labels: ['Open / Ongoing', 'Closed', 'Cancelled / Invalid'],
             datasets: [
-                { label: 'PCR', data: [pcrStats.open, pcrStats.closed, pcrStats.cancelled], backgroundColor: '#7d1f27', borderRadius: 6, maxBarThickness: 46 },
-                { label: 'NCR', data: [ncrStats.open, ncrStats.closed, ncrStats.cancelled], backgroundColor: '#c07a00', borderRadius: 6, maxBarThickness: 46 }
+                { label: 'PCR', data: [pcrStats.open, pcrStats.closed, pcrStats.cancelled], backgroundColor: '#c60404', borderRadius: 6, maxBarThickness: 46 },
+                { label: 'NCR', data: [ncrStats.open, ncrStats.closed, ncrStats.cancelled], backgroundColor: '#d97706', borderRadius: 6, maxBarThickness: 46 }
             ]
         },
         options: {

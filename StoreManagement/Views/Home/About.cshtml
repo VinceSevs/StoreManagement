@@ -1,20 +1,24 @@
-﻿@{
+<link href="~/Content/home/home.css" rel="stylesheet" />
+
+@{
     ViewBag.Title = "About";
 }
 <main aria-labelledby="title">
     @if (User.Identity.IsAuthenticated)
     {
-        <div class="lead-page-header">
-            <div class="lead-page-icon"><i class="bi bi-info-circle"></i></div>
-            <div>
-                <div class="lead-eyebrow">Store Management</div>
-                <h1 id="title">@ViewBag.Title.</h1>
+        <div class="dashboard-container">
+            <div class="dashboard-welcome">
+                <h1 id="title">@ViewBag.Title</h1>
+                <p>@ViewBag.Message</p>
             </div>
-        </div>
 
-        <div class="card shadow-sm p-4">
-            <h3 class="h5">@ViewBag.Message</h3>
-            <p class="text-secondary mb-0">Use this area to provide additional information.</p>
+            <div class="home-card">
+                <div class="main-view-card-header">
+                    <span class="main-view-card-icon"><i class="fa fa-info-circle"></i></span>
+                    <h4>About Store Management</h4>
+                </div>
+                <p class="main-row-detail-muted mb-0">Use this area to provide additional information.</p>
+            </div>
         </div>
     }
     else

@@ -2,80 +2,113 @@
     ViewBag.Title = "PDF Receipt";
 }*@
 
-<link href="~/Content/finance/pdf-receipt.css" rel="stylesheet" />
+<link href="~/Content/finance/finance.css" rel="stylesheet" />
 
-<div class="lead-page-header">
-    <div class="lead-page-icon"><i class="bi bi-receipt"></i></div>
-    <div>
-        <div class="lead-eyebrow">Finance</div>
-        <h1>PDF Receipt</h1>
-    </div>
-</div>
+<div class="main-list-page">
 
-<div class="card shadow-sm rcpt-card mb-3">
-    <label class="rcpt-drop" id="rcptDrop" for="rcptFile">
-        <input type="file" id="rcptFile" accept="application/pdf,.pdf" multiple />
-        <span class="rcpt-drop-icon"><i class="bi bi-cloud-arrow-up"></i></span>
-        <span>
-            <span class="rcpt-drop-title d-block">Drop the Transaction History Report PDF here, or click to browse</span>
-            <span class="rcpt-drop-sub d-block">Receipts are generated automatically &middot; 4 per A4 page &middot; VAT 12%</span>
-            <span class="rcpt-drop-files d-block" id="rcptFileNames"></span>
-        </span>
-    </label>
-    <div class="rcpt-status" id="rcptStatus"></div>
-</div>
-
-<div class="card shadow-sm rcpt-card mb-4 d-none" id="rcptResult">
-    <div class="rcpt-account mb-3">
-        <div class="rcpt-account-name" id="rcptAccountName"></div>
-        <div class="rcpt-account-meta" id="rcptAccountMeta"></div>
-    </div>
-    <div class="rcpt-stats" id="rcptStats"></div>
-
-    <div class="rcpt-toolbar">
-        <div class="rcpt-tabs" role="tablist">
-            <button type="button" class="active" data-tab="preview"><i class="bi bi-eye"></i> Receipt Preview</button>
-            <button type="button" data-tab="rows"><i class="bi bi-table"></i> Transactions</button>
-        </div>
-        <div class="rcpt-actions">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="rcptOnlyEsi" checked />
-                <label class="form-check-label" for="rcptOnlyEsi">Only rows with E-SI No.</label>
+    <div class="main-hero">
+        <img class="main-hero-bg"
+             src="@Url.Content("~/Content/images/vendor-hero-image.jpg")"
+             alt="PDF receipt generator" />
+        <div class="main-hero-gradient"></div>
+        <div class="main-hero-content">
+            <div class="main-hero-eyebrow">FINANCE</div>
+            <h2 class="main-hero-heading">PDF Receipt</h2>
+            <p class="main-hero-description">
+                Turn a Transaction History Report into ready-to-print receipts and a spreadsheet.
+            </p>
+            <div class="main-hero-features">
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-cloud-upload"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Upload</div>
+                        <div class="main-hero-feature-desc">Drop in the report PDF</div>
+                    </div>
+                </div>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-file-pdf-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Receipts</div>
+                        <div class="main-hero-feature-desc">4 per A4 page, VAT 12%</div>
+                    </div>
+                </div>
+                <div class="main-hero-feature">
+                    <div class="main-hero-feature-icon"><i class="fa fa-file-excel-o"></i></div>
+                    <div class="main-hero-feature-text">
+                        <div class="main-hero-feature-label">Excel Export</div>
+                        <div class="main-hero-feature-desc">Download the rows as .xlsx</div>
+                    </div>
+                </div>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="rcptExcelBtn">
-                <i class="bi bi-file-earmark-excel"></i> Excel
-            </button>
-            <button type="button" class="btn btn-primary btn-sm" id="rcptPdfBtn">
-                <i class="bi bi-download"></i> Download Receipts
-            </button>
         </div>
     </div>
 
-    <div data-panel="preview">
-        <iframe class="rcpt-preview" id="rcptPreview" title="Receipt preview"></iframe>
+    <div class="rcpt-card">
+        <label class="rcpt-drop" id="rcptDrop" for="rcptFile">
+            <input type="file" id="rcptFile" accept="application/pdf,.pdf" multiple />
+            <span class="rcpt-drop-icon"><i class="fa fa-cloud-upload"></i></span>
+            <span>
+                <span class="rcpt-drop-title d-block">Drop the Transaction History Report PDF here, or click to browse</span>
+                <span class="rcpt-drop-sub d-block">Receipts are generated automatically &middot; 4 per A4 page &middot; VAT 12%</span>
+                <span class="rcpt-drop-files d-block" id="rcptFileNames"></span>
+            </span>
+        </label>
+        <div class="rcpt-status" id="rcptStatus"></div>
     </div>
-    <div data-panel="rows" class="d-none">
-        <div class="rcpt-table-wrap">
-            <table class="table table-hover align-middle mb-0 lead-table">
-                <thead>
-                    <tr>
-                        <th>Plate No.</th>
-                        <th>Ref No.</th>
-                        <th>Sales Invoice No.</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Zone</th>
-                        <th>Entry</th>
-                        <th>Exit</th>
-                        <th class="text-end">Vatable Sales</th>
-                        <th class="text-end">VAT</th>
-                        <th class="text-end">Total Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="rcptRows"></tbody>
-            </table>
+
+    <div class="rcpt-card d-none" id="rcptResult">
+        <div class="rcpt-account mb-3">
+            <div class="rcpt-account-name" id="rcptAccountName"></div>
+            <div class="rcpt-account-meta" id="rcptAccountMeta"></div>
+        </div>
+        <div class="rcpt-stats" id="rcptStats"></div>
+
+        <div class="rcpt-toolbar">
+            <div class="rcpt-tabs" role="tablist">
+                <button type="button" class="active" data-tab="preview"><i class="fa fa-eye"></i> Receipt Preview</button>
+                <button type="button" data-tab="rows"><i class="fa fa-table"></i> Transactions</button>
+            </div>
+            <div class="rcpt-actions">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rcptOnlyEsi" checked />
+                    <label class="form-check-label" for="rcptOnlyEsi">Only rows with E-SI No.</label>
+                </div>
+                <button type="button" class="btn main-outline-btn" id="rcptExcelBtn">
+                    <i class="fa fa-file-excel-o"></i> Excel
+                </button>
+                <button type="button" class="btn main-form-save-btn" id="rcptPdfBtn">
+                    <i class="fa fa-download"></i> Download Receipts
+                </button>
+            </div>
+        </div>
+
+        <div data-panel="preview">
+            <iframe class="rcpt-preview" id="rcptPreview" title="Receipt preview"></iframe>
+        </div>
+        <div data-panel="rows" class="d-none">
+            <div class="rcpt-table-wrap">
+                <table class="table main-list-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Plate No.</th>
+                            <th>Ref No.</th>
+                            <th>Sales Invoice No.</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Zone</th>
+                            <th>Entry</th>
+                            <th>Exit</th>
+                            <th class="text-end">Vatable Sales</th>
+                            <th class="text-end">VAT</th>
+                            <th class="text-end">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rcptRows"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>

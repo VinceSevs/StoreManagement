@@ -1,0 +1,20 @@
+/* Home / About / Contact: a plain white card under the LEADS welcome header. */
+
+.home-card {
+    padding: 18px 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    color: #17191D;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+    .home-card address {
+        font-style: normal;
+    }
+
+    .home-card a {
+        color: var(--main-red);
+    }

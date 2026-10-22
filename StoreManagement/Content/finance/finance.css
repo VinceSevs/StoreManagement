@@ -1,0 +1,273 @@
+/* PDF Receipt page: upload drop zone, summary tiles, preview and transactions table.
+   Hero, buttons and the list table come from main.css. */
+
+.rcpt-card {
+    margin-bottom: 16px;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* ---- Upload drop zone ---------------------------------------------------- */
+
+.rcpt-drop {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    background: var(--main-red-bg-soft);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+    .rcpt-drop:hover,
+    .rcpt-drop.dragover {
+        border-color: var(--main-red);
+        background: var(--main-red-bg-tint);
+    }
+
+    .rcpt-drop:focus-within {
+        border-color: var(--main-red);
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .rcpt-drop input[type=file] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+.rcpt-drop-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: var(--main-red);
+    color: #ffffff;
+    font-size: 22px;
+}
+
+.rcpt-drop-title {
+    color: #17191D;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.rcpt-drop-sub {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.rcpt-drop-files {
+    margin-top: 2px;
+    color: var(--main-red);
+    font-size: 12px;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.rcpt-status {
+    min-height: 1.2em;
+    margin-top: 12px;
+    font-size: 12.5px;
+}
+
+/* ---- Account + summary tiles --------------------------------------------- */
+
+.rcpt-account-name {
+    color: #17191D;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.rcpt-account-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 12.5px;
+}
+
+    .rcpt-account-meta i {
+        margin-right: 4px;
+        color: var(--main-red);
+    }
+
+.rcpt-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.rcpt-stat {
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1px solid #eceef0;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+    .rcpt-stat .label {
+        color: #6b7280;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+
+    .rcpt-stat .value {
+        margin-top: 2px;
+        overflow: hidden;
+        color: #17191D;
+        font-size: 18px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .rcpt-stat.accent {
+        border-color: var(--main-red);
+        background: var(--main-red);
+    }
+
+        .rcpt-stat.accent .label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .rcpt-stat.accent .value {
+            color: #ffffff;
+        }
+
+/* ---- Toolbar + tabs ------------------------------------------------------- */
+
+.rcpt-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0 16px;
+}
+
+.rcpt-tabs {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid #e1e1e1;
+    border-radius: 999px;
+    background: #f5f6f8;
+}
+
+    .rcpt-tabs button {
+        padding: 6px 16px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: #6b7280;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+        .rcpt-tabs button.active {
+            background: #ffffff;
+            color: var(--main-red);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .rcpt-tabs button:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--main-red-ring);
+        }
+
+.rcpt-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+    .rcpt-actions .form-check {
+        margin: 0 8px 0 0;
+        font-size: 12.5px;
+    }
+
+    .rcpt-actions .form-check-input:checked {
+        border-color: var(--main-red);
+        background-color: var(--main-red);
+    }
+
+    .rcpt-actions .btn.main-form-save-btn {
+        min-width: 0;
+        height: 32px;
+        padding: 0 14px;
+        font-size: 12.5px;
+    }
+
+        .rcpt-actions .btn.main-form-save-btn i {
+            margin-right: 5px;
+        }
+
+.rcpt-preview {
+    width: 100%;
+    height: 78vh;
+    min-height: 520px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: #f5f6f8;
+}
+
+.rcpt-table-wrap {
+    max-height: 78vh;
+    overflow: auto;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+}
+
+    .rcpt-table-wrap table {
+        font-size: 12.5px;
+        white-space: nowrap;
+    }
+
+    .rcpt-table-wrap thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+.rcpt-muted-row td {
+    color: #9a9da2;
+}
+
+@media (max-width: 767px) {
+    .rcpt-drop {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .rcpt-toolbar,
+    .rcpt-actions {
+        width: 100%;
+    }
+
+    .rcpt-preview {
+        height: 60vh;
+        min-height: 360px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rcpt-drop {
+        transition: none;
+    }
+}

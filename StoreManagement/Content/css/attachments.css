@@ -1,0 +1,259 @@
+/* Attachment pickers, thumbnails and the photo lightbox.
+   Shared by the CAR and NNCR pages (same look as the CAR report form). */
+
+/* =========================================
+   ATTACHMENTS
+   ========================================= */
+
+.capa-attach-thumb {
+    position: relative;
+    height: 100%;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+    .capa-attach-thumb img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+    }
+
+    .capa-attach-thumb .btn-close {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 2;
+        padding: 6px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        opacity: 0.9;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+
+.capa-attach-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    background: #f7f8fa;
+}
+
+    .capa-attach-file .capa-attach-ext {
+        font-size: 28px;
+        line-height: 1;
+    }
+
+    .capa-attach-file small {
+        max-width: 90%;
+        padding: 0 8px;
+        overflow: hidden;
+        color: #6b7280;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.capa-attach-caption {
+    padding: 8px;
+}
+
+    .capa-attach-caption .form-control {
+        height: 32px;
+        border-color: #d9d9d9;
+        border-radius: 5px;
+        box-shadow: none;
+        font-size: 12.5px;
+    }
+
+.capa-attach-empty {
+    padding: 12px 0;
+    color: #6b7280;
+    font-size: 12.5px;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Photos already on a CAR (status / verification / response) */
+.attach-thumb-btn {
+    padding: 0;
+    border: 0;
+    background: none;
+    line-height: 0;
+    cursor: pointer;
+}
+
+    .attach-thumb-btn img {
+        transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .attach-thumb-btn:hover img {
+        transform: scale(1.03);
+        opacity: 0.9;
+    }
+
+.capa-thumb {
+    width: 140px;
+    height: 105px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.capa-thumb-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 140px;
+    height: 105px;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    background: #f7f8fa;
+    color: #6b7280;
+    text-decoration: none;
+}
+
+    .capa-thumb-file:hover {
+        border-color: var(--main-red);
+        color: var(--main-red);
+    }
+
+    .capa-thumb-file span {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .capa-thumb-file small {
+        max-width: 90%;
+        padding: 0 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+
+
+/* =========================================
+   LIGHTBOX (photo preview)
+   ========================================= */
+
+.lightbox-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    align-items: center;
+    justify-content: center;
+    background: rgba(23, 25, 29, 0.92);
+}
+
+    .lightbox-overlay.active {
+        display: flex;
+    }
+
+.lightbox-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 4px;
+    object-fit: contain;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-btn {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+    .lightbox-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+    }
+
+.lightbox-close { top: 20px; right: 20px; }
+.lightbox-download { top: 20px; right: 76px; font-size: 18px; }
+.lightbox-prev { left: 20px; top: 50%; transform: translateY(-50%); }
+.lightbox-next { right: 20px; top: 50%; transform: translateY(-50%); }
+
+.lightbox-caption {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    padding: 0 80px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    text-align: center;
+}
+
+.lightbox-counter {
+    position: absolute;
+    top: 30px;
+    left: 24px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+}
+
+
+
+.capa-muted {
+    color: #6b7280;
+    font-size: 12.5px;
+    font-style: italic;
+}
+
+.capa-attach-size {
+    display: block;
+    padding: 6px 8px 8px;
+    color: #6b7280;
+    font-size: 12px;
+    text-align: center;
+}
+
+.capa-attach-file .capa-attach-name {
+    max-width: 90%;
+    padding: 0 8px;
+    overflow: hidden;
+    color: #4b5563;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.capa-attach-size.is-error {
+    color: #b42318;
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .lightbox-caption {
+        padding: 0 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .attach-thumb-btn img,
+    .lightbox-btn {
+        transition: none;
+    }
+
+    .attach-thumb-btn:hover img {
+        transform: none;
+    }
+}
