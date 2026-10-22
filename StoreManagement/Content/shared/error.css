@@ -1,34 +1,116 @@
-        body {
-            font-family: 'Inter', Arial, sans-serif;
-            background: #f1e9e7;
-            color: #241316;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+/* Centered status card shared by Error.cshtml (standalone page) and AccessDenied.cshtml (inside the layout). */
 
-        .error-card {
-            background: #fff;
-            border: 1px solid #e8dcda;
-            border-radius: 16px;
-            padding: 2.5rem 3rem;
-            text-align: center;
-            max-width: 420px;
-            box-shadow: 0 12px 32px rgba(36,19,22,.08);
-        }
+.status-card-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 20px;
+}
 
-        h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            color: #7d1f27;
-            margin-bottom: .5rem;
-        }
+body.error-page {
+    margin: 0;
+    background: #f5f6f8;
+    color: #17191D;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        h2 {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #8f7d7b;
-            margin: 0;
-        }
+    body.error-page .status-card-wrap {
+        min-height: 100vh;
+    }
+
+.status-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 32px 28px;
+    border: 1px solid #e1e1e1;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    text-align: center;
+}
+
+.status-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: rgba(198, 4, 4, 0.08);
+    box-shadow: 0 0 0 6px rgba(198, 4, 4, 0.06);
+    color: #c60404;
+    font-size: 20px;
+}
+
+.status-card-eyebrow {
+    margin-bottom: 4px;
+    color: #c60404;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.status-card h1 {
+    margin: 0 0 8px;
+    color: #17191D;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.status-card p {
+    margin: 0 auto;
+    max-width: 340px;
+    color: #4b5563;
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.status-card .status-card-note {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 12.5px;
+}
+
+.status-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    margin-top: 20px;
+    padding: 0 18px;
+    border: 1px solid #c60404;
+    border-radius: 5px;
+    background: #c60404;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+    .status-card-btn:hover {
+        border-color: #a80303;
+        background: #a80303;
+        color: #ffffff;
+    }
+
+    .status-card-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(198, 4, 4, 0.25);
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .status-card-btn {
+        transition: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .status-card {
+        padding: 24px 18px;
+    }
+}

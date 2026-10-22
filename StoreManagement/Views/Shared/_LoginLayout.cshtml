@@ -6,15 +6,55 @@
     <title>@ViewBag.Title Lead Logistics Innovations, Inc.</title>
     <link rel="icon" type="image/x-icon" href="@Url.Content("~/content/icon/favicon.ico")" />
     @Styles.Render("~/Content/bootstrap.min.css")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="~/Content/lead-theme.css" rel="stylesheet">
+    <link href="@Url.Content("~/Content/account/auth.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/account/auth.css")).Ticks" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/account/auth-extras.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/account/auth-extras.css")).Ticks" rel="stylesheet" type="text/css" />
     @Scripts.Render("~/bundles/modernizr")
-    <link href="~/Content/shared/login-layout.css" rel="stylesheet" />
 </head>
 <body>
-    @RenderBody()
-    @Scripts.Render("~/bundles/jquery")
+
+    <div class="auth-wrapper">
+
+        <!-- BRAND PANEL -->
+        <div class="auth-brand">
+
+            <div class="auth-brand-logo">
+                <img src="@Url.Content("~/Content/images/icon-dark-LLII.png")" alt="LEAD" class="logo-mark-img text-center" />
+                <div class="logo-text"></div>
+            </div>
+
+            <div class="auth-brand-body">
+                <h1>Quality</h1>
+                <h2>Assurance</h2>
+                <p class="auth-brand-tagline">Corrective Action Report System</p>
+            </div>
+
+            <div class="auth-brand-footer text-center">
+                Lead Logistics Innovations, Inc. &copy; @DateTime.Now.Year
+            </div>
+
+        </div>
+
+        <!-- CURVED DIVIDER -->
+        <div class="auth-divider" aria-hidden="true">
+            <svg viewBox="0 0 140 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M100,0 Q20,500 100,1000 L140,1000 L140,0 Z"></path>
+            </svg>
+        </div>
+
+        <!-- FORM PANEL -->
+        <div class="auth-form-panel">
+            <div class="auth-card" id="loginFormBox">
+                <img src="@Url.Content("~/Content/images/icon-light-LLII.svg")" alt="LEAD" class="auth-card-logo-img" />
+                @RenderBody()
+            </div>
+        </div>
+
+    </div>
+
+    @RenderSection("overlay", required: false)
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

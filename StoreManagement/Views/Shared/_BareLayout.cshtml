@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title Lead Logistics Innovations, Inc.</title>
+    <link rel="icon" type="image/x-icon" href="@Url.Content("~/content/icon/favicon.ico")" />
+    @Styles.Render("~/Content/bootstrap.min.css")
+    <link href="@Url.Content("~/Content/css/sidebar.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/css/sidebar.css")).Ticks" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link href="@Url.Content("~/Content/css/main.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/css/main.css")).Ticks" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/lead-theme.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/lead-theme.css")).Ticks" rel="stylesheet" />
+</head>
+<body>
+    @* Form-only page: no sidebar, no header. Used by the supplier-facing NNCR response link. *@
+    <div class="guest-shell">
+        <section class="page-content guest-content">
+            @RenderBody()
+        </section>
+    </div>
+</body>
+</html>

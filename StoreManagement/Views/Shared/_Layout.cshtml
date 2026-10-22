@@ -6,48 +6,64 @@
     <title>@ViewBag.Title Lead Logistics Innovations, Inc.</title>
     <link rel="icon" type="image/x-icon" href="@Url.Content("~/content/icon/favicon.ico")" />
     @Styles.Render("~/Content/bootstrap.min.css")
+    <link href="@Url.Content("~/Content/css/sidebar.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/css/sidebar.css")).Ticks" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <link href="~/Content/lead-theme.css" rel="stylesheet">
+    <link href="@Url.Content("~/Content/css/main.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/css/main.css")).Ticks" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/lead-theme.css")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Content/lead-theme.css")).Ticks" rel="stylesheet" />
     @Scripts.Render("~/bundles/modernizr")
-
-    <link href="~/Content/shared/layout.css" rel="stylesheet" />
 </head>
 <body>
     @if (User.Identity.IsAuthenticated)
     {
-        @Html.Partial("~/Views/Shared/_PartialView/_LayoutTopbar.cshtml")
+        <!-- SIDEBAR -->
+        <div class="app-wrapper">
+            <script>
+                // Restore the desktop sidebar state before first paint (saved by layout.js).
+                // Expanded unless the user collapsed it.
+                try {
+                    if (localStorage.getItem("leads.sidebarCollapsed") === "true") {
+                        document.currentScript.parentNode.classList.add("sidebar-collapsed");
+                    }
+                } catch (e) { }
+            </script>
 
-        <div class="app-shell">
-            <div class="app-sidebar-overlay" id="sidebarOverlay"></div>
             @Html.Partial("~/Views/Shared/_PartialView/_LayoutSidebar.cshtml")
 
-            <div class="app-content container-fluid body-content p-4">
-                @if (TempData["AccessDeniedMessage"] != null)
-                {
-                    <div class="alert alert-warning py-2 small"><i class="bi bi-shield-lock"></i> @TempData["AccessDeniedMessage"]</div>
-                }
-                @RenderBody()
-            </div>
+            <div class="sidebar-overlay"></div>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+
+                @Html.Partial("~/Views/Shared/_PartialView/_LayoutTopbar.cshtml")
+
+                <!-- PAGE CONTENT -->
+                <section class="page-content">
+                    @if (TempData["AccessDeniedMessage"] != null)
+                    {
+                        <div class="alert alert-warning py-2 small"><i class="bi bi-shield-lock"></i> @TempData["AccessDeniedMessage"]</div>
+                    }
+                    @RenderBody()
+                </section>
+
+            </main>
         </div>
 
         <script>
             sessionStorage.setItem('Username', @Html.Raw(Json.Encode(User.Identity.Name)));
         </script>
-        <script src="~/Scripts/shared/layout.js"></script>
+        <script src="@Url.Content("~/Scripts/shared/layout.js")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Scripts/shared/layout.js")).Ticks"></script>
     }
     @if (!User.Identity.IsAuthenticated)
     {
-        <nav class="app-navbar navbar-dark">
-            <div class="app-navbar-inner">
-                <a class="app-brand" href="@Url.Action("Login", "Account")">
-                    <i class="bi bi-boxes" style="font-size:1.3rem;"></i>
-                    <span class="app-brand-text">Corrective Action Report</span>
-                </a>
-            </div>
-        </nav>
-        <div class="container body-content">
-            @RenderBody()
+        <div class="guest-shell">
+            <header class="top-header guest-header">
+                <img src="@Url.Content("~/Content/images/icon-light-LLII.svg")" alt="LEAD" class="guest-logo" />
+                <span class="guest-title">Corrective Action Report System</span>
+            </header>
+            <section class="page-content guest-content">
+                @RenderBody()
+            </section>
         </div>
 
         <script src="~/Scripts/shared/layout-guest.js"></script>
