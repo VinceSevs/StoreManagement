@@ -55,38 +55,41 @@
 		}
 	}
 
+    function toggleStatusSort() {
+        sortRowsByColumn(0, 'statusSortIcon', cellText(0));
+    }
     function toggleDateIssuedSort() {
-        sortRowsByColumn(0, 'dateIssuedSortIcon', function (row) { return row.getAttribute('data-created') || ''; });
+        sortRowsByColumn(1, 'dateIssuedSortIcon', function (row) { return row.getAttribute('data-created') || ''; });
     }
     function toggleCarNoSort() {
-        sortRowsByColumn(1, 'carNoSortIcon', cellText(1));
+        sortRowsByColumn(2, 'carNoSortIcon', cellText(2));
     }
     function toggleStockMovementSort() {
-        sortRowsByColumn(2, 'stockMovementSortIcon', cellText(2));
+        sortRowsByColumn(3, 'stockMovementSortIcon', cellText(3));
     }
     function toggleItemCodeSort() {
-        sortRowsByColumn(3, 'itemCodeSortIcon', cellText(3));
+        sortRowsByColumn(4, 'itemCodeSortIcon', cellText(4));
     }
     function toggleDescriptionSort() {
-        sortRowsByColumn(4, 'descriptionSortIcon', cellText(4));
+        sortRowsByColumn(5, 'descriptionSortIcon', cellText(5));
     }
     function toggleUTDSort() {
-        sortRowsByColumn(5, 'utdSortIcon', cellText(5));
+        sortRowsByColumn(6, 'utdSortIcon', cellText(6));
     }
     function toggleUOMSort() {
-        sortRowsByColumn(6, 'uomSortIcon', cellText(6));
+        sortRowsByColumn(7, 'uomSortIcon', cellText(7));
     }
     function toggleQuantitySort() {
-        sortRowsByColumn(7, 'quantitySortIcon', cellText(7));
+        sortRowsByColumn(8, 'quantitySortIcon', cellText(8));
     }
     function toggleNatureOfDefectSort() {
-        sortRowsByColumn(8, 'natureOfDefectSortIcon', cellText(8));
+        sortRowsByColumn(9, 'natureOfDefectSortIcon', cellText(9));
     }
+	function toggleSiteWarehouseSort() {
+		sortRowsByColumn(10, 'siteWarehouseIcon', cellText(10));
+	}
     function toggleCarClassificationSort() {
-        sortRowsByColumn(9, 'carClassificationSortIcon', cellText(9));
-    }
-    function toggleStatusSort() {
-        sortRowsByColumn(10, 'statusSortIcon', cellText(10));
+        sortRowsByColumn(11, 'carClassificationSortIcon', cellText(11));
     }
 
 	function applyFilters() {
@@ -224,33 +227,34 @@
 			return;
 		}
 
-		const headers = ['Date Created', 'Car No.', 'Stock Movement', 'Item Code', 'Description', 'UTD', 'UOM', 'Quantity', 'Nature of Defect', 'Car Classification', 'Status'];
+		const headers = ['Status', 'Date Created', 'Car No.', 'Stock Movement', 'Item Code', 'Description', 'UTD', 'UOM', 'Quantity', 'Nature of Defect', 'Site Warehouse', 'Car Classification'];
 		const rows = [];
 
 		matchingRows.forEach(function (row) {
-			const dateCreated = row.cells[0].textContent.trim();
-			const reportNumber = row.getAttribute('data-report-number') || row.cells[1].textContent.trim();
-			const stockMovement = row.cells[2].textContent.trim();
-			const carClassification = row.cells[9].textContent.trim();
-            const status = row.cells[10].textContent.trim();
+			const status = row.cells[0].textContent.trim();
+			const dateCreated = row.cells[1].textContent.trim();
+			const reportNumber = row.getAttribute('data-report-number') || row.cells[2].textContent.trim();
+			const stockMovement = row.cells[3].textContent.trim();
+			const warehouse = row.cells[10].textContent.trim() === '-' ? '' : row.cells[10].textContent.trim();
+			const carClassification = row.cells[11].textContent.trim();
 
 			const items = ITEMS_BY_CAR[reportNumber] || [];
 			if (items.length === 0) {
-				rows.push([dateCreated, reportNumber, stockMovement, '', '', '', '', '', '', carClassification, status]);
+				rows.push([status, dateCreated, reportNumber, stockMovement, '', '', '', '', '', '', warehouse, carClassification]);
 				return;
 			}
 
 			items.forEach(function (item) {
 				rows.push([
-					dateCreated, reportNumber, stockMovement,
-					item.itemCode, item.itemDescription, item.utd, item.uom, item.quantity, item.defectName,
-					carClassification, status
+					status, dateCreated, reportNumber, stockMovement,
+					item.itemCode, item.itemDescription, item.utd, item.uom, item.quantity, item.defectName, warehouse,
+					carClassification
 				]);
 			});
 		});
 
 		const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-		worksheet['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 28 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 20 }, { wch: 18 }, { wch: 16 }];
+		worksheet['!cols'] = [{ wch: 22 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 28 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 28 }, { wch: 14 }, { wch: 18 } ];
 
 		const workbook = XLSX.utils.book_new();
 		XLSX.utils.book_append_sheet(workbook, worksheet, 'CAR Reports');

@@ -30,10 +30,10 @@
                 {
                     itemCode = i.ItemCode,
                     itemDescription = i.ItemDescription,
-                    utd = i.UsedToDate.HasValue ? i.UsedToDate.Value.ToString("MMM dd, yyyy") : "",
+                    utd = i.UsedToDate.HasValue && i.UsedToDate.Value.Year > 1900 ? i.UsedToDate.Value.ToString("MMM dd, yyyy") : "-",
                     uom = i.UOMDisplay,
                     quantity = i.Quantity,
-                    defectName = i.DefectName
+                    defectName = i.DefectListDisplay
                 })
                 .ToList();
         }

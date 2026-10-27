@@ -7,6 +7,9 @@
             <table class="table main-list-table capa-table" id="capaTable">
                 <thead>
                     <tr>
+                        <th class="is-sortable" onclick="toggleStatusSort()">
+                            STATUS <i class="fa fa-sort sort-icon" id="statusSortIcon"></i>
+                        </th>
                         <th class="is-sortable" onclick="toggleDateIssuedSort()">
                             DATE ISSUED <i class="fa fa-sort sort-icon" id="dateIssuedSortIcon"></i>
                         </th>
@@ -34,11 +37,11 @@
                         <th class="is-sortable" onclick="toggleNatureOfDefectSort()">
                             NATURE OF DEFECT <i class="fa fa-sort sort-icon" id="natureOfDefectSortIcon"></i>
                         </th>
+                        <th class="is-sortable" onclick="toggleSiteWarehouseSort()">
+                            SITE WAREHOUSE <i class="fa fa-sort sort-icon" id="siteWarehouseIcon"></i>
+                        </th>
                         <th class="is-sortable" onclick="toggleCarClassificationSort()">
                             CAR CLASSIFICATION <i class="fa fa-sort sort-icon" id="carClassificationSortIcon"></i>
-                        </th>
-                        <th class="is-sortable" onclick="toggleStatusSort()">
-                            STATUS <i class="fa fa-sort sort-icon" id="statusSortIcon"></i>
                         </th>
                         <th class="main-actions-sticky">ACTIONS</th>
                     </tr>
@@ -47,7 +50,7 @@
                     @if (Model == null || Model.Count == 0)
             {
                         <tr class="main-empty-row">
-                            <td colspan="12">
+                            <td colspan="13">
                                 <div class="main-empty-state">
                                     <div class="main-empty-state-icon"><i class="fa fa-clipboard"></i></div>
                                     <div class="main-empty-state-title">No CAR reports yet</div>
@@ -76,7 +79,7 @@
                             }
 
     string allItemsText = capa.Items != null
-        ? string.Join(" ", capa.Items.Select(i => $"{i.ItemDescription} {i.DefectName} {i.DefectCategoryName}"))
+        ? string.Join(" ", capa.Items.Select(i => $"{i.ItemDescription} {i.DefectListDisplay} {i.DefectCategoryName}"))
         : "";
 
     string searchText = $"{capa.ReportNumber} {capa.IssuedBy} {capa.SiteWarehouseName} {capa.CarClassificationType} {capa.CarClassificationRefName} {allItemsText}".ToLower();
@@ -86,6 +89,9 @@
     bool hasMultipleItems = carItems.Count > 1;
 
                 <tr class="@(hasMultipleItems ? "has-items-expand" : "")" data-status="@statusKey" data-classification="@capa.CarClassificationType" data-created="@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("yyyy-MM-dd") : "")" data-search="@searchText" data-report-number="@capa.ReportNumber" onclick="toggleItemDetails(this, event)">
+                    <td>
+                        <span class="main-badge @badgeTone"><i class="fa fa-circle"></i>@statusText</span>
+                    </td>
                     <td class="main-tabular fw-semibold">@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("MMM dd, yyyy") : "")</td>
                     <td class="main-tabular">
                         <span class="capa-car-no">
@@ -110,11 +116,10 @@
                     <td class="main-tabular">@(firstItem?.UsedToDate != null && firstItem.UsedToDate.Value.Year > 1900 ? firstItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "-")</td>
                     <td>@(string.IsNullOrWhiteSpace(firstItem?.UOMDisplay) ? "-" : firstItem?.UOMDisplay)</td>
                     <td class="main-tabular">@((firstItem?.Quantity ?? 0) == 0 ? "-" : firstItem?.Quantity.ToString())</td>
-                    <td>@(string.IsNullOrWhiteSpace(firstItem?.DefectName) ? "-" : firstItem?.DefectName)</td>
+                    <td>@(string.IsNullOrWhiteSpace(firstItem?.DefectListDisplay) ? "-" : firstItem?.DefectListDisplay)</td>
+                    <td>@(string.IsNullOrWhiteSpace(capa.SiteWarehouseName) ? "-" : capa.SiteWarehouseName)</td>
                     <td>@capa.CarClassificationType</td>
-                    <td>
-                        <span class="main-badge @badgeTone"><i class="fa fa-circle"></i>@statusText</span>
-                    </td>
+
                     <td class="main-actions-sticky">
                         <a href="@Url.Action("CapaStatus", "Capa")?token=@capa.ResponseToken" class="btn btn-primary btn-sm" target="_blank" title="View CAR" aria-label="View CAR @capa.ReportNumber">View</a>
                     </td>
@@ -122,7 +127,7 @@
                         if (hasMultipleItems)
                         {
                 <tr class="item-detail-row d-none">
-                    <td colspan="12">
+                    <td colspan="13">
                         <table class="table capa-subtable">
                             <thead>
                                 <tr>
@@ -140,10 +145,10 @@
                                     <tr>
                                         <td class="main-tabular">@carItem.ItemCode</td>
                                         <td>@carItem.ItemDescription</td>
-                                        <td class="main-tabular">@(carItem.UsedToDate.HasValue ? carItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "")</td>
+                                        <td class="main-tabular">@(carItem.UsedToDate.HasValue && carItem.UsedToDate.Value.Year > 1900 ? carItem.UsedToDate.Value.ToString("MMM dd, yyyy") : "-")</td>
                                         <td>@carItem.UOMDisplay</td>
                                         <td class="main-tabular">@carItem.Quantity</td>
-                                        <td>@carItem.DefectName</td>
+                                        <td>@carItem.DefectListDisplay</td>
                                     </tr>
                                 }
                             </tbody>

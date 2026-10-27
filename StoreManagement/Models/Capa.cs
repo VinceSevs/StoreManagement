@@ -184,6 +184,25 @@ namespace IsseERP.Models
         public string DefectCategoryName { get; set; } // display only
         public DateTime? UsedToDate { get; set; }
         public string Remarks { get; set; }
+
+        // List/export display only. An "Other" defect has no DefectName — capa-form.js
+        // folds the typed text into Remarks as "Defect: <text>." on the first line,
+        // so recover it from there.
+        [JsonIgnore]
+        public string DefectListDisplay
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(DefectName)) return DefectName;
+                if (string.IsNullOrWhiteSpace(Remarks)) return "";
+
+                var firstLine = Remarks.Replace("\r", "").Split('\n')[0].Trim();
+                const string prefix = "Defect:";
+                if (!firstLine.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return "";
+
+                return firstLine.Substring(prefix.Length).Trim().TrimEnd('.').Trim();
+            }
+        }
         public string Hauler { get; set; }
         public short? AdjustmentQty { get; set; }
         public int? AdjustmentBy { get; set; } // FK -> tbl_UserAccount.id
