@@ -133,8 +133,9 @@
         function renderItemDropdown() {
             const query = itemSearch.value;
             if (!block._acMatches.length) {
-                itemDropdown.innerHTML = query.trim() ? '<div class="list-group-item text-secondary fst-italic small">No catalog match.</div>' : '';
-                itemDropdown.classList.toggle('open', !!query.trim());
+                const show = !!query.trim() || !!block._supplierItems;
+                itemDropdown.innerHTML = show ? '<div class="list-group-item text-secondary fst-italic small">' + (block._supplierItems ? 'No matching item for this supplier.' : 'No catalog match.') + '</div>' : '';
+                itemDropdown.classList.toggle('open', show);
                 return;
             }
             itemDropdown.innerHTML = block._acMatches.map((it, i) => `
@@ -168,12 +169,12 @@
         itemSearch.addEventListener('input', () => {
             itemIdField.value = '';
             itemCodeDisplay.value = '';
-            block._acMatches = filterCatalog(itemSearch.value);
+            block._acMatches = filterCatalog(itemSearch.value, block._supplierItems);
             block._acActiveIndex = -1;
             renderItemDropdown();
         });
         itemSearch.addEventListener('focus', () => {
-            block._acMatches = filterCatalog(itemSearch.value);
+            block._acMatches = filterCatalog(itemSearch.value, block._supplierItems);
             block._acActiveIndex = -1;
             renderItemDropdown();
         });
@@ -189,12 +190,132 @@
             if (!itemSearch.closest('.autocomplete-wrap').contains(e.target)) closeItemDropdown();
         });
     }
+
+    // Supplier comes first in each item block: the Item field stays locked until
+    // one is picked, and its suggestions are limited to that supplier's items.
+    function initSupplierSearch(block) {
+        const supplierSearch = block.querySelector('.supplier-search');
+        const supplierIdField = block.querySelector('.supplier-id-field');
+        const supplierDropdown = block.querySelector('.supplier-ac-dropdown');
+        const itemSearch = block.querySelector('.item-search');
+        const itemIdField = block.querySelector('[data-field="item_id"]');
+        const itemCodeDisplay = block.querySelector('.item-code-display');
+        if (!supplierSearch) return;
+
+        let matches = [];
+        let activeIndex = -1;
+        let loadToken = 0;
+
+        function filterVendors(query) {
+            const q = query.trim().toLowerCase();
+            const vendors = (window.CAPA_CONFIG && window.CAPA_CONFIG.vendors) || [];
+            const found = q
+                ? vendors.filter(v => (v.name || '').toLowerCase().includes(q))
+                : vendors;
+            return found.slice(0, 50);
+        }
+
+        function renderSupplierDropdown() {
+            if (!matches.length) {
+                supplierDropdown.innerHTML = '<div class="list-group-item text-secondary fst-italic small">No supplier match.</div>';
+                supplierDropdown.classList.add('open');
+                return;
+            }
+            const query = supplierSearch.value;
+            supplierDropdown.innerHTML = matches.map((v, i) => `
+                <button type="button" class="list-group-item list-group-item-action ${i === activeIndex ? 'active' : ''}" data-index="${i}">
+                    <span>${highlightMatch(v.name || '', query)}</span>
+                </button>
+            `).join('');
+            supplierDropdown.classList.add('open');
+            supplierDropdown.querySelectorAll('[data-index]').forEach(btn => {
+                btn.addEventListener('mousedown', () => selectSupplier(Number(btn.dataset.index)));
+            });
+        }
+
+        function closeSupplierDropdown() {
+            matches = [];
+            activeIndex = -1;
+            supplierDropdown.classList.remove('open');
+            supplierDropdown.innerHTML = '';
+        }
+
+        function lockItem() {
+            loadToken++;
+            block._supplierItems = null;
+            itemSearch.value = '';
+            itemIdField.value = '';
+            itemCodeDisplay.value = '';
+            itemSearch.disabled = true;
+            itemSearch.placeholder = 'Select a supplier first';
+        }
+
+        async function selectSupplier(i) {
+            const v = matches[i];
+            if (!v) return;
+            supplierSearch.value = v.name;
+            supplierIdField.value = v.id;
+            closeSupplierDropdown();
+
+            lockItem();
+            const token = loadToken;
+            itemSearch.placeholder = 'Loading supplier items…';
+            let items = [];
+            try {
+                const res = await fetch(window.CAPA_CONFIG.vendorItemListUrl + '?vendorId=' + encodeURIComponent(v.id));
+                if (res.ok) items = await res.json();
+            } catch (err) {
+                console.error('Could not load supplier items', err);
+            }
+            if (token !== loadToken) return; // supplier changed again while loading
+            block._supplierItems = items;
+            itemSearch.disabled = false;
+            itemSearch.placeholder = 'Search or pick an item…';
+            itemSearch.focus(); // opens the supplier's item list right away
+        }
+
+        supplierSearch.addEventListener('input', () => {
+            supplierIdField.value = '';
+            lockItem();
+            matches = filterVendors(supplierSearch.value);
+            activeIndex = -1;
+            renderSupplierDropdown();
+        });
+        supplierSearch.addEventListener('focus', () => {
+            matches = filterVendors(supplierSearch.value);
+            activeIndex = -1;
+            renderSupplierDropdown();
+        });
+        supplierSearch.addEventListener('keydown', (e) => {
+            if (!matches.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); activeIndex = Math.min(activeIndex + 1, matches.length - 1); renderSupplierDropdown(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); activeIndex = Math.max(activeIndex - 1, 0); renderSupplierDropdown(); }
+            else if (e.key === 'Enter') { if (activeIndex >= 0) { e.preventDefault(); selectSupplier(activeIndex); } }
+            else if (e.key === 'Escape') { closeSupplierDropdown(); }
+        });
+        // Typed text that isn't a picked supplier doesn't count — clear it on blur.
+        supplierSearch.addEventListener('blur', () => {
+            if (!supplierIdField.value) supplierSearch.value = '';
+        });
+        document.addEventListener('click', (e) => {
+            if (!supplierSearch.closest('.autocomplete-wrap').contains(e.target)) closeSupplierDropdown();
+        });
+
+        block.resetSupplier = () => {
+            supplierSearch.value = '';
+            supplierIdField.value = '';
+            closeSupplierDropdown();
+            lockItem();
+        };
+
+        lockItem();
+    }
+
     function populateDefectSelect(select) {
         if (!select) return;
         const current = select.value;
         select.innerHTML = '<option value="" disabled' + (current ? '' : ' selected') + '>Select defect&hellip;</option>' +
-            DEFECT_CATALOG.map(d => `<option value="${d.id}" data-category="${escapeHtml(d.category)}">${escapeHtml(d.name)}</option>`).join('') +
-            '<option value="other">Other (please specify)</option>';
+            DEFECT_CATALOG.map(d => `<option value="${d.id}" data-category="${escapeHtml(d.category)}">${escapeHtml(d.name)}</option>`).join('');
         if (current) select.value = current;
     }
 
@@ -210,7 +331,7 @@
 
         select.addEventListener('change', () => {
             const opt = select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
-            if (select.value === 'other') {
+            if (opt && opt.dataset.category === 'Other') {
                 categoryDisplay.value = 'Other';
                 otherInput.classList.remove('d-none');
             } else {
@@ -237,6 +358,7 @@
         document.getElementById('addItemBtn').parentElement.insertAdjacentElement('beforebegin', block);
         initItemAttachments(block);
         initItemAutocomplete(block);
+        initSupplierSearch(block);
         initVendorItemSelect(block);
         initDefectSelect(block);
         applyItemFieldsRequiredState(block);
@@ -317,6 +439,7 @@
         const block0 = document.getElementById('capaItemBlock0');
         initItemAttachments(block0);
         initItemAutocomplete(block0);
+        initSupplierSearch(block0);
         initVendorItemSelect(block0);
         initDefectSelect(block0);
     });

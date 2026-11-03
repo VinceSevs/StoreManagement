@@ -1,6 +1,6 @@
     <section class="capa-card stage-card capa-stage">
         <div class="main-view-card-header">
-            <h4><span class="capa-step">5</span>Product Disposition</h4>
+            <h4><span class="capa-step">5</span>Details of Non-conformance summary</h4>
         </div>
         @{ int itemNumber = 0; int photoIndex = 0; }
         @foreach (var capaItem in ViewBag.Capa.Items)
@@ -16,7 +16,7 @@
                         <input type="text" class="form-control readonly-field" value="@capaItem.ItemDescription" readonly>
                     </div>
                     <div class="col-md-6 main-form-group">
-                        <label class="form-label">Quantity for Disposal</label>
+                        <label class="form-label">Quantity</label>
                         <input type="text" class="form-control readonly-field" value="@capaItem.Quantity" readonly>
                     </div>
                     <div class="col-md-6 main-form-group">
@@ -36,7 +36,7 @@
                     </div>
                     <div class="col-md-6 main-form-group">
                         <label class="form-label">UTD</label>
-                        <input type="text" class="form-control readonly-field font-mono" value="@(capaItem.UsedToDate != null ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "")" readonly>
+                        <input type="text" class="form-control readonly-field font-mono" value="@(capaItem.UsedToDate != null && ((DateTime)capaItem.UsedToDate).Year > 1900 ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "-")" readonly>
                     </div>
                     <div class="col-12 main-form-group">
                         <label class="form-label">Remarks</label>

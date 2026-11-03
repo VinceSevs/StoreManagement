@@ -162,6 +162,7 @@
     <Compile Include="App_Data\BaseApiClient.cs" />
     <Compile Include="App_Data\Capaattachmentfileservice.cs" />
     <Compile Include="App_Data\CapaLogService.cs" />
+    <Compile Include="App_Data\CapaLoopHistoryStore.cs" />
     <Compile Include="App_Data\CapaService.cs" />
     <Compile Include="App_Data\HelperService.cs" />
     <Compile Include="App_Data\InboundService.cs" />

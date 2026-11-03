@@ -97,6 +97,13 @@
 		renderPage();
 	}
 
+	// CARs past their response due date are kept out of the main list and shown in
+	// the "due CARs" modal instead (see openDueModal). Searching or filtering lists
+	// every match, so nothing is hidden from the user's results.
+	function isDueRow(row) {
+		return row.getAttribute('data-due') === '1';
+	}
+
 	function renderPage() {
 		document.querySelectorAll('#capaTable tbody tr.item-detail-row').forEach(function (row) {
 			row.classList.add('d-none');
@@ -113,9 +120,14 @@
 			const matchesClassification = !currentClassificationFilter || row.getAttribute('data-classification') === currentClassificationFilter;
 			return matchesSearch && matchesStatus && matchesClassification;
 		});
-		lastMatchingRows = matchingRows;
+		lastMatchingRows = matchingRows; // export always covers every match, including the due CARs
 
-		const totalMatches = matchingRows.length;
+		const isFiltering = !!currentSearchQuery || currentStatusFilter !== 'all' || !!currentClassificationFilter;
+		const listRows = isFiltering
+			? matchingRows
+			: matchingRows.filter(function (r) { return !isDueRow(r); });
+
+		const totalMatches = listRows.length;
 		const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
 		if (currentPage > totalPages) currentPage = totalPages;
 		lastTotalPages = totalPages;
@@ -124,7 +136,7 @@
 		const endIndex = startIndex + PAGE_SIZE;
 
 		allRows.forEach(function (row) { row.style.display = 'none'; });
-		matchingRows.slice(startIndex, endIndex).forEach(function (row) { row.style.display = ''; });
+		listRows.slice(startIndex, endIndex).forEach(function (row) { row.style.display = ''; });
 
 		const infoEl = document.getElementById('capaPageInfo');
 		if (infoEl) {
@@ -195,6 +207,69 @@
 	document.getElementById('capaPageJumpInput').addEventListener('keydown', function (e) {
 		if (e.key === 'Enter') { e.preventDefault(); jumpToPage(); }
 	});
+
+	/* ---------- Due CARs modal (PAGE_SIZE rows per page) ---------- */
+	const dueModal = document.getElementById('capaDueModal');
+	let dueModalPage = 1;
+
+	function renderDueModal() {
+		const rows = Array.from(dueModal.querySelectorAll('#capaDueModalBody tr'));
+		const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+		if (dueModalPage > totalPages) dueModalPage = totalPages;
+
+		const start = (dueModalPage - 1) * PAGE_SIZE;
+		rows.forEach(function (row, i) {
+			row.style.display = (i >= start && i < start + PAGE_SIZE) ? '' : 'none';
+		});
+
+		document.getElementById('capaDueModalInfo').textContent =
+			rows.length === 0 ? '' : (start + 1) + ' to ' + Math.min(start + PAGE_SIZE, rows.length) + ' of ' + rows.length;
+
+		const pager = document.getElementById('capaDueModalPager');
+		pager.innerHTML = '';
+		if (totalPages <= 1) return;
+
+		function addBtn(label, page, opts) {
+			opts = opts || {};
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'btn main-pagination-btn' +
+				(opts.nav ? ' main-pagination-nav-btn' : '') +
+				(opts.active ? ' main-pagination-btn-active' : '');
+			btn.textContent = label;
+			btn.disabled = !!opts.disabled;
+			if (opts.active) btn.setAttribute('aria-current', 'page');
+			if (!opts.disabled && !opts.active) {
+				btn.addEventListener('click', function () { dueModalPage = page; renderDueModal(); });
+			}
+			pager.appendChild(btn);
+		}
+
+		addBtn('Previous', dueModalPage - 1, { disabled: dueModalPage === 1, nav: true });
+		for (let p = 1; p <= totalPages; p++) addBtn(String(p), p, { active: p === dueModalPage });
+		addBtn('Next', dueModalPage + 1, { disabled: dueModalPage === totalPages, nav: true });
+	}
+
+	function openDueModal() {
+		dueModalPage = 1;
+		renderDueModal();
+		dueModal.classList.add('is-open');
+		document.body.style.overflow = 'hidden';
+	}
+
+	function closeDueModal() {
+		dueModal.classList.remove('is-open');
+		document.body.style.overflow = '';
+	}
+
+	if (dueModal) {
+		document.getElementById('capaDueToggle').addEventListener('click', openDueModal);
+		document.getElementById('capaDueModalClose').addEventListener('click', closeDueModal);
+		dueModal.addEventListener('click', function (e) { if (e.target === dueModal) closeDueModal(); });
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && dueModal.classList.contains('is-open')) closeDueModal();
+		});
+	}
 
 	document.getElementById('capaSearch').addEventListener('input', function () {
 		currentSearchQuery = this.value.trim().toLowerCase();

@@ -159,6 +159,12 @@
                 <div class="col-12 main-form-group">
                     <label class="form-label">Root Cause Analysis</label>
                     <textarea class="form-control" name="RootCause" id="rootCause" rows="3" placeholder="5 Why, Fishbone, Pareto, etc." required></textarea>
+                    <div class="d-flex align-items-center gap-3 mt-2 mb-2 flex-wrap">
+                        <label for="rootCauseAttachInput" class="btn main-outline-btn mb-0 d-inline-flex align-items-center"><i class="fa fa-paperclip"></i> Attach analysis report <span class="fw-normal fst-italic ms-1">(optional)</span></label>
+                        <input type="file" id="rootCauseAttachInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple class="d-none" onchange="handleResponseAttachFiles(event, 'rootCause')">
+                        <span class="capa-muted">Images, PDF, Word, or Excel &mdash; multiple files allowed.</span>
+                    </div>
+                    <div id="rootCauseAttachGrid" class="row row-cols-2 row-cols-md-3 g-2"></div>
                 </div>
 
                 <div class="col-12 main-form-group">
@@ -180,7 +186,7 @@
                     </label>
                     <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
                         <label for="responseAttachInput" class="btn main-outline-btn mb-0 d-inline-flex align-items-center"><i class="fa fa-paperclip"></i> Add file(s)</label>
-                        <input type="file" id="responseAttachInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple class="d-none" onchange="handleResponseAttachFiles(event)">
+                        <input type="file" id="responseAttachInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple class="d-none" onchange="handleResponseAttachFiles(event, 'general')">
                         <span class="capa-muted">Images, PDF, Word, or Excel &mdash; multiple files allowed.</span>
                     </div>
                     <div id="responseAttachGrid" class="row row-cols-2 row-cols-md-3 g-2"></div>
@@ -222,4 +228,4 @@ window.CAPA_RESPONSE_DATA = {
 	attachmentPhotos: @Html.Raw(photoListJson)
 };
 </script>
-<script src="~/Scripts/capa/capa-response.js"></script>
+<script src="@Url.Content("~/Scripts/capa/capa-response.js")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Scripts/capa/capa-response.js")).Ticks"></script>

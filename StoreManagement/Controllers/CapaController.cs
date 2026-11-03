@@ -38,6 +38,17 @@ namespace IsseERP.Controllers
         public async Task<ActionResult> CapaList()
         {
             var reports = await _capaService.GetAllCapaReports();
+
+            // A CAR that was sent back gets a fresh 7 working days from the day it was
+            // sent back. That date only exists in the loop history files.
+            var historyStore = new CapaLoopHistoryStore(Server.MapPath("~/App_Data/CapaLoopHistory"));
+            foreach (var report in reports.Where(r => r.LoopNumber > 0 && r.StatusKey == "response"))
+            {
+                var lastRound = historyStore.GetForReport(report.ReportNumber).LastOrDefault();
+                if (lastRound != null && lastRound.SentBackDate > new DateTime(1900, 1, 2))
+                    report.LastSentBackDate = lastRound.SentBackDate;
+            }
+
             return View(reports);
         }
 
@@ -232,14 +243,7 @@ namespace IsseERP.Controllers
                 var fileService = new CapaAttachmentFileService(attachmentsRoot);
                 foreach (var item in model.Items)
                 {
-                    if (item.LineNumber == 1)
-                    {
-                        fileService.SaveAttachments(reportNumber, item.Attachments);
-                    }
-                    else
-                    {
-                        fileService.SaveItemAttachments(reportNumber, item.LineNumber, item.Attachments);
-                    }
+                    fileService.SaveItemAttachments(reportNumber, item.LineNumber, item.Attachments);
                 }
 
                 await _capaLogService.AddLog(
@@ -286,9 +290,7 @@ namespace IsseERP.Controllers
             var allAttachments = new List<SavedAttachment>();
             foreach (var item in capa.Items)
             {
-                var photos = item.LineNumber == 1
-                    ? fileService.GetAttachmentsByCapaNo(capa.ReportNumber)
-                    : fileService.GetItemAttachmentsByCapaNo(capa.ReportNumber, item.LineNumber);
+                var photos = fileService.GetItemAttachmentsByCapaNo(capa.ReportNumber, item.LineNumber);
                 itemAttachments[item.LineNumber] = photos;
                 allAttachments.AddRange(photos);
             }
@@ -334,6 +336,12 @@ namespace IsseERP.Controllers
                 "Cancel CAR",
                 CurrentUserID());
 
+            if (capaBeforeCancel != null)
+            {
+                await _capaService.NotifyStatusChanged(
+                    capaBeforeCancel.EventID, token, CapaStatuses.Cancelled, User?.Identity?.Name);
+            }
+
             return Json(new
             {
                 success = true
@@ -372,6 +380,31 @@ namespace IsseERP.Controllers
                 });
             }
 
+            // The response page already hides the form for these, but a form opened before
+            // QA cancelled (or a direct post) must not get through either.
+            var capaBeforeResponse = await _capaService.GetCapaByToken(request.ResponseToken);
+            if (capaBeforeResponse == null)
+            {
+                Response.StatusCode = 404;
+                return Json(new
+                {
+                    success = false,
+                    message = "This CAR could not be found."
+                });
+            }
+            if (capaBeforeResponse.StatusKey != "response")
+            {
+                Response.StatusCode = 400;
+                string reason = capaBeforeResponse.StatusKey == "cancelled"
+                    ? "This CAR has been cancelled, so a response can no longer be submitted. Please contact QA."
+                    : "This CAR is no longer waiting for a response.";
+                return Json(new
+                {
+                    success = false,
+                    message = reason
+                });
+            }
+
             bool success = await _capaService.SubmitSendeeResponse(request);
 
             if (!success)
@@ -386,7 +419,9 @@ namespace IsseERP.Controllers
 
             var respondedCapa = await _capaService.GetCapaByToken(request.ResponseToken);
 
-            if (request.Attachments != null && request.Attachments.Count > 0)
+            bool hasGeneral = request.Attachments != null && request.Attachments.Count > 0;
+            bool hasRootCause = request.RootCauseAttachments != null && request.RootCauseAttachments.Count > 0;
+            if (hasGeneral || hasRootCause)
             {
                 try
                 {
@@ -394,7 +429,13 @@ namespace IsseERP.Controllers
                     {
                         string attachmentsRoot = Server.MapPath("~/App_Data/CapaAttachments");
                         var fileService = new CapaAttachmentFileService(attachmentsRoot);
-                        fileService.SaveResponseAttachments(respondedCapa.ReportNumber, request.Attachments);
+                        // loopNumber is 0 on the first response and goes up by one each
+                        // time QA sends the CAR back, so this is the response round.
+                        int round = respondedCapa.LoopNumber + 1;
+                        if (hasGeneral)
+                            fileService.SaveResponseAttachments(respondedCapa.ReportNumber, request.Attachments, round);
+                        if (hasRootCause)
+                            fileService.SaveResponseAttachments(respondedCapa.ReportNumber, request.RootCauseAttachments, round, "RootCause");
                     }
                 }
                 catch (Exception attachEx)
@@ -410,6 +451,12 @@ namespace IsseERP.Controllers
                 $"{(!string.IsNullOrWhiteSpace(respondentEmail) ? respondentEmail : "Unknown respondent")} submitted a response",
                 "Submit Response",
                 1);
+
+            if (respondedCapa != null)
+            {
+                await _capaService.NotifyStatusChanged(
+                    respondedCapa.EventID, request.ResponseToken, CapaStatuses.AwaitingVerification, respondentEmail);
+            }
 
             return Json(new 
             { 
@@ -449,9 +496,7 @@ namespace IsseERP.Controllers
             var itemAttachments = new Dictionary<int, List<SavedAttachment>>();
             foreach (var item in capa.Items)
             {
-                itemAttachments[item.LineNumber] = item.LineNumber == 1
-                    ? fileService.GetAttachmentsByCapaNo(capa.ReportNumber)
-                    : fileService.GetItemAttachmentsByCapaNo(capa.ReportNumber, item.LineNumber);
+                itemAttachments[item.LineNumber] = fileService.GetItemAttachmentsByCapaNo(capa.ReportNumber, item.LineNumber);
             }
 
             ViewBag.Capa = capa;
@@ -477,10 +522,54 @@ namespace IsseERP.Controllers
             }
 
             var capaBeforeVerify = await _capaService.GetCapaByToken(request.ResponseToken);
+
+            // Sending a CAR back (Not Effective) clears the response. Save a copy of it as
+            // this round's history first; if that can't be written, don't send it back.
+            var historyStore = new CapaLoopHistoryStore(Server.MapPath("~/App_Data/CapaLoopHistory"));
+            int? historyRound = null;
+            if (!request.IsEffective && capaBeforeVerify != null && !string.IsNullOrWhiteSpace(capaBeforeVerify.ImmediateAction))
+            {
+                try
+                {
+                    var snapshot = new CapaLoopHistoryEntry
+                    {
+                        RoundNumber = capaBeforeVerify.LoopNumber + 1,
+                        ImmediateAction = capaBeforeVerify.ImmediateAction,
+                        IaPerson = capaBeforeVerify.IaPerson,
+                        IaTargetDate = capaBeforeVerify.IaTargetDate,
+                        RootCause = capaBeforeVerify.RootCause,
+                        CapaActions = capaBeforeVerify.CapaActions,
+                        CapaPerson = capaBeforeVerify.CapaPerson,
+                        CapaTargetDate = capaBeforeVerify.CapaTargetDate,
+                        VerificationNotes = request.VerificationNotes,
+                        SentBackBy = request.VerifiedByUsername,
+                        SentBackDate = DateTime.Now
+                    };
+                    historyStore.Save(capaBeforeVerify.ReportNumber, snapshot);
+                    historyRound = snapshot.RoundNumber;
+                }
+                catch (Exception historyEx)
+                {
+                    System.Diagnostics.Trace.TraceError("CAR loop history save failed: " + historyEx);
+                    Response.StatusCode = 500;
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Could not save the response history, so the CAR was not sent back. Please try again."
+                    });
+                }
+            }
+
             bool success = await _capaService.SubmitVerification(request);
 
             if (!success)
             {
+                // The send-back didn't happen, so the round isn't history.
+                if (historyRound.HasValue)
+                {
+                    try { historyStore.Delete(capaBeforeVerify.ReportNumber, historyRound.Value); } catch { }
+                }
+
                 Response.StatusCode = 500;
                 return Json(new
                 {
@@ -493,6 +582,17 @@ namespace IsseERP.Controllers
                 $"Submitted verification for {(capaBeforeVerify != null ? capaBeforeVerify.ReportNumber : request.ResponseToken)} — {(request.IsEffective ? "Effective" : "Not Effective")}",
                 "Submit Verification",
                 CurrentUserID());
+
+            if (capaBeforeVerify != null)
+            {
+                // Effective closes the CAR; Not Effective sends it back to the respondent.
+                await _capaService.NotifyStatusChanged(
+                    capaBeforeVerify.EventID,
+                    request.ResponseToken,
+                    request.IsEffective ? CapaStatuses.Closed : CapaStatuses.AwaitingResponse,
+                    request.VerifiedByUsername ?? User?.Identity?.Name,
+                    request.VerificationNotes);
+            }
 
             return Json(new
             {
@@ -521,11 +621,21 @@ namespace IsseERP.Controllers
             var allAttachments = new List<SavedAttachment>();
             foreach (var item in capa.Items)
             {
-                var photos = item.LineNumber == 1
-                    ? fileService.GetAttachmentsByCapaNo(capa.ReportNumber)
-                    : fileService.GetItemAttachmentsByCapaNo(capa.ReportNumber, item.LineNumber);
+                var photos = fileService.GetItemAttachmentsByCapaNo(capa.ReportNumber, item.LineNumber);
                 itemAttachments[item.LineNumber] = photos;
                 allAttachments.AddRange(photos);
+            }
+
+            // History of earlier rounds QA sent back: loaded only for IT, so for anyone
+            // else the data never reaches the view.
+            if (UserAccess.CanViewCarLoopHistory(UserAccess.Current(HttpContext)))
+            {
+                var loopHistory = new CapaLoopHistoryStore(Server.MapPath("~/App_Data/CapaLoopHistory")).GetForReport(capa.ReportNumber);
+                foreach (var round in loopHistory)
+                {
+                    round.Attachments = fileService.GetResponseAttachmentsForRound(capa.ReportNumber, round.RoundNumber);
+                }
+                ViewBag.LoopHistory = loopHistory;
             }
 
             ViewBag.Capa = capa;

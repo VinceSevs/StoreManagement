@@ -100,6 +100,42 @@ namespace IsseERP.Services
             return true;
         }
 
+        /// <summary>
+        /// Tells the email API that a CAR changed status. Best effort: the status
+        /// change is already saved by the time this runs, so a failure here is logged
+        /// and swallowed instead of failing the user's action.
+        /// </summary>
+        public async Task NotifyStatusChanged(int eventId, string responseToken, string status, string changedBy, string remarks = null)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(new
+                {
+                    EventID = eventId,
+                    ResponseToken = responseToken,
+                    Status = status,
+                    ChangedBy = changedBy,
+                    Remarks = remarks
+                });
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                using (var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(15)))
+                {
+                    var response = await _httpClient.PostAsync("api/car-email/status-changed", content, cts.Token);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string body = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Trace.TraceError(
+                            $"api/car-email/status-changed returned {(int)response.StatusCode} {response.StatusCode} for event {eventId}: {body}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("api/car-email/status-changed failed for event " + eventId + ": " + ex.Message);
+            }
+        }
+
         public async Task<List<CapaReportModel>> GetAllCapaReports()
         {
             var reports = new List<CapaReportModel>();
@@ -275,8 +311,9 @@ namespace IsseERP.Services
                             UOMID = reader["UOMID"] as short?,
                             UOMDisplay = !string.IsNullOrEmpty(uomText) ? uomText + (string.IsNullOrEmpty(uomIso) ? "" : " - " + uomIso) : null,
                             DefectCategoryID = defectCategoryId,
-                            DefectName = defectEntry?.Name,
-                            DefectCategoryName = defectEntry?.Category,
+                            // "Other" has no name of its own; the pages show it from Remarks.
+                            DefectName = defectCategoryId == DefectCatalogData.OtherId ? null : defectEntry?.Name,
+                            DefectCategoryName = defectCategoryId == DefectCatalogData.OtherId ? null : defectEntry?.Category,
                             UsedToDate = reader["UsedToDate"] as DateTime?,
                             Remarks = reader["Remarks"] as string,
                             Hauler = reader["Hauler"] as string,
@@ -481,33 +518,14 @@ namespace IsseERP.Services
                 WHERE ResponseToken = @ResponseToken
             ";
 
-            bool reset;
+            // The respondent is emailed by api/car-email/status-changed, which the
+            // controller calls after this returns.
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@ResponseToken", token);
                 int rows = await cmd.ExecuteNonQueryAsync();
-                reset = rows > 0;
+                return rows > 0;
             }
-
-            if (reset)
-            {
-                try
-                {
-                    var capa = await GetCapaByToken(token);
-                    if (capa != null)
-                    {
-                        var json = JsonConvert.SerializeObject(capa);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-                        await _httpClient.PostAsync("api/capa/respond-again", content);
-                    }
-                }
-                catch
-                {
-                    // Swallow — the reset itself already succeeded.
-                }
-            }
-
-            return reset;
         }
 
         // The external api/capa/insert decides the initial Status; make sure a

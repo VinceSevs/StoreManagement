@@ -87,7 +87,7 @@ namespace IsseERP.Services
             const string query = @"
                 SELECT DISTINCT VI.ItemID, I.item_code, I.item_desc
                 FROM tbl_Vendor V
-                INNER JOIN tbl_VendorItemPrice_Log VI ON V.VendorID = VI.VendorID
+                INNER JOIN tbl_ItemVendor VI ON V.VendorID = VI.VendorID
                 INNER JOIN tbl_Item I ON VI.ItemID = I.id
                 WHERE V.VendorID = @VendorID
                 ORDER BY I.item_desc

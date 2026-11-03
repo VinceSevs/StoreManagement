@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace IsseERP.Services
@@ -21,98 +22,26 @@ namespace IsseERP.Services
 
 		/// <summary>
 		/// Decodes each attachment's data URL and writes it to
-		/// {root}/{capaNo}/attachment_NN.ext. Returns the relative path (not
+		/// {root}/{capaNo}/NonConformance_Item1_NN.ext (item 1's "Photo / Document
+		/// Attachments" — the name says which field and item it came from). Returns the relative path (not
 		/// the full disk path) to store in the database, so the DB stays
 		/// portable if the app ever moves servers or drives.
 		/// </summary>
 		public List<SavedAttachment> SaveAttachments(string capaNo, List<CapaAttachmentModel> attachments)
 		{
-			var results = new List<SavedAttachment>();
-			if (attachments == null || attachments.Count == 0) return results;
-
-			string folderPath = Path.Combine(_rootPhysicalPath, capaNo);
-			Directory.CreateDirectory(folderPath); // no-op if it already exists
-
-			int i = 0;
-			foreach (var attachment in attachments)
-			{
-				i++;
-				if (attachment == null || string.IsNullOrWhiteSpace(attachment.DataUrl)) continue;
-
-				string contentType;
-				byte[] bytes = ParseDataUrl(attachment.DataUrl, out contentType);
-				if (bytes == null) continue; // skip anything that isn't a valid data URL
-
-				string extension = GetExtension(contentType);
-				string fileName = $"attachment_{i:D2}{extension}";
-				string fullPath = Path.Combine(folderPath, fileName);
-
-				File.WriteAllBytes(fullPath, bytes);
-
-				results.Add(new SavedAttachment
-				{
-					FilePath = (capaNo + "/" + fileName),
-					Caption = attachment.Caption,
-					ContentType = contentType
-				});
-			}
-
-			return results;
+			return SaveItemAttachments(capaNo, 1, attachments);
 		}
 
 		/// <summary>
-		/// Saves one item's photos into {root}/{capaNo}/Item{lineNumber}/attachment_NN.ext
-		/// so multiple items on the same CAPA never collide with each other's files.
-		/// Item 1 also gets written to the flat {root}/{capaNo}/ folder (via
-		/// SaveAttachments) so existing single-item pages keep working unchanged.
+		/// Saves one item's photos into the CAR's single folder as
+		/// {root}/{capaNo}/NonConformance_Item{lineNumber}_NN.ext. The item number
+		/// in the filename keeps multiple items on the same CAPA from colliding.
 		/// </summary>
 		public List<SavedAttachment> SaveItemAttachments(string capaNo, int lineNumber, List<CapaAttachmentModel> attachments)
 		{
 			var results = new List<SavedAttachment>();
 			if (attachments == null || attachments.Count == 0) return results;
 
-			string folderPath = Path.Combine(_rootPhysicalPath, capaNo, "Item" + lineNumber);
-			Directory.CreateDirectory(folderPath);
-
-			int i = 0;
-			foreach (var attachment in attachments)
-			{
-				i++;
-				if (attachment == null || string.IsNullOrWhiteSpace(attachment.DataUrl)) continue;
-
-				string contentType;
-				byte[] bytes = ParseDataUrl(attachment.DataUrl, out contentType);
-				if (bytes == null) continue;
-
-				string extension = GetExtension(contentType);
-				string fileName = $"attachment_{i:D2}{extension}";
-				string fullPath = Path.Combine(folderPath, fileName);
-
-				File.WriteAllBytes(fullPath, bytes);
-
-				results.Add(new SavedAttachment
-				{
-					FilePath = capaNo + "/Item" + lineNumber + "/" + fileName,
-					Caption = attachment.Caption,
-					ContentType = contentType
-				});
-			}
-
-			return results;
-		}
-
-		/// <summary>
-		/// Saves the respondent's optional supporting-document photos into the
-		/// same CapaNo folder as the original filing, using a "response_NN"
-		/// filename prefix so they never collide with the filer's existing
-		/// "attachment_NN" files. Both show up together when
-		/// GetAttachmentsByCapaNo lists the folder.
-		/// </summary>
-		public List<SavedAttachment> SaveResponseAttachments(string capaNo, List<CapaAttachmentModel> attachments)
-		{
-			var results = new List<SavedAttachment>();
-			if (attachments == null || attachments.Count == 0) return results;
-
 			string folderPath = Path.Combine(_rootPhysicalPath, capaNo);
 			Directory.CreateDirectory(folderPath);
 
@@ -127,7 +56,52 @@ namespace IsseERP.Services
 				if (bytes == null) continue;
 
 				string extension = GetExtension(contentType);
-				string fileName = $"response_{i:D2}{extension}";
+				string fileName = $"NonConformance_Item{lineNumber}_{i:D2}{extension}";
+				string fullPath = Path.Combine(folderPath, fileName);
+
+				File.WriteAllBytes(fullPath, bytes);
+
+				results.Add(new SavedAttachment
+				{
+					FilePath = capaNo + "/" + fileName,
+					Caption = attachment.Caption,
+					ContentType = contentType
+				});
+			}
+
+			return results;
+		}
+
+		/// <summary>
+		/// Saves the respondent's optional files into the CAR's single folder as
+		/// "response_R{round}_NN.ext", or "response_R{round}_{fieldKey}_NN.ext" when
+		/// fieldKey is given (e.g. response_R2_RootCause_01.pdf). The name says
+		/// which response round and which form field the file came from, so a
+		/// later round (after a Not Effective verification) never overwrites an
+		/// earlier one. round 1 is the first response.
+		/// </summary>
+		public List<SavedAttachment> SaveResponseAttachments(string capaNo, List<CapaAttachmentModel> attachments, int round, string fieldKey = null)
+		{
+			var results = new List<SavedAttachment>();
+			if (attachments == null || attachments.Count == 0) return results;
+
+			string folderPath = Path.Combine(_rootPhysicalPath, capaNo);
+			Directory.CreateDirectory(folderPath);
+
+			string prefix = $"response_R{round}_" + (string.IsNullOrWhiteSpace(fieldKey) ? "" : fieldKey + "_");
+
+			int i = 0;
+			foreach (var attachment in attachments)
+			{
+				i++;
+				if (attachment == null || string.IsNullOrWhiteSpace(attachment.DataUrl)) continue;
+
+				string contentType;
+				byte[] bytes = ParseDataUrl(attachment.DataUrl, out contentType);
+				if (bytes == null) continue;
+
+				string extension = GetExtension(contentType);
+				string fileName = $"{prefix}{i:D2}{extension}";
 				string fullPath = Path.Combine(folderPath, fileName);
 
 				File.WriteAllBytes(fullPath, bytes);
@@ -174,27 +148,87 @@ namespace IsseERP.Services
 		}
 
 		/// <summary>
-		/// Lists whatever image files already exist in one item's own
-		/// {root}/{capaNo}/Item{lineNumber}/ subfolder — the counterpart to
-		/// GetAttachmentsByCapaNo for items 2+ (item 1's photos live in the
-		/// flat {root}/{capaNo}/ folder instead, via GetAttachmentsByCapaNo).
+		/// Lists the respondent's files from one response round
+		/// ("response_R{round}_*"), for the loop history. Files saved before the
+		/// round was added to the name have no round and aren't listed here.
+		/// </summary>
+		public List<SavedAttachment> GetResponseAttachmentsForRound(string capaNo, int round)
+		{
+			var results = new List<SavedAttachment>();
+			if (string.IsNullOrWhiteSpace(capaNo)) return results;
+
+			string folderPath = Path.Combine(_rootPhysicalPath, capaNo);
+			if (!Directory.Exists(folderPath)) return results;
+
+			string prefix = $"response_R{round}_";
+			foreach (var filePath in Directory.GetFiles(folderPath).OrderBy(f => f))
+			{
+				string name = Path.GetFileName(filePath);
+				if (!name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+
+				results.Add(new SavedAttachment
+				{
+					FilePath = capaNo + "/" + name,
+					ContentType = GetContentTypeFromExtension(Path.GetExtension(filePath)),
+					Caption = null
+				});
+			}
+			return results;
+		}
+
+		private static readonly Regex ItemFilePattern =
+			new Regex(@"^NonConformance_Item(\d+)_", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+		/// <summary>
+		/// Lists the files that belong to one item. Every file of a CAR lives in
+		/// the single {root}/{capaNo}/ folder; the filer's files for item N are
+		/// "NonConformance_ItemN_NN.ext". Item 1 also lists the files that don't
+		/// belong to a specific other item — the respondent's "response_*" files
+		/// and CARs filed before the rename ("attachment_NN") — so those keep
+		/// showing exactly where they did. Items 2+ also read the legacy
+		/// {capaNo}/Item{N}/ subfolder older CARs were saved to.
 		/// </summary>
 		public List<SavedAttachment> GetItemAttachmentsByCapaNo(string capaNo, int lineNumber)
 		{
 			var results = new List<SavedAttachment>();
 			if (string.IsNullOrWhiteSpace(capaNo)) return results;
 
-			string folderPath = Path.Combine(_rootPhysicalPath, capaNo, "Item" + lineNumber);
-			if (!Directory.Exists(folderPath)) return results;
-
-			foreach (var filePath in Directory.GetFiles(folderPath).OrderBy(f => f))
+			string folderPath = Path.Combine(_rootPhysicalPath, capaNo);
+			if (Directory.Exists(folderPath))
 			{
-				results.Add(new SavedAttachment
+				foreach (var filePath in Directory.GetFiles(folderPath).OrderBy(f => f))
 				{
-					FilePath = capaNo + "/Item" + lineNumber + "/" + Path.GetFileName(filePath),
-					ContentType = GetContentTypeFromExtension(Path.GetExtension(filePath)),
-					Caption = null
-				});
+					string name = Path.GetFileName(filePath);
+					var match = ItemFilePattern.Match(name);
+					bool belongsHere = match.Success
+						? int.Parse(match.Groups[1].Value) == lineNumber
+						: lineNumber == 1;
+					if (!belongsHere) continue;
+
+					results.Add(new SavedAttachment
+					{
+						FilePath = capaNo + "/" + name,
+						ContentType = GetContentTypeFromExtension(Path.GetExtension(filePath)),
+						Caption = null
+					});
+				}
+			}
+
+			if (lineNumber > 1)
+			{
+				string legacyFolder = Path.Combine(folderPath, "Item" + lineNumber);
+				if (Directory.Exists(legacyFolder))
+				{
+					foreach (var filePath in Directory.GetFiles(legacyFolder).OrderBy(f => f))
+					{
+						results.Add(new SavedAttachment
+						{
+							FilePath = capaNo + "/Item" + lineNumber + "/" + Path.GetFileName(filePath),
+							ContentType = GetContentTypeFromExtension(Path.GetExtension(filePath)),
+							Caption = null
+						});
+					}
+				}
 			}
 
 			return results;

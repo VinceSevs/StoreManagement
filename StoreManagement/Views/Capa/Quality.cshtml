@@ -109,7 +109,7 @@
                 <div class="row g-3 capa-grid mb-3">
                     <div class="col-md-6 main-form-group">
                         <label class="form-label">
-                            Issued By <i class="fw-normal fst-italic">(Name / Department)</i>
+                            Issued By <span class="capa-required" aria-hidden="true">*</span> <i class="fw-normal fst-italic">(Name / Department)</i>
                         </label>
                         <input type="text" class="form-control capa-autofill" name="issued_by" id="issuedByInput" value="@IsseERP.Models.MySession.Current.FullName" readonly>
                         <div class="form-text">
@@ -122,7 +122,7 @@
 
                     <div class="col-md-6 main-form-group">
                         <label class="form-label">
-                            Ref. No. <i id="tempRefNoOptionalHint" class="fw-normal fst-italic">(not required for LLII / DC Site)</i>
+                            Ref. No. <span class="capa-required" id="refNoRequiredMark" aria-hidden="true">*</span> <i id="tempRefNoOptionalHint" class="fw-normal fst-italic">(not required for LLII / DC Site)</i>
                             <span id="refNoOptionalHint" class="fw-normal fst-italic d-none">(not required for LLII / DC Site)</span>
                         </label>
                         <input type="text" id="removeReadonly" class="form-control font-mono capa-autofill" name="ref_no" readonly>
@@ -130,7 +130,7 @@
 
                     <div class="col-md-6 main-form-group">
                         <label class="form-label">
-                            Issued to <i class="fw-normal fst-italic">(Department)</i>
+                            Issued to <span class="capa-required" aria-hidden="true">*</span> <i class="fw-normal fst-italic">(Department)</i>
                         </label>
                         <select class="form-control" name="issued_to" id="issuedToSelect" required>
                             <option value="" disabled selected>Select department&hellip;</option>
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="col-md-6 main-form-group">
-                        <label class="form-label">Site Warehouse</label>
+                        <label class="form-label">Site Warehouse <span class="capa-required" aria-hidden="true">*</span></label>
                         <select class="form-control" name="site_warehouse" id="siteWarehouseSelect" onchange="handleWarehouseChange()" required>
                             <option value="" disabled selected>Select warehouse&hellip;</option>
                             @foreach (var w in ViewBag.Warehouse)
@@ -163,7 +163,7 @@
                     <div class="col-md-6">
                         <div class="capa-panel" id="nonconformanceTypeSection">
                             <div class="capa-panel-title">
-                                Type of Non-conformance <span>(select one)</span>
+                                Type of Non-conformance <span class="capa-required" aria-hidden="true">*</span> <span>(select one)</span>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <input type="radio" class="btn-check" name="nonconformance_type" id="ncType1" value="ProductQualityFoodSafety" onchange="handleNonconformanceTypeChange()" autocomplete="off" required>
@@ -194,7 +194,7 @@
                     <div class="col-md-6">
                         <div class="capa-panel" id="carClassificationSection">
                             <div class="capa-panel-title">
-                                CAR Classification <span>(select one)</span>
+                                CAR Classification <span class="capa-required" aria-hidden="true">*</span> <span>(select one)</span>
                             </div>
                             <div class="d-flex flex-column gap-2">
                                 <div class="form-check">
@@ -210,10 +210,11 @@
                                     <input class="form-check-input" type="radio" name="car_classification_type" id="carTrucker" value="Trucker" onchange="handleCarClassificationChange()" required>
                                     <label class="form-check-label" for="carTrucker">Trucker</label>
                                 </div>
+                                @* DC Site classification hidden.
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="car_classification_type" id="carDcSite" value="DCSite" onchange="handleCarClassificationChange()" required>
                                     <label class="form-check-label" for="carDcSite">DC Site</label>
-                                </div>
+                                </div>*@
 
                             </div>
                             <div id="carClassificationDetail" class="main-form-group mt-2">
@@ -239,7 +240,15 @@
                                         <option value="@dc.ExternalCode" data-name="@dc.WarehouseName" data-email="@dcEmail">@dc.WarehouseName (@dcEmail)</option>
                                     }
                                 </select>
-                                <input type="text" id="carOtherText" class="form-control d-none" placeholder="name@leadlogistics.com.ph, name2@leadlogistics.com.ph" title="One or more email addresses, separated by a comma or semicolon" required>
+                                @* LLII / Others: email recipients as chips. *@
+                                <div id="carOtherText" class="capa-email-field d-none">
+                                    <div class="capa-chip-input" data-list="to">
+                                        <input type="text" id="carToInput" class="capa-chip-text" placeholder="name@leadlogistics.com.ph" autocomplete="off" inputmode="email" aria-describedby="carEmailHint">
+                                    </div>
+
+                                    <div id="carEmailHint" class="capa-email-hint">Press Enter, comma or Tab to add an address. Click &times; to remove one.</div>
+                                    <div id="carEmailError" class="capa-email-error d-none" role="alert"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -267,10 +276,11 @@
 </div>
 
 
-<script src="~/Scripts/capa/quality.js"></script>
+<script src="@Url.Content("~/Scripts/capa/quality.js")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Scripts/capa/quality.js")).Ticks"></script>
 
 <script>
 	window.CAPA_CONFIG = {
+			vendors: @Html.Raw(Json.Encode(((IEnumerable<dynamic>)ViewBag.Vendor).Select(v => new { id = v.VendorID, name = v.VendorName }))),
 		itemCatalogUrl: '@Url.Action("Catalog", "Capa")',
 		defectCatalogUrl: '@Url.Action("DefectCatalog", "Capa")',
 		vendorItemListUrl: '@Url.Action("VendorItemList", "Capa")',

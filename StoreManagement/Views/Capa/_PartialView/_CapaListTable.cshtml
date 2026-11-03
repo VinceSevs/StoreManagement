@@ -2,7 +2,71 @@
 @using System.Linq
 @{
     Func<IsseERP.Models.CapaReportModel, string> computeStatusKey = (Func<IsseERP.Models.CapaReportModel, string>)ViewData["CapaList_ComputeStatusKey"];
+    int dueCount = Model == null ? 0 : Model.Count(c => c.IsResponseDue);
 }
+        @if (dueCount > 0)
+        {
+            <div class="capa-due-bar" role="status">
+                <span class="capa-due-bar-text">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <strong>@dueCount</strong> CAR@(dueCount == 1 ? "" : "s") still awaiting a response past the @IsseERP.Models.CapaReportModel.ResponseDueWorkingDays working-day due date
+                </span>
+                <button type="button" class="btn btn-sm capa-due-toggle" id="capaDueToggle" aria-haspopup="dialog">Show due CARs</button>
+            </div>
+
+            <div class="capa-modal-overlay" id="capaDueModal" role="dialog" aria-modal="true" aria-labelledby="capaDueModalTitle">
+                <div class="capa-modal">
+                    <div class="capa-modal-header">
+                        <h5 class="capa-modal-title" id="capaDueModalTitle"><i class="fa fa-exclamation-triangle"></i> CARs due for response</h5>
+                        <button type="button" class="capa-modal-close" id="capaDueModalClose" aria-label="Close">&times;</button>
+                    </div>
+                    <div class="capa-modal-body">
+                        <div class="table-responsive">
+                            <table class="table main-list-table capa-table">
+                                <thead>
+                                    <tr>
+                                        <th>DUE DATE</th>
+                                        <th>CAR NO.</th>
+                                        <th>DATE ISSUED</th>
+                                        <th>DESCRIPTION</th>
+                                        <th>SITE WAREHOUSE</th>
+                                        <th>CAR CLASSIFICATION</th>
+                                        <th class="main-actions-sticky">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="capaDueModalBody">
+                                    @foreach (var due in Model.Where(c => c.IsResponseDue).OrderBy(c => c.ResponseDueDate).ThenBy(c => c.ReportNumber))
+                                    {
+                                        var dueFirstItem = due.Items != null && due.Items.Count > 0 ? due.Items[0] : null;
+                                        <tr>
+                                            <td class="main-tabular fw-semibold">@(due.ResponseDueDate.Value.ToString("MMM dd, yyyy"))</td>
+                                            <td class="main-tabular">
+                                                <span class="main-chip">@due.ReportNumber</span>
+                                                @if (due.Items != null && due.Items.Count > 1)
+                                                {
+                                                    <span class="main-badge">+@(due.Items.Count - 1) more</span>
+                                                }
+                                            </td>
+                                            <td class="main-tabular">@(due.DateCreated.HasValue ? due.DateCreated.Value.ToString("MMM dd, yyyy") : "")</td>
+                                            <td>@(string.IsNullOrWhiteSpace(dueFirstItem?.ItemDescription) ? "-" : dueFirstItem.ItemDescription)</td>
+                                            <td>@(string.IsNullOrWhiteSpace(due.SiteWarehouseName) ? "-" : due.SiteWarehouseName)</td>
+                                            <td>@due.CarClassificationType</td>
+                                            <td class="main-actions-sticky">
+                                                <a href="@Url.Action("CapaStatus", "Capa")?token=@due.ResponseToken" class="btn btn-primary btn-sm" target="_blank" title="View CAR" aria-label="View CAR @due.ReportNumber">View</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="capa-modal-footer">
+                        <span class="main-pagination-summary" id="capaDueModalInfo"></span>
+                        <div class="main-pagination-controls" id="capaDueModalPager"></div>
+                    </div>
+                </div>
+            </div>
+        }
         <div class="table-responsive">
             <table class="table main-list-table capa-table" id="capaTable">
                 <thead>
@@ -87,8 +151,9 @@
     var carItems = capa.Items ?? new List<IsseERP.Models.CapaItemModel>();
     var firstItem = carItems.Count > 0 ? carItems[0] : null;
     bool hasMultipleItems = carItems.Count > 1;
+    bool isDue = capa.IsResponseDue;
 
-                <tr class="@(hasMultipleItems ? "has-items-expand" : "")" data-status="@statusKey" data-classification="@capa.CarClassificationType" data-created="@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("yyyy-MM-dd") : "")" data-search="@searchText" data-report-number="@capa.ReportNumber" onclick="toggleItemDetails(this, event)">
+                <tr class="@(hasMultipleItems ? "has-items-expand" : "") @(isDue ? "capa-row-due" : "")" data-due="@(isDue ? "1" : "0")" data-status="@statusKey" data-classification="@capa.CarClassificationType" data-created="@(capa.DateCreated.HasValue ? capa.DateCreated.Value.ToString("yyyy-MM-dd") : "")" data-search="@searchText" data-report-number="@capa.ReportNumber" onclick="toggleItemDetails(this, event)">
                     <td>
                         <span class="main-badge @badgeTone"><i class="fa fa-circle"></i>@statusText</span>
                     </td>
@@ -103,6 +168,10 @@
                             @if (hasMultipleItems)
                             {
                                 <span class="main-badge" title="This CAR has @carItems.Count items — click the row to see them all">+@(carItems.Count - 1) more item@(carItems.Count > 2 ? "s" : "")</span>
+                            }
+                            @if (isDue)
+                            {
+                                <span class="main-badge is-brand" title="No response yet. It was due @(capa.ResponseDueDate.Value.ToString("MMM dd, yyyy")) (@(IsseERP.Models.CapaReportModel.ResponseDueWorkingDays) working days, counting the day it was @(capa.LoopNumber > 0 && capa.LastSentBackDate.HasValue ? "sent back" : "filed"))"><i class="fa fa-exclamation-triangle"></i> Due</span>
                             }
                             @if (capa.LoopNumber > 0)
                             {

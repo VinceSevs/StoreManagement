@@ -351,6 +351,78 @@
             }
         </section>
 
+        @{
+            // Only filled for the IT department (see CapaController.CapaStatus).
+            var loopHistory = ViewBag.LoopHistory as List<IsseERP.Models.CapaLoopHistoryEntry>;
+        }
+        @if (loopHistory != null && loopHistory.Count > 0)
+        {
+            <section class="capa-card stage-card capa-stage d-print-none">
+                <div class="main-view-card-header">
+                    <h4><span class="capa-step"><i class="fa fa-repeat"></i></span>Loop History</h4>
+                    <span class="main-badge is-warning stage-badge">@loopHistory.Count sent back</span>
+                </div>
+                <div class="capa-muted mb-2">Earlier responses QA sent back as Not Effective. Visible to IT only.</div>
+                @foreach (var round in loopHistory)
+                {
+                    <details class="mb-2">
+                        <summary class="fw-semibold">
+                            Round @round.RoundNumber
+                            <span class="fw-normal text-secondary">
+                                &mdash; sent back @(string.IsNullOrWhiteSpace(round.SentBackBy) ? "" : "by " + round.SentBackBy + " ")on @round.SentBackDate.ToString("MMM dd, yyyy hh:mm tt")
+                            </span>
+                        </summary>
+                        <div class="row g-3 capa-grid mt-1">
+                            <div class="col-12 main-form-group">
+                                <label class="form-label">QA Notes (why it was sent back)</label>
+                                <textarea class="form-control readonly-field" rows="2" readonly>@round.VerificationNotes</textarea>
+                            </div>
+                            <div class="col-12 main-form-group">
+                                <label class="form-label">Immediate Action Taken</label>
+                                <textarea class="form-control readonly-field" rows="2" readonly>@round.ImmediateAction</textarea>
+                            </div>
+                            <div class="col-md-6 main-form-group">
+                                <label class="form-label">Person Responsible</label>
+                                <input type="text" class="form-control readonly-field" value="@round.IaPerson" readonly>
+                            </div>
+                            <div class="col-md-6 main-form-group">
+                                <label class="form-label">Date Completed</label>
+                                <input type="text" class="form-control readonly-field font-mono" value="@(round.IaTargetDate.HasValue && round.IaTargetDate.Value.Year > 1900 ? round.IaTargetDate.Value.ToString("MMM dd, yyyy") : "")" readonly>
+                            </div>
+                            <div class="col-12 main-form-group">
+                                <label class="form-label">Root Cause Analysis</label>
+                                <textarea class="form-control readonly-field" rows="2" readonly>@round.RootCause</textarea>
+                            </div>
+                            <div class="col-12 main-form-group">
+                                <label class="form-label">Corrective Action</label>
+                                <textarea class="form-control readonly-field" rows="2" readonly>@round.CapaActions</textarea>
+                            </div>
+                            <div class="col-md-6 main-form-group">
+                                <label class="form-label">Person Responsible</label>
+                                <input type="text" class="form-control readonly-field" value="@round.CapaPerson" readonly>
+                            </div>
+                            <div class="col-md-6 main-form-group">
+                                <label class="form-label">Target Completion Date</label>
+                                <input type="text" class="form-control readonly-field font-mono" value="@(round.CapaTargetDate.HasValue && round.CapaTargetDate.Value.Year > 1900 ? round.CapaTargetDate.Value.ToString("MMM dd, yyyy") : "")" readonly>
+                            </div>
+                            @if (round.Attachments != null && round.Attachments.Count > 0)
+                            {
+                                <div class="col-12 main-form-group">
+                                    <label class="form-label">Respondent's Files</label>
+                                    <ul class="mb-0">
+                                        @foreach (var file in round.Attachments)
+                                        {
+                                            <li><a href="@(Url.Action("CapaAttachment", "Capa") + "?path=" + Uri.EscapeDataString(file.FilePath))" target="_blank" rel="noopener">@System.IO.Path.GetFileName(file.FilePath)</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </details>
+                }
+            </section>
+        }
+
     </div>
 
 </div>

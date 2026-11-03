@@ -251,4 +251,4 @@
 		logCapaActionUrl: '@Url.Action("LogCapaAction", "Capa")'
 	};
 </script>
-<script src="~/Scripts/capa/capa-list.js"></script>
+<script src="@Url.Content("~/Scripts/capa/capa-list.js")?v=@System.IO.File.GetLastWriteTimeUtc(Server.MapPath("~/Scripts/capa/capa-list.js")).Ticks"></script>

@@ -248,6 +248,114 @@
     gap: 6px;
 }
 
+/* CARs past their response due date: a red edge on the row, and a bar above the table */
+.capa-table tbody tr.capa-row-due > td:first-child {
+    box-shadow: inset 3px 0 0 var(--main-red);
+}
+
+.capa-due-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--main-red);
+    border-radius: 8px;
+    background: var(--main-red-bg-soft);
+    color: var(--main-red);
+    font-size: 13px;
+}
+
+.capa-due-bar .fa {
+    margin-right: 6px;
+}
+
+.capa-due-toggle {
+    border: 1px solid var(--main-red);
+    background: #fff;
+    color: var(--main-red);
+    font-weight: 600;
+}
+
+/* Due CARs modal */
+.capa-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.5);
+}
+
+    .capa-modal-overlay.is-open {
+        display: flex;
+    }
+
+.capa-modal {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1100px;
+    max-height: calc(100vh - 32px);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
+}
+
+.capa-modal-header,
+.capa-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px;
+}
+
+.capa-modal-header {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.capa-modal-footer {
+    border-top: 1px solid #e5e7eb;
+}
+
+.capa-modal-title {
+    margin: 0;
+    color: var(--main-red);
+    font-weight: 600;
+}
+
+    .capa-modal-title .fa {
+        margin-right: 6px;
+    }
+
+.capa-modal-close {
+    border: 0;
+    background: transparent;
+    color: #6b7280;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .capa-modal-close:hover {
+        color: var(--main-red);
+    }
+
+.capa-modal-body {
+    padding: 12px 18px;
+    overflow: auto;
+}
+
+.capa-modal-info {
+    color: #6b7280;
+    font-size: 13px;
+}
+
 /* Expanded item rows keep the table's own look but not its row hover */
 .capa-table tbody tr.item-detail-row,
 .capa-table tbody tr.item-detail-row:hover {
@@ -410,6 +518,133 @@
         font-weight: 400;
         text-transform: lowercase;
     }
+
+/* Required-field marker (the red *) */
+.capa-required,
+.capa-panel-title .capa-required {
+    color: var(--main-red);
+    font-weight: 700;
+    text-transform: none;
+}
+
+.capa-required-note {
+    margin: 0 0 12px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+/* LLII / Others: To and CC email recipients as chips */
+.capa-email-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.capa-email-label {
+    margin: 6px 0 0;
+    color: #222222;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+    .capa-email-label:first-child {
+        margin-top: 0;
+    }
+
+    .capa-email-label span {
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+.capa-chip-input {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: text;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .capa-chip-input:focus-within {
+        border-color: var(--main-red);
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+    .capa-chip-input.is-invalid {
+        border-color: #dc2626;
+    }
+
+.capa-chip-text {
+    flex: 1 1 160px;
+    min-width: 140px;
+    max-width: none;
+    padding: 4px 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+}
+
+.capa-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 2px 4px 2px 10px;
+    border: 1px solid var(--main-red-bg-strong);
+    border-radius: 999px;
+    background: var(--main-red-bg-soft);
+    color: #222222;
+    font-size: 13px;
+}
+
+.capa-chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.capa-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--main-red);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .capa-chip-remove:hover {
+        background: var(--main-red);
+        color: #ffffff;
+    }
+
+    .capa-chip-remove:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--main-red-ring);
+    }
+
+.capa-email-hint {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.capa-email-error {
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 600;
+}
 
 /* Item blocks inside a stage card (one per CAR item) */
 .capa-item-card {

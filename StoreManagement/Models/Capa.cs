@@ -109,6 +109,52 @@ namespace IsseERP.Models
         [JsonIgnore]
         public int LoopNumber { get; set; }
 
+        // A response is due on the 7th working day (Mon-Fri; holidays aren't counted),
+        // with the day the CAR was filed as day 1 when that is a working day. It turns
+        // due at the start of that day, there is no cut-off time. Display only, so it's
+        // kept out of the posted JSON too.
+        public const int ResponseDueWorkingDays = 7;
+
+        // When QA last sent the CAR back (Not Effective). The 7 days start again from
+        // then. Filled in by the list from the loop history; blank for CARs sent back
+        // before that history existed, which keep counting from the filing date.
+        [JsonIgnore]
+        public DateTime? LastSentBackDate { get; set; }
+
+        [JsonIgnore]
+        public DateTime? ResponseDueDate
+        {
+            get
+            {
+                DateTime? start = LoopNumber > 0 && LastSentBackDate.HasValue ? LastSentBackDate : DateCreated;
+                if (!start.HasValue) return null;
+                DateTime due = start.Value.Date;
+                int counted = IsWorkingDay(due) ? 1 : 0;
+                while (counted < ResponseDueWorkingDays)
+                {
+                    due = due.AddDays(1);
+                    if (IsWorkingDay(due)) counted++;
+                }
+                return due;
+            }
+        }
+
+        private static bool IsWorkingDay(DateTime day)
+        {
+            return day.DayOfWeek != DayOfWeek.Saturday && day.DayOfWeek != DayOfWeek.Sunday;
+        }
+
+        // Still awaiting a response on or after its due date.
+        [JsonIgnore]
+        public bool IsResponseDue
+        {
+            get
+            {
+                var due = ResponseDueDate;
+                return StatusKey == "response" && due.HasValue && DateTime.Today >= due.Value;
+            }
+        }
+
         // Type of non-conformance — single-select. One of
         // "ProductQualityFoodSafety" | "EnvironmentHealthSafetySecurity" |
         // "InternalQualityAudit" | "ExternalQualityAudit" | "CustomerAudit".
@@ -127,7 +173,6 @@ namespace IsseERP.Models
         public string CarClassificationRefName { get; set; }
         public string CarClassificationRefEmail { get; set; }
         public string CarClassificationOtherText { get; set; }
-
         // Step 1
 
         // Step 2 — filled by whoever CAR Classification points to (entered
@@ -171,10 +216,7 @@ namespace IsseERP.Models
     {
         public int LineNumber { get; set; }
         public int? ItemID { get; set; } // FK -> tbl_Item.id
-        // display only — excluded from the JSON posted to api/capa/insert,
-        // same reason as CapaReportModel.LoopNumber above.
-        [JsonIgnore]
-        public string ItemCode { get; set; }
+        public string ItemCode { get; set; } // display only, sent with ItemDescription
         public string ItemDescription { get; set; } // display only
         public short? Quantity { get; set; }
         public short? UOMID { get; set; } // FK -> tbl_UOM.id
@@ -277,6 +319,34 @@ namespace IsseERP.Models
         // MVC's own JSON binding and is unaffected by this attribute.
         [Newtonsoft.Json.JsonIgnore]
         public List<CapaAttachmentModel> Attachments { get; set; } = new List<CapaAttachmentModel>();
+
+        // Optional files attached to the Root Cause Analysis field. Stored as
+        // response_RootCause_NN.ext so they can be told apart from the general
+        // supporting documents above. Local-only, like Attachments.
+        [Newtonsoft.Json.JsonIgnore]
+        public List<CapaAttachmentModel> RootCauseAttachments { get; set; } = new List<CapaAttachmentModel>();
+    }
+
+    // One response round that QA sent back (verification = Not Effective), copied
+    // from the CAR when it looped. Stored as a JSON file per round (CapaLoopHistoryStore).
+    public class CapaLoopHistoryEntry
+    {
+        public int RoundNumber { get; set; } // 1 = the first response
+        public string ImmediateAction { get; set; }
+        public string IaPerson { get; set; }
+        public DateTime? IaTargetDate { get; set; }
+        public string RootCause { get; set; }
+        public string CapaActions { get; set; }
+        public string CapaPerson { get; set; }
+        public DateTime? CapaTargetDate { get; set; }
+        public string VerificationNotes { get; set; }
+        public string SentBackBy { get; set; }
+        public DateTime SentBackDate { get; set; }
+
+        // Files the respondent attached in this round (response_R{n}_*), if any.
+        // Looked up when the history is shown — not stored in the snapshot file.
+        [JsonIgnore]
+        public List<SavedAttachment> Attachments { get; set; } = new List<SavedAttachment>();
     }
 
     // Submitted from the CapaVerification page — QA signing off on the

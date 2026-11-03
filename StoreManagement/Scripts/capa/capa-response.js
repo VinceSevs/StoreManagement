@@ -2,7 +2,13 @@ const RESPONSE_TOKEN = window.CAPA_RESPONSE_DATA.responseToken;
 const SUBMIT_ENDPOINT = window.CAPA_RESPONSE_DATA.submitEndpoint;
 const ATTACHMENT_PHOTOS = window.CAPA_RESPONSE_DATA.attachmentPhotos;
 
-let responseAttachments = [];
+// One list per attachment field. Each group is posted separately and stored
+// under its own filename prefix server-side, so the source field can be told
+// from the saved file's name.
+const responseAttachGroups = {
+	general: { items: [], gridId: 'responseAttachGrid' },
+	rootCause: { items: [], gridId: 'rootCauseAttachGrid' }
+};
 let responseAttachIdSeq = 0;
 
 const RESPONSE_ALLOWED_ATTACHMENT_TYPES = [
@@ -57,37 +63,37 @@ function responseCompressImageFile(file, maxDimension = 1600, quality = 0.82) {
 	}));
 }
 
-function handleResponseAttachFiles(event) {
+function handleResponseAttachFiles(event, group) {
 	const files = Array.from(event.target.files || []);
 	files.forEach(file => {
 		if (!file.type.startsWith('image/') && !RESPONSE_ALLOWED_ATTACHMENT_TYPES.includes(file.type)) return;
 		const isImage = file.type.startsWith('image/');
 		const process = isImage ? responseCompressImageFile(file) : responseReadAsDataUrl(file);
 		process.then(dataUrl => {
-			responseAttachments.push({ id: ++responseAttachIdSeq, dataUrl, caption: '', fileName: file.name, isImage });
-			renderResponseAttachments();
+			responseAttachGroups[group].items.push({ id: ++responseAttachIdSeq, dataUrl, caption: '', fileName: file.name, isImage });
+			renderResponseAttachments(group);
 		});
 	});
 	event.target.value = '';
 }
 
-function removeResponseAttachment(id) {
-	responseAttachments = responseAttachments.filter(a => a.id !== id);
-	renderResponseAttachments();
+function removeResponseAttachment(group, id) {
+	responseAttachGroups[group].items = responseAttachGroups[group].items.filter(a => a.id !== id);
+	renderResponseAttachments(group);
 }
 
-function updateResponseCaption(id, value) {
-	const a = responseAttachments.find(a => a.id === id);
+function updateResponseCaption(group, id, value) {
+	const a = responseAttachGroups[group].items.find(a => a.id === id);
 	if (a) a.caption = value;
 }
 
-function renderResponseAttachments() {
-	const grid = document.getElementById('responseAttachGrid');
+function renderResponseAttachments(group) {
+	const grid = document.getElementById(responseAttachGroups[group].gridId);
 	if (!grid) return;
-	grid.innerHTML = responseAttachments.map(a => `
+	grid.innerHTML = responseAttachGroups[group].items.map(a => `
 		<div class="col">
 			<div class="capa-attach-thumb">
-				<button type="button" class="btn-close" aria-label="Remove" onclick="removeResponseAttachment(${a.id})"></button>
+				<button type="button" class="btn-close" aria-label="Remove" onclick="removeResponseAttachment('${group}', ${a.id})"></button>
 				${a.isImage
 					? `<img src="${a.dataUrl}" alt="Attachment">`
 					: `<div class="capa-attach-file">
@@ -95,7 +101,7 @@ function renderResponseAttachments() {
 						   <small>${responseEscapeHtml(a.fileName)}</small>
 					   </div>`}
 				<div class="capa-attach-caption">
-					<input type="text" class="form-control" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" oninput="updateResponseCaption(${a.id}, this.value)">
+					<input type="text" class="form-control" placeholder="Caption (optional)" value="${a.caption.replace(/"/g, '&quot;')}" oninput="updateResponseCaption('${group}', ${a.id}, this.value)">
 				</div>
 			</div>
 		</div>
@@ -143,7 +149,8 @@ async function submitResponse() {
 		CapaActions: val('capaActions'),
 		CapaPerson: val('capaPerson'),
 		CapaTargetDate: val('capaTargetDate') || null,
-		Attachments: responseAttachments.map(a => ({ Caption: a.caption, DataUrl: a.dataUrl }))
+		Attachments: responseAttachGroups.general.items.map(a => ({ Caption: a.caption, DataUrl: a.dataUrl })),
+		RootCauseAttachments: responseAttachGroups.rootCause.items.map(a => ({ Caption: a.caption, DataUrl: a.dataUrl }))
 	};
 
 	try {

@@ -7,7 +7,16 @@
                 <div>
                     <div class="row g-3 capa-grid">
                         <div class="col-md-6 main-form-group">
-                            <label class="form-label">Item Description <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
+                            <label class="form-label">Supplier<span class="capa-required item-required-mark" aria-hidden="true">*</span> <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
+                            <div class="autocomplete-wrap supplier-search-wrap">
+                                <input type="text" class="form-control supplier-search" autocomplete="off"
+                                       placeholder="Search supplier&hellip;">
+                                <input type="hidden" class="supplier-id-field">
+                                <div class="list-group ac-dropdown supplier-ac-dropdown shadow-sm"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 main-form-group">
+                            <label class="form-label">Item Description<span class="capa-required item-required-mark" aria-hidden="true">*</span> <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
                             <div class="autocomplete-wrap item-search-wrap">
                                 <input type="text" class="form-control item-search" autocomplete="off"
                                        placeholder="Start typing, e.g. &ldquo;mini apple&rdquo;&hellip;" required>
@@ -23,11 +32,11 @@
                             <input type="text" class="form-control font-mono item-code-display" placeholder="Auto-fills from selection" readonly>
                         </div>
                         <div class="col-md-6 main-form-group">
-                            <label class="form-label">Quantity of Affected Items <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
+                            <label class="form-label">Quantity of Affected Items<span class="capa-required item-required-mark" aria-hidden="true">*</span> <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
                             <input type="number" min="0" class="form-control item-field" data-field="quantity" required>
                         </div>
                         <div class="col-md-6 main-form-group">
-                            <label class="form-label">Unit of Measure <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
+                            <label class="form-label">Unit of Measure<span class="capa-required item-required-mark" aria-hidden="true">*</span> <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
                             <select class="form-control item-field" data-field="uom_id" required>
                                 @foreach (var u in ViewBag.UOM)
                                 {
@@ -43,7 +52,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 main-form-group">
-                            <label class="form-label">Defect Description <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
+                            <label class="form-label">Defect Description<span class="capa-required item-required-mark" aria-hidden="true">*</span> <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
                             <select class="form-control item-field defect-select" data-field="defect_category_id" required>
                                 <option value="" disabled selected>Loading&hellip;</option>
                             </select>
@@ -54,12 +63,12 @@
                             <input type="text" class="form-control font-mono defect-category-display" placeholder="Auto-fills from selection" readonly>
                         </div>
                         <div class="col-md-6 main-form-group">
-                            <label class="form-label">UTD <span class="optional-hint d-none fw-normal text-secondary">(optional)</span></label>
-                            <input type="date" class="form-control item-field" data-field="used_to_date" required>
+                            <label class="form-label">UTD <span class="fw-normal text-secondary">(optional)</span></label>
+                            <input type="date" class="form-control item-field" data-field="used_to_date">
                         </div>
                     </div>
                     <div class="main-form-group mt-3 mb-0">
-                        <label class="form-label">Remarks</label>
+                        <label class="form-label">Remarks <span class="capa-required" aria-hidden="true">*</span></label>
                         <textarea class="form-control item-field" data-field="remarks" rows="4" placeholder="Describe what happened, when and where it was discovered, and which product, batch, or shipment is affected&hellip;" required></textarea>
                     </div>
                 </div>

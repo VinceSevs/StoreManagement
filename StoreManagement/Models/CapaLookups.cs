@@ -101,7 +101,11 @@ namespace IsseERP.Models
             new DefectCatalogItem { Id = 19, Name = "Illegible label / print smudge", Category = "Labeling" },
             new DefectCatalogItem { Id = 20, Name = "Incorrect SKU / mixed items in case", Category = "Labeling" },
             new DefectCatalogItem { Id = 21, Name = "Physical damage during transport", Category = "Handling" },
-            new DefectCatalogItem { Id = 22, Name = "Received in wrong quantity", Category = "Handling" }
+            new DefectCatalogItem { Id = 22, Name = "Received in wrong quantity", Category = "Handling" },
+            new DefectCatalogItem { Id = OtherId, Name = "Other (please specify)", Category = "Other" }
         };
+
+        // Defect not on the list. The user types it in, and it is kept in Remarks.
+        public const int OtherId = 23;
     }
 }

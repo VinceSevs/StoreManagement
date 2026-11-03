@@ -36,14 +36,18 @@ function applyItemFieldsRequiredState(scopeEl) {
 		const quantity = block.querySelector('[data-field="quantity"]');
 		const uom = block.querySelector('[data-field="uom_id"]');
 		const defectSelect = block.querySelector('[data-field="defect_category_id"]');
-		const usedToDate = block.querySelector('[data-field="used_to_date"]');
 
-		[itemSearch, quantity, uom, defectSelect, usedToDate].forEach(el => {
+		// UTD is always optional, so it isn't part of this toggle.
+		[itemSearch, quantity, uom, defectSelect].forEach(el => {
 			if (el) el.required = !optional;
 		});
 
 		block.querySelectorAll('.optional-hint').forEach(hint => {
 			hint.classList.toggle('d-none', !optional);
+		});
+		// The * on item fields only shows while those fields are actually required.
+		block.querySelectorAll('.item-required-mark').forEach(mark => {
+			mark.classList.toggle('d-none', optional);
 		});
 	});
 }
@@ -63,6 +67,8 @@ function handleCarClassificationChange() {
     const tempRefNoHint = document.getElementById('tempRefNoOptionalHint');
 	const type = selected ? selected.value : null;
 	if (refNoHint) refNoHint.classList.toggle('d-none', type !== 'LLII' && type !== 'DCSite');
+	const refNoMark = document.getElementById('refNoRequiredMark');
+	if (refNoMark) refNoMark.classList.toggle('d-none', type === 'LLII' || type === 'DCSite');
 	//if (removeReadonly) removeReadonly.classList.toggle('style', type !== 'Supplier' && type !== 'Trucker');
 
 	// The Item field is restricted to a vendor-specific dropdown only while
@@ -122,12 +128,110 @@ function parseEmailList(raw) {
 	return { valid, invalid, normalized: valid.join(',') };
 }
 
+/* Chip input: the To / CC fields under LLII. Each address becomes a removable chip. */
+const carEmailLists = { to: [] };
+
+function escapeChipText(text) {
+	return text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function showCarEmailError(message) {
+	const el = document.getElementById('carEmailError');
+	if (!el) return;
+	el.textContent = message || '';
+	el.classList.toggle('d-none', !message);
+}
+
+function renderCarEmailChips(list) {
+	const box = document.querySelector(`.capa-chip-input[data-list="${list}"]`);
+	if (!box) return;
+	box.querySelectorAll('.capa-chip').forEach(chip => chip.remove());
+	const input = box.querySelector('.capa-chip-text');
+	carEmailLists[list].forEach(email => {
+		const chip = document.createElement('span');
+		chip.className = 'capa-chip';
+		chip.innerHTML = `<span class="capa-chip-label">${escapeChipText(email)}</span>`
+			+ `<button type="button" class="capa-chip-remove" aria-label="Remove ${escapeChipText(email)}">&times;</button>`;
+		chip.querySelector('.capa-chip-remove').addEventListener('click', () => removeCarEmail(list, email));
+		box.insertBefore(chip, input);
+	});
+}
+
+function removeCarEmail(list, email) {
+	carEmailLists[list] = carEmailLists[list].filter(e => e.toLowerCase() !== email.toLowerCase());
+	renderCarEmailChips(list);
+	showCarEmailError('');
+}
+
+// Adds every address found in `raw`. Returns the entries that were not valid emails,
+// so the caller can leave them in the text box for the user to fix.
+function addCarEmails(list, raw) {
+	const parsed = parseEmailList(raw);
+	parsed.valid.forEach(email => {
+		const key = email.toLowerCase();
+		if (!carEmailLists[list].some(e => e.toLowerCase() === key)) carEmailLists[list].push(email);
+	});
+	renderCarEmailChips(list);
+	showCarEmailError(parsed.invalid.length ? `Not a valid email address: ${parsed.invalid.join(', ')}` : '');
+	return parsed.invalid;
+}
+
+function commitCarEmailInput(input) {
+	const list = input.closest('.capa-chip-input').dataset.list;
+	const invalid = addCarEmails(list, input.value);
+	input.value = invalid.join(', ');
+	input.closest('.capa-chip-input').classList.toggle('is-invalid', invalid.length > 0);
+	return invalid;
+}
+
+function initCarEmailChips() {
+	document.querySelectorAll('.capa-chip-input').forEach(box => {
+		const input = box.querySelector('.capa-chip-text');
+		// Clicking anywhere in the box focuses the text field.
+		box.addEventListener('click', e => { if (e.target === box) input.focus(); });
+		input.addEventListener('keydown', e => {
+			if (e.key === 'Enter' || e.key === ',' || e.key === ';' || (e.key === 'Tab' && input.value.trim())) {
+				if (!input.value.trim()) { if (e.key !== 'Tab') e.preventDefault(); return; }
+				if (e.key !== 'Tab') e.preventDefault();
+				commitCarEmailInput(input);
+			} else if (e.key === 'Backspace' && !input.value) {
+				const list = box.dataset.list;
+				const last = carEmailLists[list][carEmailLists[list].length - 1];
+				if (last) removeCarEmail(list, last);
+			}
+		});
+		input.addEventListener('input', () => box.classList.remove('is-invalid'));
+		input.addEventListener('paste', e => {
+			const text = (e.clipboardData || window.clipboardData).getData('text');
+			if (!/[,;\s]/.test(text.trim())) return;
+			e.preventDefault();
+			addCarEmails(box.dataset.list, text.replace(/\s+/g, ','));
+		});
+		input.addEventListener('blur', () => { if (input.value.trim()) commitCarEmailInput(input); });
+	});
+}
+
+function resetCarEmails() {
+	carEmailLists.to = [];
+	renderCarEmailChips('to');
+	document.querySelectorAll('.capa-chip-text').forEach(i => { i.value = ''; });
+	document.querySelectorAll('.capa-chip-input').forEach(b => b.classList.remove('is-invalid'));
+	showCarEmailError('');
+}
+
+// Anything still typed in a box counts as an address too. Valid ones are turned into
+// chips here; whatever is left over is invalid and gets reported.
 function getInvalidClassificationEmails() {
 	const selected = document.querySelector('input[name="car_classification_type"]:checked');
 	if (!selected || (selected.value !== 'LLII' && selected.value !== 'Others')) return [];
-	const otherInput = document.getElementById('carOtherText');
-	return parseEmailList(otherInput ? otherInput.value : '').invalid;
+	let invalid = [];
+	document.querySelectorAll('.capa-chip-text').forEach(input => {
+		if (input.value.trim()) invalid = invalid.concat(commitCarEmailInput(input));
+	});
+	return invalid;
 }
+
+document.addEventListener('DOMContentLoaded', initCarEmailChips);
 
 function getCarClassificationPayload() {
 	const selected = document.querySelector('input[name="car_classification_type"]:checked');
@@ -152,13 +256,14 @@ function getCarClassificationPayload() {
 		};
 	}
 
-	const otherInput = document.getElementById('carOtherText');
+	// LLII / Others: the To chips go to OtherText as before.
+	getInvalidClassificationEmails(); // turns anything still typed in the box into a chip
 	return {
 		CarClassificationType: type,
 		CarClassificationRefId: null,
 		CarClassificationRefName: null,
 		CarClassificationRefEmail: null,
-		CarClassificationOtherText: otherInput ? parseEmailList(otherInput.value).normalized : null
+		CarClassificationOtherText: carEmailLists.to.join(',')
 	};
 }
 
@@ -212,10 +317,16 @@ function highlightMatch(name, query) {
 	return escapeHtml(name.slice(0, idx)) + '<mark>' + escapeHtml(name.slice(idx, idx + query.length)) + '</mark>' + escapeHtml(name.slice(idx + query.length));
 }
 
-function filterCatalog(query) {
+// With a supplier's item list, an empty query lists that supplier's items up
+// front (scrollable); typing narrows them. The full catalog needs a query.
+function filterCatalog(query, source) {
 	const q = query.trim().toLowerCase();
-	if (!q) return [];
-	return ITEM_CATALOG.filter(it => it.name.toLowerCase().includes(q) || (it.code || '').toLowerCase().includes(q)).slice(0, 8);
+	if (!source) {
+		if (!q) return [];
+		return ITEM_CATALOG.filter(it => it.name.toLowerCase().includes(q) || (it.code || '').toLowerCase().includes(q)).slice(0, 8);
+	}
+	if (!q) return source.slice(0, 100);
+	return source.filter(it => it.name.toLowerCase().includes(q) || (it.code || '').toLowerCase().includes(q)).slice(0, 100);
 }
 
 /* ---------- Save to database (ASP.NET MVC + ADO.NET backend) ---------- */
@@ -233,11 +344,13 @@ function collectItemPayload(block, index) {
 	const haulerEl = document.querySelector('[name="hauler"]');
 	const hauler = haulerEl ? haulerEl.value : '';
 
-	// "Other" isn't a real catalog entry — DefectCategoryID stays blank, and
-	// whatever the user typed to specify it gets folded into Remarks instead
-	// (there's no dedicated free-text defect column on tbl_QualityIncidentDtl).
+	// "Other" is a catalog entry (category "Other"), but the defect itself is free
+	// text — whatever the user typed gets folded into Remarks (there's no dedicated
+	// free-text defect column on tbl_QualityIncidentDtl).
 	const defectRaw = getField('defect_category_id');
-	const isOtherDefect = defectRaw === 'other';
+	const defectSelectEl = block.querySelector('[data-field="defect_category_id"]');
+	const isOtherDefect = !!(defectSelectEl && defectSelectEl.selectedIndex >= 0 &&
+		defectSelectEl.options[defectSelectEl.selectedIndex].dataset.category === 'Other');
 	const otherInput = block.querySelector('.defect-other-input');
 	const otherText = otherInput ? otherInput.value.trim() : '';
 
@@ -246,12 +359,48 @@ function collectItemPayload(block, index) {
 		remarks = remarks ? `Defect: ${otherText}.\n - ${remarks}` : `Defect: ${otherText}`;
 	}
 
+	// The description is only meaningful for a picked item — typed-but-unselected
+	// text clears item_id, so it must not be sent on its own.
+	const itemId = toIntOrNull(getField('item_id'));
+	let itemDescription = '';
+	let itemCode = '';
+	if (itemId) {
+		const itemSearch = block.querySelector('.item-search');
+		const vendorSelect = block.querySelector('.item-vendor-select');
+		const itemCodeDisplay = block.querySelector('.item-code-display');
+		itemDescription = itemSearch ? itemSearch.value.trim() : '';
+		if (!itemDescription && vendorSelect && vendorSelect.selectedIndex >= 0) {
+			itemDescription = vendorSelect.options[vendorSelect.selectedIndex].text.trim();
+		}
+		itemCode = itemCodeDisplay ? itemCodeDisplay.value.trim() : '';
+	}
+
+	// Name and category sent alongside DefectCategoryID, like ItemDescription.
+	// "Other" has no catalog name, so the specified text stands in for it.
+	let defectName = '';
+	let defectCategoryName = '';
+	if (defectRaw) {
+		const defectSelect = block.querySelector('[data-field="defect_category_id"]');
+		const categoryDisplay = block.querySelector('.defect-category-display');
+		if (isOtherDefect) {
+			defectName = otherText;
+			defectCategoryName = 'Other';
+		} else if (defectSelect && defectSelect.selectedIndex >= 0) {
+			defectName = defectSelect.options[defectSelect.selectedIndex].text.trim();
+			defectCategoryName = categoryDisplay ? categoryDisplay.value.trim() : '';
+		}
+	}
+
 	return {
 		LineNumber: index + 1,
-		ItemID: toIntOrNull(getField('item_id')),
+		ItemID: itemId,
+		ItemCode: itemCode,
+		ItemDescription: itemDescription,
 		Quantity: toIntOrNull(getField('quantity')),
 		UOMID: toIntOrNull(getField('uom_id')),
-		DefectCategoryID: isOtherDefect ? null : toIntOrNull(defectRaw),
+		DefectCategoryID: toIntOrNull(defectRaw),
+		DefectName: defectName,
+		DefectCategoryName: defectCategoryName,
 		UsedToDate: getField('used_to_date') || null,
 		Remarks: remarks,
 		Hauler: hauler || '',
@@ -346,7 +495,8 @@ function getRequiredFieldChecks() {
 			return el ? el.value.trim() : '';
 		};
 		checks.push(
-			{ test: () => itemFieldsOptional || !!getVal('item_id'), label: label('Item') },
+			{ test: () => itemFieldsOptional || !!block.querySelector('.supplier-id-field').value, label: label('Supplier') },
+				{ test: () => itemFieldsOptional || !!getVal('item_id'), label: label('Item') },
 			{ test: () => itemFieldsOptional || !!getVal('quantity'), label: label('Quantity of Affected Items') },
 			{ test: () => itemFieldsOptional || !!getVal('uom_id'), label: label('UOM') },
 			{
@@ -354,7 +504,9 @@ function getRequiredFieldChecks() {
 					if (itemFieldsOptional) return true;
 					const val = getVal('defect_category_id');
 					if (!val) return false;
-					if (val === 'other') {
+					const sel = block.querySelector('[data-field="defect_category_id"]');
+						const picked = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+						if (picked && picked.dataset.category === 'Other') {
 						const otherInput = block.querySelector('.defect-other-input');
 						return !!(otherInput && otherInput.value.trim());
 					}
@@ -362,7 +514,6 @@ function getRequiredFieldChecks() {
 				},
 				label: label('Defect Description')
 			},
-			{ test: () => itemFieldsOptional || !!getVal('used_to_date'), label: label('Used-to Date') },
 			{ test: () => !!getVal('remarks'), label: label('Remarks') }
 		);
 	});
@@ -476,6 +627,7 @@ function clearForm() {
 
 		const block0 = document.getElementById('capaItemBlock0');
 		if (block0 && block0.resetAttachments) block0.resetAttachments();
+		if (block0 && block0.resetSupplier) block0.resetSupplier();
 
 		setDefaultDate();
 		document.getElementById('warehouseCodeInput').value = '';
@@ -485,7 +637,7 @@ function clearForm() {
 			el.selectedIndex = 0;
 		});
 		document.getElementById('carOtherText').classList.add('d-none');
-		document.getElementById('carOtherText').value = '';
+		resetCarEmails();
 		document.getElementById('externalAuditSubWrap').classList.add('d-none');
 		document.getElementById('submitStatus').textContent = '';
 		document.getElementById('submitStatus').className = 'me-auto small fw-semibold';

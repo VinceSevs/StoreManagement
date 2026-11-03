@@ -56,6 +56,12 @@ namespace StoreManagement.Models
             return user != null && user.DepartmentId == AllAccessDepartment;
         }
 
+        // The history of looped CARs (earlier responses QA sent back) is for AllAccessDepartment (IT) only.
+        public static bool CanViewCarLoopHistory(Login user)
+        {
+            return user != null && user.DepartmentId == AllAccessDepartment;
+        }
+
         public static bool CanCloseNncr(Login user)
         {
             return user != null && System.Array.IndexOf(NncrCloserRoles, user.RoleId) >= 0;

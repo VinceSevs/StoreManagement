@@ -195,7 +195,7 @@
                         </div>
                         <div class="col-md-6 main-form-group">
                             <label class="form-label">UTD</label>
-                            <input type="text" class="form-control readonly-field font-mono" value="@(capaItem.UsedToDate != null ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "")" readonly>
+                            <input type="text" class="form-control readonly-field font-mono" value="@(capaItem.UsedToDate != null && ((DateTime)capaItem.UsedToDate).Year > 1900 ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "-")" readonly>
                         </div>
                         <div class="col-12 main-form-group">
                             <label class="form-label">Remarks</label>
@@ -375,7 +375,7 @@
             quantity = capaItem.Quantity,
             uom = (string)capaItem.UOMDisplay,
             defect = string.IsNullOrWhiteSpace((string)capaItem.DefectName) ? "Other (Kindly Check Remarks)" : $"{capaItem.DefectName} ({capaItem.DefectCategoryName})",
-            utd = capaItem.UsedToDate != null ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "",
+            utd = capaItem.UsedToDate != null && ((DateTime)capaItem.UsedToDate).Year > 1900 ? ((DateTime)capaItem.UsedToDate).ToString("MMM dd, yyyy") : "-",
             remarks = (string)capaItem.Remarks,
             hauler = (string)capaItem.Hauler
         });
