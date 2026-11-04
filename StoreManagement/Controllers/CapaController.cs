@@ -172,6 +172,10 @@ namespace IsseERP.Controllers
         [HttpPost]
         public async Task<JsonResult> SaveCapaReport()
         {
+            // Without this IIS replaces our JSON 4xx/5xx bodies with its generic error page,
+            // so the form could only ever show "HTTP 500" instead of the real message.
+            Response.TrySkipIisCustomErrors = true;
+
             try
             {
                 // 2. Read the raw incoming JSON stream manually
@@ -239,11 +243,30 @@ namespace IsseERP.Controllers
                 await _capaService.MarkAwaitingResponse(reportNumber);
 
                 // 3. Save attachments using the server-generated report number
-                string attachmentsRoot = Server.MapPath("~/App_Data/CapaAttachments");
-                var fileService = new CapaAttachmentFileService(attachmentsRoot);
-                foreach (var item in model.Items)
+                // The CAR is already in the database by now, so a file failure is reported
+                // alongside the success instead of failing (and inviting a duplicate filing).
+                string attachmentError = null;
+                string attachmentFolder = null;
+                int attachmentsSent = model.Items.Sum(i => i.Attachments == null ? 0 : i.Attachments.Count);
+                int attachmentsSaved = 0;
+                try
                 {
-                    fileService.SaveItemAttachments(reportNumber, item.LineNumber, item.Attachments);
+                    string attachmentsRoot = Server.MapPath("~/App_Data/CapaAttachments");
+                    attachmentFolder = System.IO.Path.Combine(attachmentsRoot, reportNumber);
+                    var fileService = new CapaAttachmentFileService(attachmentsRoot);
+                    foreach (var item in model.Items)
+                    {
+                        attachmentsSaved += fileService.SaveItemAttachments(reportNumber, item.LineNumber, item.Attachments).Count;
+                    }
+                    if (attachmentsSaved < attachmentsSent)
+                    {
+                        attachmentError = $"{attachmentsSent} file(s) were received but only {attachmentsSaved} could be saved to {attachmentFolder}.";
+                    }
+                }
+                catch (Exception attachEx)
+                {
+                    System.Diagnostics.Trace.TraceError("CAR attachment save failed for " + reportNumber + ": " + attachEx);
+                    attachmentError = attachEx.GetType().Name + ": " + attachEx.Message;
                 }
 
                 await _capaLogService.AddLog(
@@ -255,7 +278,7 @@ namespace IsseERP.Controllers
                 var savedCapa = await _capaService.GetCapaByReportNumber(reportNumber);
 
                 // Return the newly generated report number back to the client
-                return Json(new { success = true, ReportNumber = reportNumber, ResponseToken = savedCapa?.ResponseToken });
+                return Json(new { success = true, ReportNumber = reportNumber, ResponseToken = savedCapa?.ResponseToken, attachmentError, attachmentsSent, attachmentsSaved, attachmentFolder });
             }
             catch (Exception ex)
             {

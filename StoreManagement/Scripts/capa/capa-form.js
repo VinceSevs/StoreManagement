@@ -573,12 +573,33 @@ async function submitCapaForm() {
 				);
 			}
 
+			// Attached files in the form but none reached the server, so there is nothing to save.
+			const attachedCount = payload.Items.reduce((n, i) => n + i.Attachments.length, 0);
+			if (!result.attachmentError && attachedCount > 0 && !result.attachmentsSent) {
+				result.attachmentError = `${attachedCount} file(s) were attached in the form but the server received none.`;
+			}
+			if (!result.attachmentError && result.attachmentsSaved > 0) {
+				console.info(`Saved ${result.attachmentsSaved} attachment(s) to ${result.attachmentFolder}`);
+			}
+
+			if (result.attachmentError) {
+				Swal.fire({
+					icon: 'warning',
+					title: `${result.ReportNumber} saved, but its attachments were not`,
+					text: result.attachmentError,
+					confirmButtonColor: '#c60404',
+					allowOutsideClick: false
+				}).then(() => location.reload());
+				return;
+			}
+
 			let timerInterval;
 
 			Swal.fire({
 				icon: 'success',
 				title: 'CAPA Report Saved!',
 				html: 'Reloading page in <b>3</b> seconds...',
+				footer: result.attachmentsSaved > 0 ? `${result.attachmentsSaved} file(s) saved to ${result.attachmentFolder}` : undefined,
 				timer: 3000,
 				timerProgressBar: true,
 				allowOutsideClick: false,
