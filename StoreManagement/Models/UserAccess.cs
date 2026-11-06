@@ -31,8 +31,8 @@ namespace StoreManagement.Models
                 case AllAccessDepartment:
                     return true;
                 case QualityDepartment:
-                    // Dashboard, PCR, NCR and NNCR are IT-only (AllAccessDepartment).
-                    return section == AppSection.Car;
+                    // Quality gets CAR and NNCR. Dashboard, PCR and NCR are IT-only (AllAccessDepartment).
+                    return section == AppSection.Car || section == AppSection.Nncr;
                 case ProcurementDepartment:
                     return section == AppSection.PdfReceipt;
                 default:
@@ -40,8 +40,8 @@ namespace StoreManagement.Models
             }
         }
 
-        // tbl_UserAccount.role_id values allowed to close NNCRs. NNCR itself is IT-only
-        // (AllAccessDepartment), so these roles only matter for users inside that department.
+        // Who can close an NNCR: the IT department (AllAccessDepartment), plus these QA
+        // tbl_UserAccount.role_id values (49 = QA Supervisor, 8 = QA Manager).
         public static readonly int[] NncrCloserRoles = { 49, 8 };
 
         public static bool CanAccess(Login user, AppSection section)
@@ -64,7 +64,8 @@ namespace StoreManagement.Models
 
         public static bool CanCloseNncr(Login user)
         {
-            return user != null && System.Array.IndexOf(NncrCloserRoles, user.RoleId) >= 0;
+            return user != null
+                && (user.DepartmentId == AllAccessDepartment || System.Array.IndexOf(NncrCloserRoles, user.RoleId) >= 0);
         }
 
         // Signed-in user's profile, loaded once per request.

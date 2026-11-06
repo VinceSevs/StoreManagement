@@ -5,6 +5,8 @@
     ViewBag.Title = "NNCR Response";
     bool isAwaiting = Model.Status == NncrStatuses.AwaitingResponse;
     bool isResponded = Model.HasSupplierResponse;
+    // The contact this emailed link was sent to (falls back to the supplier's own email).
+    string respondentEmail = (ViewBag.RespondentEmail as string) ?? Model.SupplierEmail;
 
     string badgeText = Model.StatusLabel;
     string badgeClass = Model.StatusKey == "awaiting" ? "is-info"
@@ -16,7 +18,8 @@
     {
         responseToken = Model.ResponseToken,
         reportNumber = Model.ReportNumber,
-        submitEndpoint = Url.Action("SubmitResponse", "Nncr")
+        submitEndpoint = Url.Action("SubmitResponse", "Nncr"),
+        respondentEmail = respondentEmail
     }, new Newtonsoft.Json.JsonSerializerSettings { StringEscapeHandling = Newtonsoft.Json.StringEscapeHandling.EscapeHtml });
 }
 
@@ -61,7 +64,7 @@
             <div class="row">
                 <div class="col-12 col-sm-6 main-form-group">
                     <label for="supplierEmail">Supplier Email</label>
-                    <input type="text" class="form-control main-form-calculated-field nncr-mono" id="supplierEmail" value="@Model.SupplierEmail" readonly>
+                    <input type="text" class="form-control main-form-calculated-field nncr-mono" id="supplierEmail" value="@respondentEmail" readonly>
                 </div>
                 <div class="col-12 col-sm-6 main-form-group">
                     <label for="responseDate">Response Date</label>
@@ -109,7 +112,7 @@
                 </div>
             </dl>
             <div class="nncr-muted mt-3 text-start">
-                Submitted as <strong class="nncr-mono">@Model.SupplierEmail</strong> on <span class="nncr-mono" id="thankYouDate"></span>
+                Submitted as <strong class="nncr-mono">@respondentEmail</strong> on <span class="nncr-mono" id="thankYouDate"></span>
             </div>
         </div>
     }

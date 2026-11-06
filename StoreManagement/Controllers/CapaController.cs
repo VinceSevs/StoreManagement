@@ -471,7 +471,7 @@ namespace IsseERP.Controllers
                 ? respondedCapa.CarClassificationRefEmail
                 : respondedCapa?.CarClassificationOtherText;
             await _capaLogService.AddLog(
-                $"{(!string.IsNullOrWhiteSpace(respondentEmail) ? respondentEmail : "Unknown respondent")} submitted a response",
+                $"{(!string.IsNullOrWhiteSpace(respondentEmail) ? respondentEmail : "Unknown respondent")} submitted a response to {(!string.IsNullOrWhiteSpace(respondedCapa?.ReportNumber) ? respondedCapa.ReportNumber : request.ResponseToken)}",
                 "Submit Response",
                 1);
 

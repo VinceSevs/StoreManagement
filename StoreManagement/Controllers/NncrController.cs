@@ -16,7 +16,7 @@ namespace IsseERP.Controllers
     //   Quality (QA files, Status = Awaiting Response, due in 7 working days) -> email to the supplier
     //     with a link to NncrResponse (shown as a popup while email sending is disabled)
     //   NncrResponse (supplier approves/rejects + remarks, Status = Responded)
-    //   NncrStatus -> Close (role 49 only, Status = Closed)
+    //   NncrStatus -> Close (IT department, QA Supervisor / Manager roles; Status = Closed)
     // NncrResponse / SubmitResponse / NncrAttachment are reached from the email and are not
     // authenticated (token only), so SectionAccess is applied per action instead of on the class.
     public class NncrController : BaseController
@@ -37,9 +37,25 @@ namespace IsseERP.Controllers
             return _accountRepo.GetByUsername(User.Identity.Name);
         }
 
-        private string AbsoluteAction(string action, string token)
+        // email: the recipient this link is for (same token for everyone, so the response shows who answered).
+        private string AbsoluteAction(string action, string token, string email = null)
         {
-            return Url.Action(action, "Nncr", new { token }, Request.Url.Scheme);
+            return string.IsNullOrWhiteSpace(email)
+                ? Url.Action(action, "Nncr", new { token }, Request.Url.Scheme)
+                : Url.Action(action, "Nncr", new { token, email }, Request.Url.Scheme);
+        }
+
+        // The supplier's recipients: tbl_Vendor email(s) + active tbl_VendorContacts of the same VendorID.
+        private Task<List<string>> RecipientsFor(NncrReport nncr)
+        {
+            return _nncrRepo.GetSupplierRecipients(nncr.IssuedToSupplier);
+        }
+
+        // The recipient address matching `email` (case-insensitive), or null when it is not one of them.
+        private static string MatchRecipient(IEnumerable<string> recipients, string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            return recipients.FirstOrDefault(r => string.Equals(r, email.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
         private NncrAttachmentService Attachments()
@@ -49,16 +65,38 @@ namespace IsseERP.Controllers
 
         private const string LogoPath = "~/Content/images/lead-logo.png";
 
-        private NncrNotificationService.EmailMessage SupplierEmailPreview(NncrReport nncr)
+        private NncrNotificationService.EmailMessage SupplierEmailPreview(NncrReport nncr, IList<string> recipients)
         {
             string logoUrl = new Uri(Request.Url, Url.Content(LogoPath)).AbsoluteUri;
-            return _notifier.BuildSupplierEmail(nncr, AbsoluteAction("NncrResponse", nncr.ResponseToken), logoUrl);
+            string first = recipients.FirstOrDefault();
+            var attachmentNames = Attachments().List(nncr.ReportNumber).Select(a => a.DisplayName).ToList();
+            return _notifier.BuildSupplierEmail(nncr, recipients, AbsoluteAction("NncrResponse", nncr.ResponseToken, first), logoUrl, attachmentNames);
         }
 
-        // Returns null when sent, otherwise why it was not sent.
-        private string TrySendSupplierEmail(NncrReport nncr)
+        // Emails every recipient their own link. The result says who was emailed and who was not.
+        private NncrNotificationService.SendResult TrySendSupplierEmail(NncrReport nncr, IList<string> recipients)
         {
-            return _notifier.SendSupplierEmail(nncr, AbsoluteAction("NncrResponse", nncr.ResponseToken), Server.MapPath(LogoPath));
+            var attachments = Attachments();
+            var attachmentFiles = attachments.List(nncr.ReportNumber)
+                .Select(a => new NncrNotificationService.EmailFile
+                {
+                    Path = attachments.Resolve(nncr.ReportNumber, a.FileName),
+                    DisplayName = a.DisplayName
+                })
+                .Where(f => f.Path != null)
+                .ToList();
+            return _notifier.SendSupplierEmail(nncr, recipients,
+                address => AbsoluteAction("NncrResponse", nncr.ResponseToken, address), Server.MapPath(LogoPath), attachmentFiles);
+        }
+
+        // Writes the "Emailed" / "Email Failed" entries of a send to the NNCR log.
+        private async Task LogEmailResult(NncrReport nncr, NncrNotificationService.SendResult result, string verb, Login user)
+        {
+            int userId = user?.UserID ?? 0;
+            if (result.Sent.Count > 0)
+                await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.Emailed, $"{nncr.ReportNumber} supplier email {verb} to {string.Join(", ", result.Sent)}", userId, user?.DisplayName);
+            if (result.Problem != null)
+                await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.EmailFailed, $"{nncr.ReportNumber} supplier email not sent: {result.Problem}", userId, user?.DisplayName);
         }
 
         [Authorize]
@@ -138,9 +176,12 @@ namespace IsseERP.Controllers
                 }
 
                 var nncr = await _nncrRepo.GetByToken(saved.ResponseToken) ?? saved;
-                string emailError = TrySendSupplierEmail(nncr);
+                var recipients = await RecipientsFor(nncr);
+                var sendResult = TrySendSupplierEmail(nncr, recipients);
+                string emailError = sendResult.Problem;
                 await _capaLogService.AddLog($"Filed {nncr.ReportNumber}", "Submit NNCR", user.UserID);
-                await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.Filed, $"NNCR filed against {nncr.SupplierName}", user.UserID, user.DisplayName);
+                await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.Filed, $"{nncr.ReportNumber} filed against {nncr.SupplierName}", user.UserID, user.DisplayName);
+                await LogEmailResult(nncr, sendResult, "sent", user);
 
                 return Json(new
                 {
@@ -150,7 +191,9 @@ namespace IsseERP.Controllers
                     attachmentError,
                     emailSent = emailError == null,
                     emailError,
-                    email = SupplierEmailPreview(nncr)
+                    emailedTo = sendResult.Sent,
+                    emailFailed = sendResult.Failed,
+                    email = SupplierEmailPreview(nncr, recipients)
                 });
             }
             catch (Exception ex)
@@ -163,10 +206,16 @@ namespace IsseERP.Controllers
 
         [AllowAnonymous]
         [Route("nncr-response")]
-        public async Task<ActionResult> NncrResponse(string token)
+        public async Task<ActionResult> NncrResponse(string token, string email = null)
         {
             var nncr = await _nncrRepo.GetByToken(token);
             if (nncr == null) return View("NncrResponseInvalid");
+
+            // Each recipient's link carries their address; only a real contact of this supplier counts.
+            // A link without one (e.g. an older email) answers as the supplier's own email.
+            string respondent = MatchRecipient(await RecipientsFor(nncr), email);
+            ViewBag.RespondentEmail = respondent ?? nncr.SupplierEmail;
+            ViewBag.RespondentIsContact = respondent != null;
 
             nncr.Attachments = Attachments().List(nncr.ReportNumber);
             return View(nncr);
@@ -206,15 +255,20 @@ namespace IsseERP.Controllers
                 return Json(new { success = false, message = "This NNCR is not linked to a registered supplier, so the response cannot be accepted. Please contact QA." });
             }
 
+            // Who answered: the contact whose link was used (verified against the supplier's contacts),
+            // otherwise the supplier's own email.
+            string respondent = MatchRecipient(await RecipientsFor(nncr), request.RespondentEmail) ?? nncr.SupplierEmail;
+
             if (!await _nncrRepo.SubmitSupplierResponse(request.ResponseToken, request.Decision, request.VendorRemarks.Trim(),
-                    vendorId.Value, nncr.SupplierEmail))
+                    vendorId.Value, respondent))
             {
                 Response.StatusCode = 409;
                 return Json(new { success = false, message = "This NNCR is no longer awaiting a response (it may have been answered already)." });
             }
 
-            await _capaLogService.AddLog($"{nncr.SupplierName} responded to {nncr.ReportNumber} ({request.Decision})", "Submit NNCR Response", vendorId.Value);
-            await _nncrLog.Add(nncr.ReportNumber, request.Decision == NncrDecisions.Approve ? NncrLogActions.Approved : NncrLogActions.Rejected, $"Supplier {(request.Decision == NncrDecisions.Approve ? "approved" : "rejected")} the NNCR", vendorId.Value, nncr.SupplierName);
+            string respondedBy = string.IsNullOrWhiteSpace(respondent) ? nncr.SupplierName : respondent;
+            await _capaLogService.AddLog($"{respondedBy} ({nncr.SupplierName}) responded to {nncr.ReportNumber} ({request.Decision})", "Submit NNCR Response", vendorId.Value);
+            await _nncrLog.Add(nncr.ReportNumber, request.Decision == NncrDecisions.Approve ? NncrLogActions.Approved : NncrLogActions.Rejected, $"{respondedBy} {(request.Decision == NncrDecisions.Approve ? "approved" : "rejected")} {nncr.ReportNumber}", vendorId.Value, nncr.SupplierName);
             return Json(new { success = true });
         }
 
@@ -231,7 +285,7 @@ namespace IsseERP.Controllers
             ViewBag.CanViewLog = canViewLog;
             if (canViewLog) nncr.Logs = await _nncrLog.GetForReport(nncr.ReportNumber);
             ViewBag.CanClose = UserAccess.CanCloseNncr(CurrentUser());
-            ViewBag.SupplierEmail = SupplierEmailPreview(nncr);
+            ViewBag.SupplierEmail = SupplierEmailPreview(nncr, await RecipientsFor(nncr));
             return View(nncr);
         }
 
@@ -253,17 +307,23 @@ namespace IsseERP.Controllers
                 return Json(new { success = false, message = "The supplier has already responded to this NNCR." });
             }
 
-            string emailError = TrySendSupplierEmail(nncr);
-            if (emailError != null)
+            var recipients = await RecipientsFor(nncr);
+            if (recipients.Count > 0) await _nncrRepo.SaveRecipientEmails(nncr.ResponseToken, recipients);
+            var sendResult = TrySendSupplierEmail(nncr, recipients);
+            var user = CurrentUser();
+            if (sendResult.Sent.Count > 0)
+            {
+                await _capaLogService.AddLog($"Emailed {nncr.ReportNumber} to {string.Join(", ", sendResult.Sent)}", "Send NNCR Email", user?.UserID ?? 0);
+            }
+            await LogEmailResult(nncr, sendResult, "re-sent", user);
+
+            if (sendResult.Sent.Count == 0)
             {
                 Response.StatusCode = 502;
-                return Json(new { success = false, message = emailError });
+                return Json(new { success = false, message = sendResult.Problem });
             }
-
-            var user = CurrentUser();
-            await _capaLogService.AddLog($"Emailed {nncr.ReportNumber} to {nncr.SupplierEmail}", "Send NNCR Email", user?.UserID ?? 0);
-            await _nncrLog.Add(nncr.ReportNumber, NncrLogActions.Emailed, $"Supplier email re-sent to {nncr.SupplierEmail}", user?.UserID ?? 0, user?.DisplayName);
-            return Json(new { success = true, to = nncr.SupplierEmail });
+            // Some addresses may have failed: still a send, but say which ones did not get it.
+            return Json(new { success = true, to = string.Join(", ", sendResult.Sent), warning = sendResult.Problem });
         }
 
         [Authorize]
@@ -291,7 +351,7 @@ namespace IsseERP.Controllers
 
             var nncr = await _nncrRepo.GetByToken(request.ResponseToken);
             await _capaLogService.AddLog($"Closed {nncr?.ReportNumber}", "Close NNCR", user.UserID);
-            await _nncrLog.Add(nncr?.ReportNumber, NncrLogActions.Closed, "NNCR closed", user.UserID, user.DisplayName);
+            await _nncrLog.Add(nncr?.ReportNumber, NncrLogActions.Closed, $"{nncr?.ReportNumber} closed", user.UserID, user.DisplayName);
             return Json(new { success = true });
         }
 
@@ -305,12 +365,14 @@ namespace IsseERP.Controllers
             string path = nncr == null ? null : Attachments().Resolve(nncr.ReportNumber, file);
             if (path == null) return HttpNotFound();
 
+            // The file is stored under a renamed name; it is downloaded under the name it was uploaded with.
+            string shownName = Attachments().DisplayNameOf(nncr.ReportNumber, System.IO.Path.GetFileName(path));
             string contentType = MimeMapping.GetMimeMapping(path);
             bool inline = (contentType.StartsWith("image/") && contentType != "image/svg+xml") || contentType == "application/pdf";
             Response.AppendHeader("X-Content-Type-Options", "nosniff");
-            if (!inline) return File(path, "application/octet-stream", System.IO.Path.GetFileName(path));
+            if (!inline) return File(path, "application/octet-stream", shownName);
 
-            Response.AppendHeader("Content-Disposition", "inline; filename=\"" + System.IO.Path.GetFileName(path).Replace("\"", "") + "\"");
+            Response.AppendHeader("Content-Disposition", "inline; filename=\"" + shownName.Replace("\"", "") + "\"");
             return File(path, contentType);
         }
     }

@@ -84,10 +84,10 @@
             <dt>NNCR No.</dt>
             <dd class="nncr-mono">@Model.ReportNumber</dd>
         </div>
-        <div class="col-12 col-sm-6 main-view-field">
+        @*<div class="col-12 col-sm-6 main-view-field">
             <dt>Status</dt>
             <dd><span class="main-badge @statusTone"><i class="fa fa-circle"></i>@Model.StatusLabel</span></dd>
-        </div>
+        </div>*@
         <div class="col-12 col-sm-6 main-view-field">
             <dt>Date of Incident</dt>
             <dd class="nncr-mono">@FormatDate(Model.DateOfIncident)</dd>
@@ -217,17 +217,17 @@
                 string href = attachmentUrl + "?token=" + Url.Encode(Model.ResponseToken) + "&file=" + Url.Encode(file.FileName);
                 if (file.IsImage)
                 {
-                    photos.Add(new { url = href, caption = "", fileName = file.FileName });
-                    <button type="button" class="attach-thumb-btn" onclick="openLightbox(@photoIndex)" title="@file.FileName">
-                        <img src="@href" class="capa-thumb" alt="@file.FileName" loading="lazy">
+                    photos.Add(new { url = href, caption = "", fileName = file.DisplayName });
+                    <button type="button" class="attach-thumb-btn" onclick="openLightbox(@photoIndex)" title="@file.DisplayName">
+                        <img src="@href" class="capa-thumb" alt="@file.DisplayName" loading="lazy">
                     </button>
                     photoIndex++;
                 }
                 else
                 {
-                    <a href="@href" target="_blank" rel="noopener" class="capa-thumb-file" title="@file.FileName">
-                        <span>@(System.IO.Path.GetExtension(file.FileName).TrimStart('.').ToUpperInvariant())</span>
-                        <small>@file.FileName</small>
+                    <a href="@href" target="_blank" rel="noopener" class="capa-thumb-file" title="@file.DisplayName">
+                        <span>@(System.IO.Path.GetExtension(file.DisplayName).TrimStart('.').ToUpperInvariant())</span>
+                        <small>@file.DisplayName</small>
                     </a>
                 }
             }

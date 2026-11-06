@@ -371,10 +371,12 @@ async function submitNncrForm() {
 				await Swal.fire({ icon: 'warning', title: 'Attachments not saved', text: result.attachmentError, confirmButtonColor: NNCR_BRAND_COLOR });
 			}
 
-			var done = await showSupplierEmailPopup(result.reportNumber, result.email, result.emailSent, result.emailError);
+			var done = await showSupplierEmailPopup(result);
 			if (done.isDenied && result.responseToken) {
 				window.location.href = nncrConfig().statusUrl + '?token=' + encodeURIComponent(result.responseToken);
-			} else {
+				setSaving(false);
+			} 
+			else {
 				resetNncrForm();
 			}
 			return; // keep the button disabled while navigating away
@@ -394,44 +396,44 @@ async function submitNncrForm() {
 }
 
 /* ---------- Supplier email popup ---------- */
-// After filing, shows the email sent to the supplier (or why it wasn't sent).
-// Its button opens the supplier's response form. email = { To, Subject, BodyHtml, ResponseUrl } (body is
-// built and HTML-encoded on the server).
-function showSupplierEmailPopup(reportNumber, email, emailSent, emailError) {
-	email = email || {};
-	var to = email.To
-		? '<span class="font-mono">' + escapeHtml(email.To) + '</span>'
-		: '<span class="text-danger">No email on file for this supplier</span>';
-	var banner = emailSent
-		? '<div class="alert alert-success py-2 mb-2"><i class="fa fa-check-circle"></i> Email sent to the supplier.</div>'
-		: '<div class="alert alert-warning py-2 mb-2"><i class="fa fa-exclamation-triangle"></i> Email not sent: ' + escapeHtml(emailError) +
-			' You can send it later from the NNCR status page, or share the response form link.</div>';
+// After filing, tells QA who the NNCR was emailed to (and who it could not be emailed to).
+// result = the SaveNncr response: { reportNumber, emailSent, emailError, emailedTo[], emailFailed[] }.
+// Confirm = file another, Deny = open the NNCR status page.
+function showSupplierEmailPopup(result) {
+	var sent = result.emailedTo || [];
+	var failed = result.emailFailed || [];
+
+	function list(items) {
+		return '<ul class="mb-0 ps-3">' + items.map(function (i) { return '<li class="font-mono">' + escapeHtml(i) + '</li>'; }).join('') + '</ul>';
+	}
+
+	var html = '<div class="text-start small">';
+	if (sent.length) {
+		html += '<div class="alert alert-success py-2 mb-2"><i class="fa fa-check-circle"></i> Emailed to ' + sent.length +
+			' recipient' + (sent.length === 1 ? '' : 's') + ':' + list(sent) + '</div>';
+	}
+	if (failed.length) {
+		html += '<div class="alert alert-warning py-2 mb-2"><i class="fa fa-exclamation-triangle"></i> Not emailed to:' + list(failed) + '</div>';
+	} else if (!sent.length) {
+		html += '<div class="alert alert-warning py-2 mb-2"><i class="fa fa-exclamation-triangle"></i> Email not sent: ' + escapeHtml(result.emailError || 'unknown reason') + '</div>';
+	}
+	if (!result.emailSent) {
+		html += '<div class="text-muted">You can send it again from the NNCR status page.</div>';
+	}
+	html += '</div>';
 
 	return Swal.fire({
-		icon: emailSent ? 'success' : 'warning',
-		title: 'NNCR ' + escapeHtml(reportNumber) + ' filed',
-		width: 720,
-		html:
-			'<div class="text-start small">' +
-			banner +
-			'<div class="border rounded">' +
-			'<div class="border-bottom px-3 py-2 bg-light"><div><b>To:</b> ' + to + '</div><div><b>Subject:</b> ' + escapeHtml(email.Subject) + '</div></div>' +
-			'<div class="px-3 py-2">' + (email.BodyHtml || '') + '</div>' +
-			'</div></div>',
+		icon: result.emailSent ? 'success' : 'warning',
+		title: 'NNCR ' + escapeHtml(result.reportNumber) + ' filed',
+		html: html,
+		width: 640,
 		showDenyButton: true,
-		showCancelButton: true,
-		confirmButtonText: '<i class="fa fa-external-link"></i> Open response form',
+		confirmButtonText: 'File another',
 		denyButtonText: 'View status',
-		cancelButtonText: 'File another',
 		confirmButtonColor: NNCR_BRAND_COLOR,
 		denyButtonColor: '#6c757d',
 		allowOutsideClick: false,
-		allowEscapeKey: false,
-		preConfirm: function () {
-			// Open the supplier form in a new tab and keep this popup open.
-			if (email.ResponseUrl) window.open(email.ResponseUrl, '_blank', 'noopener');
-			return false;
-		}
+		allowEscapeKey: false
 	});
 }
 
@@ -447,6 +449,7 @@ function resetNncrForm() {
 	renderAttachments();
 	setDefaultDate();
 	setDueDate();
+	setSaving(false);
 	var statusEl = document.getElementById('submitStatus');
 	statusEl.textContent = '';
 	statusEl.className = NNCR_STATUS_CLASS;

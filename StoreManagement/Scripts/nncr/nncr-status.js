@@ -24,7 +24,12 @@
 			});
 			var result = await response.json().catch(function () { return null; });
 			if (response.ok && result && result.success) {
-				Swal.fire({ icon: 'success', title: 'Email sent', text: 'Sent to ' + result.to + '.', confirmButtonColor: BRAND_COLOR });
+				Swal.fire({
+					icon: result.warning ? 'warning' : 'success',
+					title: result.warning ? 'Email partly sent' : 'Email sent',
+					text: 'Sent to ' + result.to + '.' + (result.warning ? ' ' + result.warning : ''),
+					confirmButtonColor: BRAND_COLOR
+				});
 			} else {
 				Swal.fire({ icon: 'error', title: 'Email not sent', text: (result && result.message) || ('HTTP ' + response.status), confirmButtonColor: BRAND_COLOR });
 			}

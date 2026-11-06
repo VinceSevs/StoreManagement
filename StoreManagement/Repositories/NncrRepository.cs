@@ -183,6 +183,8 @@ namespace StoreManagement.Repositories
         {
             DateTime filed = DateTime.Now;
             DateTime due = NncrDueDates.AddWorkingDays(filed, NncrDueDates.WorkingDaysToRespond);
+            // Every email the NNCR goes to (vendor + active contacts) is kept in CarClassificationRefEmail.
+            string recipientEmails = string.Join("; ", await GetSupplierRecipients(request.IssuedToSupplier));
 
             using (var conn = new SqlConnection(connectionString))
             {
@@ -219,7 +221,7 @@ namespace StoreManagement.Repositories
                              ISNULL((SELECT username FROM dbo.tbl_UserAccount WHERE id = @IssuedBy), ''), 0, @SiteWarehouse,
                              'Supplier', CAST(@IssuedToSupplier AS VARCHAR(100)),
                              ISNULL((SELECT VendorName FROM dbo.tbl_Vendor WHERE VendorID = @IssuedToSupplier), ''),
-                             ISNULL((SELECT LTRIM(RTRIM(ISNULL(EmailAddress, ''))) FROM dbo.tbl_Vendor WHERE VendorID = @IssuedToSupplier), ''),
+                             @RecipientEmails,
                              @NonconformanceType, @NonconformanceInterception, @DetailsOfNonconformance, @QARemarks,
                              '', ISNULL(@DateOfIncident, GETDATE()), @DateFiled, @DueDate,
                              0, '1900-01-01', '1900-01-01', '', ''", conn, tx))
@@ -230,6 +232,7 @@ namespace StoreManagement.Repositories
                         cmd.Parameters.AddWithValue("@IssuedBy", issuedBy);
                         cmd.Parameters.AddWithValue("@IssuedToSupplier", request.IssuedToSupplier);
                         cmd.Parameters.AddWithValue("@SiteWarehouse", request.SiteWarehouse);
+                        cmd.Parameters.AddWithValue("@RecipientEmails", recipientEmails);
                         cmd.Parameters.AddWithValue("@NonconformanceType", request.NonconformanceType ?? "");
                         cmd.Parameters.AddWithValue("@NonconformanceInterception", request.NonconformanceInterception ?? "");
                         cmd.Parameters.AddWithValue("@DetailsOfNonconformance", request.DetailsOfNonconformance ?? "");
@@ -274,6 +277,56 @@ namespace StoreManagement.Repositories
                 if (result == null || result == DBNull.Value) return null;
                 int id = Convert.ToInt32(result);
                 return id > 0 ? id : (int?)null;
+            }
+        }
+
+        // Everyone who is emailed for a supplier: the tbl_Vendor email(s) plus the active tbl_VendorContacts
+        // emails of the same VendorID, de-duplicated (case-insensitive). tbl_Vendor.EmailAddress may hold
+        // several addresses separated by ';' or ','.
+        public async Task<List<string>> GetSupplierRecipients(int vendorId)
+        {
+            var list = new List<string>();
+            if (vendorId <= 0) return list;
+
+            const string sql = @"
+                SELECT EmailAddress FROM dbo.tbl_Vendor WHERE VendorID = @VendorID
+                UNION ALL
+                SELECT EmailAddress FROM dbo.tbl_VendorContacts WHERE VendorID = @VendorID AND Del_flag = 0";
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (var conn = new SqlConnection(connectionString))
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@VendorID", vendorId);
+                await conn.OpenAsync();
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        if (reader.IsDBNull(0)) continue;
+                        foreach (var part in reader.GetString(0).Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            string address = part.Trim();
+                            if (address.Length > 0 && address.Contains("@") && seen.Add(address)) list.Add(address);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+
+        // Keeps CarClassificationRefEmail in step with who the NNCR was last emailed to (resend).
+        public async Task SaveRecipientEmails(string token, IEnumerable<string> recipients)
+        {
+            const string sql = @"
+                UPDATE dbo.tbl_QualityIncidentHdr SET CarClassificationRefEmail = @Emails
+                WHERE ResponseToken = @Token AND ReportNumber LIKE 'NNCR-%'";
+            using (var conn = new SqlConnection(connectionString))
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@Emails", string.Join("; ", recipients));
+                cmd.Parameters.AddWithValue("@Token", token);
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
             }
         }
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Newtonsoft.Json;
 using StoreManagement.Models;
 
 namespace IsseERP.Services
@@ -31,19 +32,52 @@ namespace IsseERP.Services
             string folder = Path.Combine(_rootPhysicalPath, reportNumber);
             Directory.CreateDirectory(folder);
 
+            // Saved under the NNCR's number, not the uploaded name: NNCR-0011_01.jpg, NNCR-0011_02.pdf, ...
+            // (the original extension is kept). The numbering continues after any files already saved.
+            // The name it was uploaded with is kept in a small names file in the folder, so the status page,
+            // downloads and the email can still show the original.
+            var names = ReadNames(folder);
+            int index = Directory.GetFiles(folder).Count(f => Path.GetFileName(f) != NamesFile);
             foreach (var file in uploads)
             {
-                string name = SafeFileName(file.FileName);
-                string path = Path.Combine(folder, name);
-
-                // Same name uploaded twice: "photo.jpg", "photo (2).jpg", ...
-                int n = 2;
-                while (File.Exists(path))
+                string original = SafeFileName(file.FileName);
+                string extension = Path.GetExtension(original).ToLowerInvariant();
+                string path;
+                do
                 {
-                    path = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(name)} ({n++}){Path.GetExtension(name)}");
-                }
+                    path = Path.Combine(folder, $"{SafeFileName(reportNumber)}_{++index:D2}{extension}");
+                } while (File.Exists(path));
                 file.SaveAs(path);
+                names[Path.GetFileName(path)] = original;
             }
+            File.WriteAllText(Path.Combine(folder, NamesFile), JsonConvert.SerializeObject(names));
+        }
+
+        // Disk name -> name it was uploaded with. Missing (e.g. older NNCRs): the disk name is the original.
+        private const string NamesFile = ".nncr-names.json";
+
+        private static Dictionary<string, string> ReadNames(string folder)
+        {
+            try
+            {
+                string path = Path.Combine(folder, NamesFile);
+                if (File.Exists(path))
+                    return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path))
+                           ?? new Dictionary<string, string>();
+            }
+            catch
+            {
+                // an unreadable names file just means the disk names are shown
+            }
+            return new Dictionary<string, string>();
+        }
+
+        // The uploaded name of a saved file (its disk name if none was recorded).
+        public string DisplayNameOf(string reportNumber, string fileName)
+        {
+            string name;
+            return ReadNames(Path.Combine(_rootPhysicalPath, reportNumber ?? "")).TryGetValue(fileName ?? "", out name)
+                ? name : fileName;
         }
 
         public List<NncrAttachment> List(string reportNumber)
@@ -51,11 +85,14 @@ namespace IsseERP.Services
             string folder = Path.Combine(_rootPhysicalPath, reportNumber ?? "");
             if (string.IsNullOrWhiteSpace(reportNumber) || !Directory.Exists(folder)) return new List<NncrAttachment>();
 
+            var names = ReadNames(folder);
             return Directory.GetFiles(folder)
+                .Where(f => Path.GetFileName(f) != NamesFile)
                 .OrderBy(f => f)
                 .Select(f => new NncrAttachment
                 {
                     FileName = Path.GetFileName(f),
+                    DisplayName = names.TryGetValue(Path.GetFileName(f), out var original) ? original : Path.GetFileName(f),
                     Size = new FileInfo(f).Length,
                     ContentType = MimeMapping.GetMimeMapping(f)
                 })
@@ -67,6 +104,7 @@ namespace IsseERP.Services
         public string Resolve(string reportNumber, string fileName)
         {
             if (string.IsNullOrWhiteSpace(reportNumber) || string.IsNullOrWhiteSpace(fileName)) return null;
+            if (Path.GetFileName(fileName) == NamesFile) return null;
             string path = Path.Combine(_rootPhysicalPath, reportNumber, Path.GetFileName(fileName));
             return File.Exists(path) ? path : null;
         }

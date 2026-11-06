@@ -182,7 +182,8 @@ namespace StoreManagement.Models
     // A file QA attached when filing, stored in App_Data/NncrAttachments/{ReportNumber}/.
     public class NncrAttachment
     {
-        public string FileName { get; set; }
+        public string FileName { get; set; }      // name on disk (NNCR-0011_01.jpg): used in links
+        public string DisplayName { get; set; }   // the name it was uploaded with: what people see
         public long Size { get; set; }
         public string ContentType { get; set; }
         public bool IsImage => ContentType != null && ContentType.StartsWith("image/") && ContentType != "image/svg+xml";
@@ -204,6 +205,7 @@ namespace StoreManagement.Models
         public string ResponseToken { get; set; }
         public string Decision { get; set; }
         public string VendorRemarks { get; set; }
+        public string RespondentEmail { get; set; } // the contact whose emailed link was used; checked against the supplier's contacts
     }
 
     public class NncrCloseRequest

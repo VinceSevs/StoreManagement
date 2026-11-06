@@ -1,5 +1,6 @@
 // NNCR Response page (Views/Nncr/NncrResponse.cshtml) - supplier-facing, anonymous.
-// Config: window.NNCR_RESPONSE_DATA = { responseToken, reportNumber, submitEndpoint }
+// Config: window.NNCR_RESPONSE_DATA = { responseToken, reportNumber, submitEndpoint, respondentEmail }
+// respondentEmail is the contact whose emailed link this is (the server re-checks it on submit).
 (function () {
 	'use strict';
 
@@ -88,7 +89,8 @@
 				body: JSON.stringify({
 					ResponseToken: CONFIG.responseToken,
 					Decision: decision,
-					VendorRemarks: remarks
+					VendorRemarks: remarks,
+					RespondentEmail: CONFIG.respondentEmail || ''
 				})
 			});
 			var result = await response.json().catch(function () { return null; });
